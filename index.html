@@ -331,23 +331,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   border:none;color:var(--dm);width:30px;height:30px;border-radius:50%;
   cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
 .ws-tld{color:var(--dm);font-size:.82rem;display:flex;align-items:center;gap:.5rem;margin:.5rem 0;}
-
-/* ── FORMAT BADGES ── */
-.fmt-badge{font-size:.66rem;font-weight:700;padding:.15rem .42rem;border-radius:4px;letter-spacing:.03em;}
-.fmt-txt{background:rgba(74,158,255,.13);color:var(--en);}
-.fmt-epub{background:rgba(167,139,250,.15);color:#a78bfa;}
-.fmt-html{background:rgba(74,222,128,.13);color:#4ade80;}
 .fmt-pdf{background:rgba(255,107,107,.13);color:#ff6b6b;}
-
-/* ── HTML / PDF VIEWER SCREEN ── */
-#sv-doc{flex-direction:column;height:100%;overflow:hidden;}
-.doc-topbar{display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;
-  background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;}
-.doc-title{font-family:Georgia,serif;font-size:.88rem;flex:1;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
-#doc-frame{flex:1;border:none;width:100%;background:#fff;}
-.doc-err{flex:1;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:1rem;padding:2rem;text-align:center;}
 .doc-err p{color:var(--dm);font-size:.9rem;line-height:1.6;}
 
 /* ── DOWNLOAD BUTTONS ── */
@@ -435,11 +419,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       <div class="ms">Palabras clave<br>del libro con<br>traducción y ejemplos</div>
     </div>
   </div>
-  <!-- Download links -->
-  <div style="margin-top:1.2rem;text-align:center;">
-    <div style="font-size:.72rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Descargar libro</div>
-    <div class="dl-row" style="justify-content:center;" id="dl-links"></div>
-  </div>
+</div>
+
+<!-- VOCABULARY
 </div>
 
 <!-- VOCABULARY SCREEN -->
@@ -529,24 +511,8 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <button class="fab" onclick="togMob()">📝</button>
 </div>
 
-<!-- HTML / PDF VIEWER -->
-<div id="sv-doc" class="sc">
-  <div class="doc-topbar">
-    <button class="bbtn" onclick="closeDoc()">← Volver</button>
-    <span class="doc-title" id="doc-title"></span>
-    <div class="theme-wrap">
-      <button class="cb" onclick="toggleThemeMenu('sv-doc')" title="Tema">🌓</button>
-      <div class="theme-menu" id="theme-menu-sv-doc" style="right:0">
-        <div class="theme-opt" onclick="setTheme('dark','sv-doc')">🌙 Oscuro</div>
-        <div class="theme-opt" onclick="setTheme('light','sv-doc')">☀️ Claro</div>
-        <div class="theme-opt" onclick="setTheme('auto','sv-doc')">⚙️ Automático</div>
-      </div>
-    </div>
-  </div>
-  <iframe id="doc-frame" title="Visor de libro" sandbox="allow-same-origin allow-scripts"></iframe>
-</div>
 
-<!-- LOADING -->
+<!-- LOADING<!-- LOADING -->
 <div id="sld" class="sc">
   <div class="lsp"></div>
   <div class="ltx" id="ltx">Cargando…</div>
@@ -768,249 +734,9 @@ const BOOKS = {
   ],
 };
 
-// ── DOWNLOAD LINKS per book ──
-// epub: Gutenberg .epub.noimages or Standard Ebooks
-// pdf:  Gutenberg .pdf.images
-const DOWNLOADS = {
-  // English
-  alice:      {gutid:11,   se:"lewis-carroll/alices-adventures-in-wonderland"},
-  wizard:     {gutid:55,   se:"l-frank-baum/the-wonderful-wizard-of-oz"},
-  secret:     {gutid:17396},
-  treasure:   {gutid:120,  se:"robert-louis-stevenson/treasure-island"},
-  wild:       {gutid:215,  se:"jack-london/the-call-of-the-wild"},
-  moby:       {gutid:2701, se:"herman-melville/moby-dick"},
-  frank:      {gutid:84,   se:"mary-shelley/frankenstein"},
-  dracula:    {gutid:345,  se:"bram-stoker/dracula"},
-  jekyll:     {gutid:42,   se:"robert-louis-stevenson/the-strange-case-of-dr-jekyll-and-mr-hyde"},
-  time:       {gutid:35,   se:"h-g-wells/the-time-machine"},
-  war:        {gutid:36,   se:"h-g-wells/the-war-of-the-worlds"},
-  journey:    {gutid:18857,se:"jules-verne/journey-to-the-center-of-the-earth_f-a-malleson"},
-  // Spanish
-  quijote:    {gutid:2000},
-  lazarillo:  {gutid:320},
-  quevedo:    {gutid:65999},
-  calderon:   {gutid:54436},
-  lope:       {gutid:28408},
-  becquer:    {gutid:53552},
-  regenta:    {gutid:17073},
-  fortunata:  {gutid:17013},
-  marianela:  {gutid:17340},
-  pepita:     {gutid:17223},
-  cuentos:    {gutid:55514},
-  dueno:      {gutid:56044},
-  // French
-  mousq:      {gutid:13951},
-  notredame:  {gutid:19657},
-  verne_fr:   {gutid:5097},
-  miser:      {gutid:17489},
-  germ:       {gutid:5711},
-  bovary:     {gutid:14155},
-  rouge:      {gutid:798},
-  educ:       {gutid:52893},
-  cyrano:     {gutid:1256},
-  // German
-  werther:    {gutid:2407, se:"j-w-von-goethe/the-sorrows-of-young-werther_r-d-boylan"},
-  siddh:      {gutid:2499},
-  faust:      {gutid:2229},
-  zara:       {gutid:7205},
-  verwandlung:{gutid:22367,se:"franz-kafka/the-metamorphosis_ian-johnston"},
-  strafk:     {gutid:25791},
-  // Portuguese
-  casmurro:   {gutid:55752},
-  quincas:    {gutid:55682},
-  helena:     {gutid:67162},
-  amaro:      {gutid:31971},
-  mandarin:   {gutid:16384},
-  lusiadas:   {gutid:3333},
-  // Italian
-  pinocchio:  {gutid:52484,se:"carlo-collodi/the-adventures-of-pinocchio_carol-della-chiesa"},
-  promessi:   {gutid:45334},
-  mistero:    {gutid:22504},
-  canti:      {gutid:55236},
-  inferno:    {gutid:997,  se:"dante-alighieri/the-divine-comedy_henry-wadsworth-longfellow"},
-};
 
-function getDlLinks(bookId){
-  const d = DOWNLOADS[bookId];
-  if(!d) return '';
-  const links = [];
-  const gutBase = 'https://www.gutenberg.org/ebooks/';
-  if(d.gutid){
-    links.push(`<a class="dl-btn epub" href="${gutBase}${d.gutid}.epub.noimages" target="_blank">📱 EPUB</a>`);
-    links.push(`<a class="dl-btn pdf"  href="${gutBase}${d.gutid}.pdf.images"    target="_blank">📄 PDF</a>`);
-  }
-  if(d.se){
-    const seBase='https://standardebooks.org/ebooks/';
-    const name = d.se.split('/').pop();
-    links.push(`<a class="dl-btn epub" href="${seBase}${d.se}/downloads/${d.se.replace(/\//g,'_').replace(/-/g,'_').split('_').slice(0,3).join('_')}.epub" target="_blank" style="border-color:#a78bfa;color:#a78bfa;">✨ EPUB Standard</a>`);
-  }
-  return links.join('');
-}
 
-// ── HTML & PDF BOOK ENTRIES ──
-// fmt: 'html' or 'pdf'
-// hurl: URL to the HTML or PDF file on raw.githubusercontent.com
-// G already defined above
-const HTML_BOOKS = {
-  en:[
-    {cat:"Edición formateada 📄",desc:"HTML con imágenes y tipografía · A2–C1",books:[
-      {id:"alice_h",   title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"Edición HTML ilustrada de Gutenberg.",       fmt:"html",hurl:G+"Alice-s-Adventures-in-Wonderland_11/master/11-h/11-h.htm"},
-      {id:"alice_pdf", title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"Edición PDF con ilustraciones originales.",   fmt:"pdf", hurl:G+"Alice-s-Adventures-in-Wonderland_11/master/11-pdf.pdf"},
-      {id:"wizard_h",  title:"The Wonderful Wizard of Oz",      author:"L. Frank Baum",  lv:"a2",desc:"Edición HTML ilustrada de Gutenberg.",       fmt:"html",hurl:G+"The-Wonderful-Wizard-of-Oz_55/master/55-h/55-h.htm"},
-      {id:"secret_h",  title:"The Secret Garden",               author:"F. H. Burnett",  lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Secret-Garden_17396/master/17396-h/17396-h.htm"},
-      {id:"treasure_h",title:"Treasure Island",                 author:"R. L. Stevenson",lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Treasure-Island_120/master/120-h/120-h.htm"},
-      {id:"wild_h",    title:"The Call of the Wild",            author:"Jack London",    lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Call-of-the-Wild_215/master/215-h/215-h.htm"},
-      {id:"moby_h",    title:"Moby-Dick",                       author:"Herman Melville",lv:"c1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Moby-Dick--Or-The-Whale_2701/master/2701-h/2701-h.htm"},
-      {id:"frank_h",   title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Frankenstein_84/master/84-h/84-h.htm"},
-      {id:"dracula_h", title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Dracula_345/master/345-h/345-h.htm"},
-      {id:"time_h",    title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Time-Machine_35/master/35-h/35-h.htm"},
-      {id:"war_h",     title:"The War of the Worlds",           author:"H. G. Wells",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-War-of-the-Worlds_36/master/36-h/36-h.htm"},
-      {id:"journey_h", title:"Journey to the Centre of the Earth",author:"Jules Verne", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857-h/18857-h.htm"},
-    ]},
-  ],
-  es:[
-    {cat:"Edición formateada 📄",desc:"HTML con tipografía original · B2–C2",books:[
-      {id:"quijote_h",  title:"Don Quijote de la Mancha",       author:"Miguel de Cervantes",  lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Don-Quijote_2000/master/2000-h/2000-h.htm"},
-      {id:"lazarillo_h",title:"Lazarillo de Tormes",            author:"Anónimo",              lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Vida-De-Lazarillo-De-Tormes-Y-De-Sus-Fortunas-Y-Adversidades_320/master/320-h/320-h.htm"},
-      {id:"calderon_h", title:"Teatro selecto",                 author:"Calderón de la Barca", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Teatro-selecto-tomo-1-de-4_54436/master/54436-h/54436-h.htm"},
-      {id:"lope_h",     title:"Comedias escogidas",             author:"Lope de Vega",         lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Comedias--El-remedio-en-la-desdicha--El-mejor-alcalde-el-rey_28408/master/28408-h/28408-h.htm"},
-      {id:"becquer_h",  title:"Obras escogidas",                author:"Gustavo A. Bécquer",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Obras-escogidas_53552/master/53552-h/53552-h.htm"},
-      {id:"regenta_h",  title:"La Regenta",                     author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"La-Regenta_17073/master/17073-h/17073-h.htm"},
-      {id:"fortunata_h",title:"Fortunata y Jacinta",            author:"Benito Pérez Galdós",  lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Fortunata-y-Jacintados-historias-de-casadas_17013/master/17013-h/17013-h.htm"},
-      {id:"marianela_h",title:"Marianela",                      author:"Benito Pérez Galdós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Marianela_17340/master/17340-h/17340-h.htm"},
-      {id:"pepita_h",   title:"Pepita Jiménez",                 author:"Juan Valera",          lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Pepita-Jim-nez_17223/master/17223-h/17223-h.htm"},
-      {id:"quevedo_h",  title:"Los Sueños",                     author:"Francisco de Quevedo", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Los-suenos-Vol-1_65999/master/65999-h/65999-h.htm"},
-      {id:"cuentos_h",  title:"Cuentos de amor",                author:"Emilia Pardo Bazán",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Cuentos-de-amor_55514/master/55514-h/55514-h.htm"},
-      {id:"dueno_h",    title:"Dulce Dueño",                    author:"Emilia Pardo Bazán",   lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Dulce-Dueno_56044/master/56044-h/56044-h.htm"},
-    ]},
-  ],
-  fr:[
-    {cat:"Édition formatée 📄",desc:"HTML con tipografía original · C1–C2",books:[
-      {id:"miser_h",    title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Les-mis-rables-Tome-I--13-Fantine_17489/master/17489-h/17489-h.htm"},
-      {id:"notredame_h",title:"Notre-Dame de Paris",             author:"Victor Hugo",      lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Notre-Dame-de-Paris_19657/master/19657-h/19657-h.htm"},
-      {id:"cyrano_h",   title:"Cyrano de Bergerac",              author:"Edmond Rostand",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Cyrano-de-Bergerac_1256/master/1256-h/1256-h.htm"},
-      {id:"rouge_h",    title:"Le Rouge et le Noir",             author:"Stendhal",        lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Le-Rouge-et-le-noir--chronique-du-XIXe-si-cle_798/master/798-h/798-h.htm"},
-    ]},
-  ],
-  de:[
-    {cat:"Formatierte Ausgabe 📄",desc:"HTML con tipografía original · B2–C1",books:[
-      {id:"verwandlung_h",title:"Die Verwandlung",               author:"Franz Kafka",     lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Die-Verwandlung_22367/master/22367-h/22367-h.htm"},
-      {id:"strafk_h",    title:"In der Strafkolonie",             author:"Franz Kafka",    lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"In-der-Strafkolonie_25791/master/25791-h/25791-h.htm"},
-    ]},
-  ],
-  pt:[
-    {cat:"Edição formatada 📄",desc:"HTML con tipografía original · B1–C2",books:[
-      {id:"casmurro_h", title:"Dom Casmurro",                    author:"Machado de Assis", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Dom-Casmurro_55752/master/55752-h/55752-h.htm"},
-      {id:"quincas_h",  title:"Quincas Borba",                   author:"Machado de Assis", lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Quincas-Borba_55682/master/55682-h/55682-h.htm"},
-      {id:"helena_h",   title:"Helena",                          author:"Machado de Assis", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Helena_67162/master/67162-h/67162-h.htm"},
-      {id:"amaro_h",    title:"O Crime do Padre Amaro",           author:"Eça de Queirós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"O-crime-do-padre-Amaro-scenas-da-vida-devota_31971/master/31971-h/31971-h.htm"},
-      {id:"mandarin_h", title:"O Mandarim",                      author:"Eça de Queirós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"O-Mandarim_16384/master/16384-h/16384-h.htm"},
-      {id:"lusiadas_h", title:"Os Lusíadas",                     author:"Luís de Camões",  lv:"c2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Os-Lus-adas_3333/master/3333-h/3333-h.htm"},
-    ]},
-  ],
-  it:[
-    {cat:"Edizione formattata 📄",desc:"HTML con tipografía original · A2–C1",books:[
-      {id:"pinocchio_h",title:"Le avventure di Pinocchio",       author:"Carlo Collodi",    lv:"a2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Le-avventure-di-Pinocchio-Storia-di-un-burattino_52484/master/52484-h/52484-h.htm"},
-      {id:"promessi_h", title:"I Promessi Sposi",                author:"Alessandro Manzoni",lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"I-promessi-sposiOpere-di-Alessando-Manzoni-vol.-1_45334/master/45334-h/45334-h.htm"},
-      {id:"canti_h",    title:"I Canti",                         author:"Giacomo Leopardi", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"I-Canti_55236/master/55236-h/55236-h.htm"},
-    ]},
-  ],
-};
 
-// ── WIKISOURCE EXPORT SERVICE ──
-// ws-export.wmcloud.org generates PDF/EPUB on demand from Wikisource (browser-accessible)
-// URL pattern: https://ws-export.wmcloud.org/?lang={lang}&format={pdf|epub}&page={PageName}
-const WE = (lang,fmt,page) => `https://ws-export.wmcloud.org/?lang=${lang}&format=${fmt}&page=${encodeURIComponent(page)}`;
-
-// Add Wikisource PDF/EPUB entries to each language
-// These are generated on-demand — may take 10-30s to load on first request
-const WS_BOOKS = {
-  en:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · A2–C1",books:[
-      {id:"alice_ws_pdf",   title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Alice's_Adventures_in_Wonderland")},
-      {id:"frank_ws_pdf",   title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Frankenstein")},
-      {id:"dracula_ws_pdf", title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Dracula")},
-      {id:"jekyll_ws_pdf",  title:"Dr Jekyll and Mr Hyde",           author:"R.L. Stevenson", lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Strange_Case_of_Dr_Jekyll_and_Mr_Hyde")},
-      {id:"time_ws_pdf",    title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","The_Time_Machine")},
-      {id:"war_ws_pdf",     title:"The War of the Worlds",           author:"H. G. Wells",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","The_War_of_the_Worlds")},
-      {id:"treasure_ws_pdf",title:"Treasure Island",                 author:"R.L. Stevenson", lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Treasure_Island")},
-      {id:"moby_ws_pdf",    title:"Moby-Dick",                       author:"Herman Melville",lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Moby-Dick")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · A2–C1",books:[
-      {id:"alice_ws_epub",  title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Alice's_Adventures_in_Wonderland")},
-      {id:"frank_ws_epub",  title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Frankenstein")},
-      {id:"dracula_ws_epub",title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Dracula")},
-      {id:"time_ws_epub",   title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","The_Time_Machine")},
-      {id:"treasure_ws_epub",title:"Treasure Island",                author:"R.L. Stevenson", lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Treasure_Island")},
-    ]},
-  ],
-  es:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B2–C2",books:[
-      {id:"quijote_ws_pdf",   title:"Don Quijote de la Mancha",      author:"Miguel de Cervantes",  lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","El_ingenioso_hidalgo_don_Quijote_de_la_Mancha")},
-      {id:"lazarillo_ws_pdf", title:"Lazarillo de Tormes",           author:"Anónimo",              lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","Vida_de_Lazarillo_de_Tormes")},
-      {id:"regenta_ws_pdf",   title:"La Regenta",                    author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"PDF con texto de Wikisource.", fmt:"pdf",hurl:WE("es","pdf","La_Regenta")},
-      {id:"becquer_ws_pdf",   title:"Rimas",                         author:"Gustavo A. Bécquer",   lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","Rimas_(Bécquer)")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B2–C2",books:[
-      {id:"quijote_ws_epub",  title:"Don Quijote de la Mancha",      author:"Miguel de Cervantes",  lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("es","epub","El_ingenioso_hidalgo_don_Quijote_de_la_Mancha")},
-      {id:"lazarillo_ws_epub",title:"Lazarillo de Tormes",           author:"Anónimo",              lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("es","epub","Vida_de_Lazarillo_de_Tormes")},
-      {id:"regenta_ws_epub",  title:"La Regenta",                    author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"EPUB con texto de Wikisource.",fmt:"epub",hurl:WE("es","epub","La_Regenta")},
-    ]},
-  ],
-  fr:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B1–C2",books:[
-      {id:"mousq_ws_pdf",   title:"Les Trois Mousquetaires",         author:"Alexandre Dumas",  lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Les_Trois_Mousquetaires")},
-      {id:"miser_ws_pdf",   title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Les_Misérables")},
-      {id:"bovary_ws_pdf",  title:"Madame Bovary",                   author:"Gustave Flaubert", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Madame_Bovary")},
-      {id:"germ_ws_pdf",    title:"Germinal",                        author:"Émile Zola",      lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Germinal")},
-      {id:"cyrano_ws_pdf",  title:"Cyrano de Bergerac",              author:"Edmond Rostand",  lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Cyrano_de_Bergerac")},
-      {id:"rouge_ws_pdf",   title:"Le Rouge et le Noir",             author:"Stendhal",        lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Le_Rouge_et_le_Noir")},
-      {id:"ndame_ws_pdf",   title:"Notre-Dame de Paris",             author:"Victor Hugo",     lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Notre-Dame_de_Paris")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B1–C2",books:[
-      {id:"mousq_ws_epub",  title:"Les Trois Mousquetaires",         author:"Alexandre Dumas",  lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Les_Trois_Mousquetaires")},
-      {id:"miser_ws_epub",  title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Les_Misérables")},
-      {id:"bovary_ws_epub", title:"Madame Bovary",                   author:"Gustave Flaubert", lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Madame_Bovary")},
-      {id:"germ_ws_epub",   title:"Germinal",                        author:"Émile Zola",      lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Germinal")},
-    ]},
-  ],
-  de:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B2–C2",books:[
-      {id:"faust_ws_pdf",    title:"Faust — Erster Teil",            author:"J. W. von Goethe", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Faust_(Goethe)")},
-      {id:"verwandlung_ws_pdf",title:"Die Verwandlung",              author:"Franz Kafka",      lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Die_Verwandlung")},
-      {id:"zara_ws_pdf",     title:"Also sprach Zarathustra",        author:"F. Nietzsche",     lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Also_sprach_Zarathustra")},
-      {id:"werther_ws_pdf",  title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Die_Leiden_des_jungen_Werthers")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B2–C2",books:[
-      {id:"faust_ws_epub",   title:"Faust — Erster Teil",            author:"J. W. von Goethe", lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Faust_(Goethe)")},
-      {id:"verwandlung_ws_epub",title:"Die Verwandlung",             author:"Franz Kafka",      lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Die_Verwandlung")},
-      {id:"werther_ws_epub", title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Die_Leiden_des_jungen_Werthers")},
-    ]},
-  ],
-  pt:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B1–C2",books:[
-      {id:"casmurro_ws_pdf",title:"Dom Casmurro",                    author:"Machado de Assis", lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("pt","pdf","Dom_Casmurro")},
-      {id:"lusiadas_ws_pdf",title:"Os Lusíadas",                     author:"Luís de Camões",  lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("pt","pdf","Os_Lusíadas")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B1–C2",books:[
-      {id:"casmurro_ws_epub",title:"Dom Casmurro",                   author:"Machado de Assis", lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("pt","epub","Dom_Casmurro")},
-      {id:"lusiadas_ws_epub",title:"Os Lusíadas",                    author:"Luís de Camões",  lv:"c2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("pt","epub","Os_Lusíadas")},
-    ]},
-  ],
-  it:[
-    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · A2–C2",books:[
-      {id:"pinocchio_ws_pdf",title:"Le avventure di Pinocchio",      author:"Carlo Collodi",    lv:"a2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","Le_avventure_di_Pinocchio")},
-      {id:"inferno_ws_pdf",  title:"Divina Commedia — Inferno",      author:"Dante Alighieri",  lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","Divina_Commedia")},
-      {id:"promessi_ws_pdf", title:"I Promessi Sposi",               author:"Alessandro Manzoni",lv:"b2",desc:"PDF con texto de Wikisource.", fmt:"pdf",hurl:WE("it","pdf","I_promessi_sposi")},
-      {id:"canti_ws_pdf",    title:"I Canti",                        author:"Giacomo Leopardi", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","I_Canti_(Leopardi)")},
-    ]},
-    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · A2–C2",books:[
-      {id:"pinocchio_ws_epub",title:"Le avventure di Pinocchio",     author:"Carlo Collodi",    lv:"a2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("it","epub","Le_avventure_di_Pinocchio")},
-      {id:"inferno_ws_epub",  title:"Divina Commedia — Inferno",     author:"Dante Alighieri",  lv:"c2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("it","epub","Divina_Commedia")},
-      {id:"promessi_ws_epub", title:"I Promessi Sposi",              author:"Alessandro Manzoni",lv:"b2",desc:"EPUB con texto de Wikisource.",fmt:"epub",hurl:WE("it","epub","I_promessi_sposi")},
-    ]},
-  ],
-};
 
 const TRANS_TARGET = {en:'es',es:'en',fr:'es',de:'es',pt:'es',it:'es'};
 const TRANS_LABEL  = {en:'español',es:'inglés',fr:'español',de:'español',pt:'español',it:'español'};
@@ -1475,87 +1201,13 @@ function selBook(id){
   S.book = b;
   document.getElementById('mtitle').textContent = b.title;
   document.getElementById('mauth').textContent  = b.author;
-  // Populate download links
-  document.getElementById('dl-links').innerHTML = getDlLinks(id);
   goTo('sm');
 }
 function exitR(){ stopAudio(); goTo('sm'); }
 
 // ── HTML / PDF / EPUB VIEWER ──
-function findDocBook(bookId){
-  for(const catalog of [HTML_BOOKS, WS_BOOKS]){
-    for(const lang of Object.keys(catalog)){
-      for(const cat of catalog[lang]){
-        const found = cat.books.find(b=>b.id===bookId);
-        if(found) return found;
-      }
-    }
-  }
-  return null;
-}
 
-function openDoc(bookId){
-  const book = findDocBook(bookId);
-  if(!book) return;
 
-  document.getElementById('doc-title').textContent = book.title + ' — ' + book.author;
-  const frame = document.getElementById('doc-frame');
-
-  if(book.fmt === 'epub'){
-    // EPUB: open download link in new tab (browser handles it)
-    // Also show info panel inside viewer
-    frame.src = 'about:blank';
-    frame.style.display = 'none';
-    // Show a download page inside the viewer
-    const docScreen = document.getElementById('sv-doc');
-    // Remove old err div if any
-    let err = docScreen.querySelector('.doc-err');
-    if(!err){ err = document.createElement('div'); err.className='doc-err'; docScreen.appendChild(err); }
-    err.style.display = 'flex';
-    err.innerHTML = `
-      <div style="font-size:3rem">📗</div>
-      <p><strong>${esc(book.title)}</strong><br>${esc(book.author)}</p>
-      <p>Los archivos EPUB se abren con una app de lectura.<br>
-      Pulsa el botón para descargarlo en tu dispositivo.</p>
-      <a href="${book.hurl}" target="_blank" download
-         style="background:var(--ac);color:#fff;border:none;padding:.7rem 1.4rem;
-                border-radius:var(--rs);font-size:.92rem;font-weight:600;
-                text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
-        📥 Descargar EPUB
-      </a>
-      <p style="font-size:.78rem;opacity:.6">Generado por Wikisource · ws-export.wmcloud.org</p>`;
-    goTo('sv-doc');
-  } else {
-    // HTML or PDF: load in iframe
-    let err = document.getElementById('sv-doc').querySelector('.doc-err');
-    if(err) err.style.display = 'none';
-    frame.style.display = 'block';
-    // For Wikisource PDF, add a loading notice
-    if(book.hurl.includes('ws-export')){
-      frame.src = 'about:blank';
-      let err2 = document.getElementById('sv-doc').querySelector('.doc-err');
-      if(!err2){ err2=document.createElement('div'); err2.className='doc-err'; document.getElementById('sv-doc').appendChild(err2); }
-      err2.style.display='flex';
-      err2.innerHTML=`<div class="lsp"></div><p>Generando ${book.fmt.toUpperCase()} desde Wikisource…<br><span style="font-size:.78rem;opacity:.6">Puede tardar 15–30 segundos la primera vez.</span></p>`;
-      setTimeout(()=>{
-        err2.style.display='none';
-        frame.style.display='block';
-        frame.src = book.hurl;
-      }, 100);
-    } else {
-      frame.src = book.hurl;
-    }
-    goTo('sv-doc');
-  }
-}
-
-function closeDoc(){
-  document.getElementById('doc-frame').src = 'about:blank';
-  document.getElementById('doc-frame').style.display = 'block';
-  const err = document.getElementById('sv-doc').querySelector('.doc-err');
-  if(err) err.style.display = 'none';
-  goTo('sb');
-}
 
 // ── VOCABULARY ──
 let _vocabAll = [];   // current book's full word list
@@ -2301,49 +1953,29 @@ document.querySelectorAll('.lc').forEach(c=>{
 });
 
 // ── LIBRARY RENDER (text + HTML/PDF books) ──
-function renderBookCard(b, lang, isDoc){
+function renderBookCard(b, lang){
   let bm = null;
-  if(!isDoc){
-    try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
-  }
+  try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
   const pct = bm ? Math.round(bm.pct*100) : 0;
   const resumeBadge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-  const onclick = isDoc ? `openDoc('${b.id}','doc')` : `selBook('${b.id}')`;
-
-  // Format badge
-  let fmtBadge = '';
-  if(b.fmt==='html') fmtBadge = `<span class="fmt-badge fmt-html">HTML</span>`;
-  else if(b.fmt==='pdf')  fmtBadge = `<span class="fmt-badge fmt-pdf">PDF</span>`;
-  else if(b.fmt==='epub') fmtBadge = `<span class="fmt-badge fmt-epub">EPUB</span>`;
-  else fmtBadge = `<span class="fmt-badge fmt-txt">TXT</span>`;
-
-  const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
-
-  return `<div class="bc ${b.lv}" onclick="${onclick}">
+  return `<div class="bc ${b.lv}" onclick="selBook('${b.id}')">
     ${resumeBadge}
     <div class="btt">${b.title}</div>
     <div class="ba">${b.author}</div>
     <div class="bm">
       <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
-      ${fmtBadge}
-      ${audioIcon}
+      <span class="sp">🎧</span>
     </div>
     <div class="bdsc">${b.desc}</div>
   </div>`;
 }
 
 function renderLib(lang){
-  // Merge text books + HTML/PDF books + Wikisource PDF/EPUB
-  const textCats = (BOOKS[lang]||[]).map(c=>({...c, isDoc:false}));
-  const docCats  = (HTML_BOOKS[lang]||[]).map(c=>({...c, isDoc:true}));
-  const wsCats   = (WS_BOOKS[lang]||[]).map(c=>({...c, isDoc:true}));
-  const allCats  = [...textCats, ...docCats, ...wsCats];
-
-  document.getElementById('lby').innerHTML = allCats.map(c=>`
+  document.getElementById('lby').innerHTML = (BOOKS[lang]||[]).map(c=>`
     <div class="cs">
       <div class="ch"><span class="ct">${c.cat}</span><span class="cd">${c.desc}</span></div>
       <div class="bg">
-        ${c.books.map(b=>renderBookCard(b, lang, c.isDoc)).join('')}
+        ${c.books.map(b=>renderBookCard(b, lang)).join('')}
       </div>
     </div>`).join('');
 }
