@@ -10,22 +10,50 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Aprende idiomas leyendo grandes obras en su idioma original">
 <title>Libreo</title>
-<link rel="manifest" id="manifest-link">
-<link rel="apple-touch-icon" id="apple-icon">
 <style>
+/* ── SHARED (language accent colours, sizes) ── */
 :root{
-  --bg:#0e1117;--sf:#161b25;--sf2:#1e2534;--bd:#2a3347;
   --en:#4a9eff;--fr:#ff6b6b;--de:#f5a623;--pt:#4ade80;--it:#c084fc;--es:#fbbf24;
   --ac:#4a9eff;--soft:rgba(74,158,255,.13);
-  --tx:#e8edf5;--dm:#8892a4;--dmr:#4a5568;
   --gd:#f5c842;--gr:#4ade80;--r:14px;--rs:10px;
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
-@media(prefers-color-scheme:light){:root{
-  --bg:#f0f4fc;--sf:#fff;--sf2:#e8edf8;--bd:#d0d8ea;
+/* ── DARK theme (default) ── */
+:root, [data-theme="dark"]{
+  --bg:#0e1117;--sf:#161b25;--sf2:#1e2534;--bd:#2a3347;
+  --tx:#e8edf5;--dm:#8892a4;--dmr:#4a5568;
+}
+/* ── LIGHT theme ── */
+[data-theme="light"]{
+  --bg:#f4f6fb;--sf:#ffffff;--sf2:#eaeff8;--bd:#d0d9ea;
   --tx:#1a2035;--dm:#5a6882;--dmr:#9baabb;
-}}
+}
+/* ── AUTO: follow OS when no manual choice ── */
+@media(prefers-color-scheme:light){
+  :root:not([data-theme="dark"]):not([data-theme="light"]){
+    --bg:#f4f6fb;--sf:#ffffff;--sf2:#eaeff8;--bd:#d0d9ea;
+    --tx:#1a2035;--dm:#5a6882;--dmr:#9baabb;
+  }
+}
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-btn{background:none;border:1px solid var(--bd);color:var(--dm);
+  padding:.35rem .6rem;border-radius:var(--rs);cursor:pointer;font-size:.88rem;
+  transition:all .15s;min-height:36px;min-width:36px;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-user-select:none;user-select:none;}
+.theme-btn:active{background:var(--sf2);}
+/* Theme toggle dropdown */
+.theme-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
+  box-shadow:0 6px 20px rgba(0,0,0,.3);overflow:hidden;min-width:130px;z-index:50;}
+.theme-menu.show{display:block;}
+.theme-opt{padding:.6rem .9rem;font-size:.85rem;cursor:pointer;
+  display:flex;align-items:center;gap:.6rem;transition:background .1s;white-space:nowrap;}
+.theme-opt:hover{background:var(--sf2);}
+.theme-opt.active{color:var(--ac);font-weight:600;}
+.theme-wrap{position:relative;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;background:var(--bg);}
 body{display:flex;flex-direction:column;min-height:100%;height:100%;
@@ -37,16 +65,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .sc{display:none;flex-direction:column;flex:1;}
 .sc.on{display:flex;}
 
-/* ── INSTALL BANNER ── */
-#install-banner{display:none;align-items:center;gap:.75rem;padding:.75rem 1rem;
-  background:linear-gradient(135deg,rgba(74,158,255,.15),rgba(255,107,107,.1));
-  border-bottom:1px solid var(--bd);font-size:.82rem;}
-#install-banner.show{display:flex;}
-#install-banner p{flex:1;color:var(--tx);line-height:1.4;}
-#install-banner .ibtn{background:var(--ac);color:#fff;border:none;padding:.4rem .9rem;
-  border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;}
-#install-banner .dismiss{background:none;color:var(--dm);border:none;
-  padding:.4rem .5rem;font-size:1rem;cursor:pointer;}
 
 /* ── LANG SELECT ── */
 #sl{align-items:center;justify-content:center;gap:1.6rem;
@@ -254,10 +272,93 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 #load-bar-wrap.show{display:block;}
 #load-bar{height:100%;width:0%;background:var(--ac);transition:width .4s ease;}
 
+/* ── WORD CONTEXT MENU ── */
+#ctx-menu{display:none;position:fixed;z-index:500;
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
+  box-shadow:0 8px 28px rgba(0,0,0,.45);overflow:hidden;min-width:160px;}
+#ctx-menu.show{display:block;}
+.ctx-item{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;
+  display:flex;align-items:center;gap:.6rem;
+  transition:background .12s;white-space:nowrap;}
+.ctx-item:hover,.ctx-item:active{background:var(--sf2);}
+.ctx-sep{height:1px;background:var(--bd);margin:.2rem 0;}
+
+/* ── READ-FROM-HERE button in trans panel ── */
+.rfh-btn{display:flex;align-items:center;gap:.5rem;width:100%;
+  background:var(--soft);border:1px solid var(--ac);color:var(--ac);
+  border-radius:var(--rs);padding:.5rem .8rem;font-size:.82rem;font-weight:600;
+  cursor:pointer;margin-top:.7rem;transition:background .15s;}
+.rfh-btn:hover,.rfh-btn:active{background:var(--ac);color:#fff;}
+
 /* ── RESUME BADGE on book cards ── */
 .resume-badge{position:absolute;top:6px;right:6px;
   background:var(--ac);color:#fff;font-size:.6rem;font-weight:700;
   padding:.15rem .4rem;border-radius:6px;letter-spacing:.03em;}
+
+/* ── VOCABULARY SCREEN ── */
+#sv{flex-direction:column;}
+.vocab-topbar{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10;flex-shrink:0;}
+.vocab-search{flex:1;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  padding:.4rem .8rem;border-radius:var(--rs);font-size:.88rem;outline:none;}
+.vocab-search:focus{border-color:var(--ac);}
+.vocab-body{padding:1.2rem;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.vocab-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--dmr);margin:0 0 .7rem;}
+
+.alpha-list{display:flex;flex-direction:column;gap:.5rem;}
+.vw-row{display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
+  cursor:pointer;transition:background .12s;-webkit-user-select:none;user-select:none;}
+.vw-row:active{background:var(--sf2);}
+.vw-word{font-family:Georgia,serif;font-size:.95rem;font-weight:600;min-width:110px;}
+.vw-hint{font-size:.78rem;color:var(--dm);flex:1;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.vw-arr{color:var(--dmr);font-size:.8rem;}
+
+/* ── WORD DETAIL SHEET ── */
+#word-sheet{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.55);}
+#word-sheet.show{display:flex;align-items:flex-end;}
+.ws-card{background:var(--sf);border-radius:20px 20px 0 0;padding:1.4rem 1.4rem calc(1.4rem + var(--safe-b));
+  width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.ws-word{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;color:var(--ac);margin-bottom:.2rem;}
+.ws-trans{font-size:1.1rem;font-weight:600;margin-bottom:.8rem;}
+.ws-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dmr);margin-bottom:.3rem;margin-top:.8rem;}
+.ws-exp{font-size:.9rem;line-height:1.6;color:var(--tx);}
+.ws-ex{font-size:.88rem;line-height:1.6;color:var(--dm);font-style:italic;
+  border-left:3px solid var(--ac);padding-left:.8rem;margin-top:.3rem;}
+.ws-close{position:absolute;top:1rem;right:1.2rem;background:var(--sf2);
+  border:none;color:var(--dm);width:30px;height:30px;border-radius:50%;
+  cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.ws-tld{color:var(--dm);font-size:.82rem;display:flex;align-items:center;gap:.5rem;margin:.5rem 0;}
+
+/* ── FORMAT BADGES ── */
+.fmt-badge{font-size:.66rem;font-weight:700;padding:.15rem .42rem;border-radius:4px;letter-spacing:.03em;}
+.fmt-txt{background:rgba(74,158,255,.13);color:var(--en);}
+.fmt-epub{background:rgba(167,139,250,.15);color:#a78bfa;}
+.fmt-html{background:rgba(74,222,128,.13);color:#4ade80;}
+.fmt-pdf{background:rgba(255,107,107,.13);color:#ff6b6b;}
+
+/* ── HTML / PDF VIEWER SCREEN ── */
+#sv-doc{flex-direction:column;height:100%;overflow:hidden;}
+.doc-topbar{display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.doc-title{font-family:Georgia,serif;font-size:.88rem;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+#doc-frame{flex:1;border:none;width:100%;background:#fff;}
+.doc-err{flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1rem;padding:2rem;text-align:center;}
+.doc-err p{color:var(--dm);font-size:.9rem;line-height:1.6;}
+
+/* ── DOWNLOAD BUTTONS ── */
+.dl-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;}
+.dl-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;
+  border-radius:var(--rs);font-size:.8rem;font-weight:600;text-decoration:none;
+  border:1px solid var(--bd);color:var(--tx);background:var(--sf2);
+  transition:border-color .15s,background .15s;cursor:pointer;}
+.dl-btn:hover{border-color:var(--ac);background:var(--soft);}
+.dl-btn.epub{border-color:var(--gr);color:var(--gr);}
+.dl-btn.pdf{border-color:var(--accent-fr,#ff6b6b);color:#ff6b6b;}
 
 /* ── RESUME TOAST ── */
 #resume-bar{display:none;align-items:center;gap:.7rem;padding:.6rem 1rem;
@@ -271,14 +372,17 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 </head>
 <body>
 
-<div id="install-banner">
-  <p>📱 Instala <strong>Libreo</strong> como app en tu móvil</p>
-  <button class="ibtn" onclick="installApp()">Instalar</button>
-  <button class="dismiss" onclick="document.getElementById('install-banner').classList.remove('show')" aria-label="Cerrar">✕</button>
-</div>
 
 <!-- LANG SELECT -->
 <div id="sl" class="sc on">
+  <div style="position:absolute;top:calc(.9rem + var(--safe-t));right:1.2rem;" class="theme-wrap">
+    <button class="theme-btn" id="theme-btn-sl" onclick="toggleThemeMenu('sl')" title="Tema">🌓</button>
+    <div class="theme-menu" id="theme-menu-sl">
+      <div class="theme-opt" onclick="setTheme('dark','sl')">🌙 Oscuro</div>
+      <div class="theme-opt" onclick="setTheme('light','sl')">☀️ Claro</div>
+      <div class="theme-opt" onclick="setTheme('auto','sl')">⚙️ Automático</div>
+    </div>
+  </div>
   <div class="logo">
     <div class="logo-icon" id="logo-svg"></div>
     <h1>Libreo</h1>
@@ -300,6 +404,14 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
     <button class="bbtn" onclick="goTo('sl')">← Idiomas</button>
     <span class="tt">Biblioteca</span>
     <span id="bdg" class="bdg"></span>
+    <div class="theme-wrap">
+      <button class="theme-btn" onclick="toggleThemeMenu('sb')" title="Tema">🌓</button>
+      <div class="theme-menu" id="theme-menu-sb">
+        <div class="theme-opt" onclick="setTheme('dark','sb')">🌙 Oscuro</div>
+        <div class="theme-opt" onclick="setTheme('light','sb')">☀️ Claro</div>
+        <div class="theme-opt" onclick="setTheme('auto','sb')">⚙️ Automático</div>
+      </div>
+    </div>
   </div>
   <div class="lby" id="lby"></div>
 </div>
@@ -318,6 +430,48 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       <div class="mi">🎧</div><div class="ml">Audiolibro</div>
       <div class="ms">Narración en el<br>idioma original<br>con texto sincronizado</div>
     </div>
+    <div class="mc" onclick="openVocab()">
+      <div class="mi">📚</div><div class="ml">Vocabulario</div>
+      <div class="ms">Palabras clave<br>del libro con<br>traducción y ejemplos</div>
+    </div>
+  </div>
+  <!-- Download links -->
+  <div style="margin-top:1.2rem;text-align:center;">
+    <div style="font-size:.72rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Descargar libro</div>
+    <div class="dl-row" style="justify-content:center;" id="dl-links"></div>
+  </div>
+</div>
+
+<!-- VOCABULARY SCREEN -->
+<div id="sv" class="sc">
+  <div class="vocab-topbar">
+    <button class="bbtn" onclick="goTo('sm')">← Modos</button>
+    <span class="tt" id="vocab-title">Vocabulario</span>
+    <input class="vocab-search" id="vocab-search" type="search" placeholder="Buscar…" oninput="filterVocab(this.value)">
+    <div class="theme-wrap">
+      <button class="theme-btn" onclick="toggleThemeMenu('sv')" title="Tema">🌓</button>
+      <div class="theme-menu" id="theme-menu-sv" style="right:0">
+        <div class="theme-opt" onclick="setTheme('dark','sv')">🌙 Oscuro</div>
+        <div class="theme-opt" onclick="setTheme('light','sv')">☀️ Claro</div>
+        <div class="theme-opt" onclick="setTheme('auto','sv')">⚙️ Automático</div>
+      </div>
+    </div>
+  </div>
+  <div class="vocab-body" id="vocab-body"></div>
+</div>
+
+<!-- WORD DETAIL SHEET (bottom sheet) -->
+<div id="word-sheet" onclick="closeWordSheet(event)">
+  <div class="ws-card" style="position:relative">
+    <button class="ws-close" onclick="closeWordSheet()">✕</button>
+    <div class="ws-word"  id="ws-word"></div>
+    <div id="ws-trans-wrap">
+      <div class="ws-tld"><div class="sp2"></div> Traduciendo…</div>
+    </div>
+    <div class="ws-label">Explicación</div>
+    <div class="ws-exp" id="ws-exp"></div>
+    <div class="ws-label">Ejemplo en el libro</div>
+    <div class="ws-ex"  id="ws-ex"></div>
   </div>
 </div>
 
@@ -347,6 +501,14 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       </select>
     </div>
     <button class="cb" onclick="cycleFont()" title="Tamaño texto">Aa</button>
+    <div class="theme-wrap">
+      <button class="cb" onclick="toggleThemeMenu('sr')" title="Tema">🌓</button>
+      <div class="theme-menu" id="theme-menu-sr" style="right:0">
+        <div class="theme-opt" onclick="setTheme('dark','sr')">🌙 Oscuro</div>
+        <div class="theme-opt" onclick="setTheme('light','sr')">☀️ Claro</div>
+        <div class="theme-opt" onclick="setTheme('auto','sr')">⚙️ Automático</div>
+      </div>
+    </div>
     <button class="cb" onclick="togPanel()" title="Traducción">📝</button>
   </div>
   <div class="pb"><div class="pf" id="pf"></div></div>
@@ -367,6 +529,23 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <button class="fab" onclick="togMob()">📝</button>
 </div>
 
+<!-- HTML / PDF VIEWER -->
+<div id="sv-doc" class="sc">
+  <div class="doc-topbar">
+    <button class="bbtn" onclick="closeDoc()">← Volver</button>
+    <span class="doc-title" id="doc-title"></span>
+    <div class="theme-wrap">
+      <button class="cb" onclick="toggleThemeMenu('sv-doc')" title="Tema">🌓</button>
+      <div class="theme-menu" id="theme-menu-sv-doc" style="right:0">
+        <div class="theme-opt" onclick="setTheme('dark','sv-doc')">🌙 Oscuro</div>
+        <div class="theme-opt" onclick="setTheme('light','sv-doc')">☀️ Claro</div>
+        <div class="theme-opt" onclick="setTheme('auto','sv-doc')">⚙️ Automático</div>
+      </div>
+    </div>
+  </div>
+  <iframe id="doc-frame" title="Visor de libro" sandbox="allow-same-origin allow-scripts"></iframe>
+</div>
+
 <!-- LOADING -->
 <div id="sld" class="sc">
   <div class="lsp"></div>
@@ -375,129 +554,58 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <div class="toast" id="toast"></div>
 
+<!-- Word context menu -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-translate">🌐 Traducir</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-readfrom">▶ Leer desde aquí</div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════
 // ICONO: libro + candado abierto
 // ═══════════════════════════════════════════════
 const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Fondo redondeado -->
-  <rect width="512" height="512" rx="96" fill="#161b25"/>
+  <!-- Fondo blanco redondeado -->
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
 
-  <!-- Libro (páginas izquierda) -->
-  <rect x="80" y="140" width="156" height="240" rx="12" fill="#1e2a3d"/>
-  <rect x="80" y="140" width="156" height="240" rx="12" fill="none" stroke="#4a9eff" stroke-width="6"/>
-  <!-- Lomo izquierdo -->
-  <rect x="224" y="140" width="14" height="240" rx="4" fill="#2a3a55"/>
-  <!-- Líneas de páginas izquierda -->
-  <line x1="104" y1="195" x2="210" y2="195" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="104" y1="225" x2="210" y2="225" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="104" y1="255" x2="210" y2="255" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="104" y1="285" x2="210" y2="285" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="104" y1="315" x2="210" y2="315" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+  <!-- Libro izquierda -->
+  <rect x="72" y="148" width="152" height="232" rx="10" fill="#e8f0fe"/>
+  <rect x="72" y="148" width="152" height="232" rx="10" fill="none" stroke="#4a9eff" stroke-width="7"/>
+  <rect x="212" y="148" width="12" height="232" rx="4" fill="#b8d0f8"/>
+  <line x1="94" y1="200" x2="204" y2="200" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="94" y1="228" x2="204" y2="228" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="94" y1="256" x2="204" y2="256" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="94" y1="284" x2="204" y2="284" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+  <line x1="94" y1="312" x2="170" y2="312" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".3"/>
 
-  <!-- Libro (páginas derecha) -->
-  <rect x="238" y="140" width="156" height="240" rx="12" fill="#1e2a3d"/>
-  <rect x="238" y="140" width="156" height="240" rx="12" fill="none" stroke="#ff6b6b" stroke-width="6"/>
-  <!-- Lomo derecho -->
-  <rect x="238" y="140" width="14" height="240" rx="4" fill="#2a3a55"/>
-  <!-- Líneas de páginas derecha -->
-  <line x1="268" y1="195" x2="374" y2="195" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="268" y1="225" x2="374" y2="225" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="268" y1="255" x2="374" y2="255" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="268" y1="285" x2="374" y2="285" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
-  <line x1="268" y1="315" x2="374" y2="315" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+  <!-- Libro derecha -->
+  <rect x="228" y="148" width="152" height="232" rx="10" fill="#fef0ee"/>
+  <rect x="228" y="148" width="152" height="232" rx="10" fill="none" stroke="#ff6b6b" stroke-width="7"/>
+  <rect x="228" y="148" width="12" height="232" rx="4" fill="#f8c8c0"/>
+  <line x1="252" y1="200" x2="362" y2="200" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="252" y1="228" x2="362" y2="228" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="252" y1="256" x2="362" y2="256" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  <line x1="252" y1="284" x2="362" y2="284" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+  <line x1="252" y1="312" x2="328" y2="312" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".3"/>
 
-  <!-- Candado abierto (esquina superior derecha del libro) -->
-  <!-- Cuerpo del candado -->
-  <rect x="330" y="290" width="110" height="88" rx="14" fill="#f5c842"/>
-  <!-- Agujero del candado -->
-  <circle cx="385" cy="326" r="14" fill="#161b25"/>
-  <rect x="378" y="326" width="14" height="22" rx="4" fill="#161b25"/>
-  <!-- Arco del candado ABIERTO (desplazado hacia arriba-derecha) -->
-  <path d="M355 290 L355 248 Q355 210 393 210 Q431 210 431 248 L431 275"
-        fill="none" stroke="#f5c842" stroke-width="20" stroke-linecap="round"/>
+  <!-- Candado ABIERTO — cuerpo abajo a la derecha -->
+  <rect x="318" y="296" width="118" height="94" rx="16" fill="#f5c842"/>
+  <circle cx="377" cy="333" r="15" fill="#fff" opacity=".7"/>
+  <rect x="370" y="333" width="15" height="24" rx="5" fill="#c9971a"/>
+  <!-- Arco muy abierto — desplazado claramente a la derecha y arriba -->
+  <path d="M348 296 L348 230 Q348 178 392 178 Q436 178 436 230 L436 268"
+        fill="none" stroke="#f5c842" stroke-width="22" stroke-linecap="round"/>
+  <!-- Segunda línea para dar grosor visual -->
+  <path d="M348 296 L348 230 Q348 178 392 178 Q436 178 436 230 L436 268"
+        fill="none" stroke="#fde68a" stroke-width="10" stroke-linecap="round" opacity=".5"/>
 </svg>`;
 
-// ════════════════════════════════════════════
-// PWA SETUP
-// ════════════════════════════════════════════
 function setupPWA(){
-  // Render logo in page
   document.getElementById('logo-svg').innerHTML = ICON_SVG.replace(
     'viewBox="0 0 512 512"','viewBox="0 0 512 512" width="80" height="80"');
-
-  // Icon blob
-  const iconBlob = new Blob([ICON_SVG],{type:'image/svg+xml'});
-  const iconUrl  = URL.createObjectURL(iconBlob);
-  document.getElementById('apple-icon').href = iconUrl;
-
-  // Manifest
-  const manifest = {
-    name:"Libreo",
-    short_name:"Libreo",
-    description:"Aprende idiomas leyendo grandes obras en su idioma original",
-    start_url:"./",
-    display:"standalone",
-    background_color:"#0e1117",
-    theme_color:"#0e1117",
-    orientation:"any",
-    lang:"es",
-    icons:[
-      {src:iconUrl,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"},
-      {src:iconUrl,sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},
-    ]
-  };
-  const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  document.getElementById('manifest-link').href = URL.createObjectURL(mBlob);
-
-  // Service Worker — cache libros y traducciones
-  if('serviceWorker' in navigator){
-    const swCode = `
-const CACHE = 'libreo-v1';
-self.addEventListener('install', e => { self.skipWaiting(); });
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks =>
-    Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  const cacheable = url.hostname === 'raw.githubusercontent.com'
-                 || url.hostname.includes('mymemory');
-  if(!cacheable) return;
-  e.respondWith(
-    caches.open(CACHE).then(cache =>
-      cache.match(e.request).then(hit => {
-        if(hit) return hit;
-        return fetch(e.request).then(res => {
-          if(res.ok) cache.put(e.request, res.clone());
-          return res;
-        }).catch(() => hit || new Response('Offline',{status:503}));
-      })
-    )
-  );
-});`;
-    const swBlob = new Blob([swCode],{type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob),{scope:'./'})
-      .catch(()=>{});
-  }
 }
 
-// Install prompt
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); deferredPrompt = e;
-  document.getElementById('install-banner').classList.add('show');
-});
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').classList.remove('show');
-});
-function installApp(){
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(()=>{ deferredPrompt = null; });
-}
 
 // ════════════════════════════════════════════
 // CATÁLOGO — todos verificados en idioma original
@@ -660,6 +768,250 @@ const BOOKS = {
   ],
 };
 
+// ── DOWNLOAD LINKS per book ──
+// epub: Gutenberg .epub.noimages or Standard Ebooks
+// pdf:  Gutenberg .pdf.images
+const DOWNLOADS = {
+  // English
+  alice:      {gutid:11,   se:"lewis-carroll/alices-adventures-in-wonderland"},
+  wizard:     {gutid:55,   se:"l-frank-baum/the-wonderful-wizard-of-oz"},
+  secret:     {gutid:17396},
+  treasure:   {gutid:120,  se:"robert-louis-stevenson/treasure-island"},
+  wild:       {gutid:215,  se:"jack-london/the-call-of-the-wild"},
+  moby:       {gutid:2701, se:"herman-melville/moby-dick"},
+  frank:      {gutid:84,   se:"mary-shelley/frankenstein"},
+  dracula:    {gutid:345,  se:"bram-stoker/dracula"},
+  jekyll:     {gutid:42,   se:"robert-louis-stevenson/the-strange-case-of-dr-jekyll-and-mr-hyde"},
+  time:       {gutid:35,   se:"h-g-wells/the-time-machine"},
+  war:        {gutid:36,   se:"h-g-wells/the-war-of-the-worlds"},
+  journey:    {gutid:18857,se:"jules-verne/journey-to-the-center-of-the-earth_f-a-malleson"},
+  // Spanish
+  quijote:    {gutid:2000},
+  lazarillo:  {gutid:320},
+  quevedo:    {gutid:65999},
+  calderon:   {gutid:54436},
+  lope:       {gutid:28408},
+  becquer:    {gutid:53552},
+  regenta:    {gutid:17073},
+  fortunata:  {gutid:17013},
+  marianela:  {gutid:17340},
+  pepita:     {gutid:17223},
+  cuentos:    {gutid:55514},
+  dueno:      {gutid:56044},
+  // French
+  mousq:      {gutid:13951},
+  notredame:  {gutid:19657},
+  verne_fr:   {gutid:5097},
+  miser:      {gutid:17489},
+  germ:       {gutid:5711},
+  bovary:     {gutid:14155},
+  rouge:      {gutid:798},
+  educ:       {gutid:52893},
+  cyrano:     {gutid:1256},
+  // German
+  werther:    {gutid:2407, se:"j-w-von-goethe/the-sorrows-of-young-werther_r-d-boylan"},
+  siddh:      {gutid:2499},
+  faust:      {gutid:2229},
+  zara:       {gutid:7205},
+  verwandlung:{gutid:22367,se:"franz-kafka/the-metamorphosis_ian-johnston"},
+  strafk:     {gutid:25791},
+  // Portuguese
+  casmurro:   {gutid:55752},
+  quincas:    {gutid:55682},
+  helena:     {gutid:67162},
+  amaro:      {gutid:31971},
+  mandarin:   {gutid:16384},
+  lusiadas:   {gutid:3333},
+  // Italian
+  pinocchio:  {gutid:52484,se:"carlo-collodi/the-adventures-of-pinocchio_carol-della-chiesa"},
+  promessi:   {gutid:45334},
+  mistero:    {gutid:22504},
+  canti:      {gutid:55236},
+  inferno:    {gutid:997,  se:"dante-alighieri/the-divine-comedy_henry-wadsworth-longfellow"},
+};
+
+function getDlLinks(bookId){
+  const d = DOWNLOADS[bookId];
+  if(!d) return '';
+  const links = [];
+  const gutBase = 'https://www.gutenberg.org/ebooks/';
+  if(d.gutid){
+    links.push(`<a class="dl-btn epub" href="${gutBase}${d.gutid}.epub.noimages" target="_blank">📱 EPUB</a>`);
+    links.push(`<a class="dl-btn pdf"  href="${gutBase}${d.gutid}.pdf.images"    target="_blank">📄 PDF</a>`);
+  }
+  if(d.se){
+    const seBase='https://standardebooks.org/ebooks/';
+    const name = d.se.split('/').pop();
+    links.push(`<a class="dl-btn epub" href="${seBase}${d.se}/downloads/${d.se.replace(/\//g,'_').replace(/-/g,'_').split('_').slice(0,3).join('_')}.epub" target="_blank" style="border-color:#a78bfa;color:#a78bfa;">✨ EPUB Standard</a>`);
+  }
+  return links.join('');
+}
+
+// ── HTML & PDF BOOK ENTRIES ──
+// fmt: 'html' or 'pdf'
+// hurl: URL to the HTML or PDF file on raw.githubusercontent.com
+// G already defined above
+const HTML_BOOKS = {
+  en:[
+    {cat:"Edición formateada 📄",desc:"HTML con imágenes y tipografía · A2–C1",books:[
+      {id:"alice_h",   title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"Edición HTML ilustrada de Gutenberg.",       fmt:"html",hurl:G+"Alice-s-Adventures-in-Wonderland_11/master/11-h/11-h.htm"},
+      {id:"alice_pdf", title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"Edición PDF con ilustraciones originales.",   fmt:"pdf", hurl:G+"Alice-s-Adventures-in-Wonderland_11/master/11-pdf.pdf"},
+      {id:"wizard_h",  title:"The Wonderful Wizard of Oz",      author:"L. Frank Baum",  lv:"a2",desc:"Edición HTML ilustrada de Gutenberg.",       fmt:"html",hurl:G+"The-Wonderful-Wizard-of-Oz_55/master/55-h/55-h.htm"},
+      {id:"secret_h",  title:"The Secret Garden",               author:"F. H. Burnett",  lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Secret-Garden_17396/master/17396-h/17396-h.htm"},
+      {id:"treasure_h",title:"Treasure Island",                 author:"R. L. Stevenson",lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Treasure-Island_120/master/120-h/120-h.htm"},
+      {id:"wild_h",    title:"The Call of the Wild",            author:"Jack London",    lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Call-of-the-Wild_215/master/215-h/215-h.htm"},
+      {id:"moby_h",    title:"Moby-Dick",                       author:"Herman Melville",lv:"c1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Moby-Dick--Or-The-Whale_2701/master/2701-h/2701-h.htm"},
+      {id:"frank_h",   title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Frankenstein_84/master/84-h/84-h.htm"},
+      {id:"dracula_h", title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"Dracula_345/master/345-h/345-h.htm"},
+      {id:"time_h",    title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-Time-Machine_35/master/35-h/35-h.htm"},
+      {id:"war_h",     title:"The War of the Worlds",           author:"H. G. Wells",    lv:"b2",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"The-War-of-the-Worlds_36/master/36-h/36-h.htm"},
+      {id:"journey_h", title:"Journey to the Centre of the Earth",author:"Jules Verne", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",      fmt:"html",hurl:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857-h/18857-h.htm"},
+    ]},
+  ],
+  es:[
+    {cat:"Edición formateada 📄",desc:"HTML con tipografía original · B2–C2",books:[
+      {id:"quijote_h",  title:"Don Quijote de la Mancha",       author:"Miguel de Cervantes",  lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Don-Quijote_2000/master/2000-h/2000-h.htm"},
+      {id:"lazarillo_h",title:"Lazarillo de Tormes",            author:"Anónimo",              lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Vida-De-Lazarillo-De-Tormes-Y-De-Sus-Fortunas-Y-Adversidades_320/master/320-h/320-h.htm"},
+      {id:"calderon_h", title:"Teatro selecto",                 author:"Calderón de la Barca", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Teatro-selecto-tomo-1-de-4_54436/master/54436-h/54436-h.htm"},
+      {id:"lope_h",     title:"Comedias escogidas",             author:"Lope de Vega",         lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Comedias--El-remedio-en-la-desdicha--El-mejor-alcalde-el-rey_28408/master/28408-h/28408-h.htm"},
+      {id:"becquer_h",  title:"Obras escogidas",                author:"Gustavo A. Bécquer",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Obras-escogidas_53552/master/53552-h/53552-h.htm"},
+      {id:"regenta_h",  title:"La Regenta",                     author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"La-Regenta_17073/master/17073-h/17073-h.htm"},
+      {id:"fortunata_h",title:"Fortunata y Jacinta",            author:"Benito Pérez Galdós",  lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Fortunata-y-Jacintados-historias-de-casadas_17013/master/17013-h/17013-h.htm"},
+      {id:"marianela_h",title:"Marianela",                      author:"Benito Pérez Galdós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Marianela_17340/master/17340-h/17340-h.htm"},
+      {id:"pepita_h",   title:"Pepita Jiménez",                 author:"Juan Valera",          lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Pepita-Jim-nez_17223/master/17223-h/17223-h.htm"},
+      {id:"quevedo_h",  title:"Los Sueños",                     author:"Francisco de Quevedo", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Los-suenos-Vol-1_65999/master/65999-h/65999-h.htm"},
+      {id:"cuentos_h",  title:"Cuentos de amor",                author:"Emilia Pardo Bazán",   lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Cuentos-de-amor_55514/master/55514-h/55514-h.htm"},
+      {id:"dueno_h",    title:"Dulce Dueño",                    author:"Emilia Pardo Bazán",   lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Dulce-Dueno_56044/master/56044-h/56044-h.htm"},
+    ]},
+  ],
+  fr:[
+    {cat:"Édition formatée 📄",desc:"HTML con tipografía original · C1–C2",books:[
+      {id:"miser_h",    title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Les-mis-rables-Tome-I--13-Fantine_17489/master/17489-h/17489-h.htm"},
+      {id:"notredame_h",title:"Notre-Dame de Paris",             author:"Victor Hugo",      lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Notre-Dame-de-Paris_19657/master/19657-h/19657-h.htm"},
+      {id:"cyrano_h",   title:"Cyrano de Bergerac",              author:"Edmond Rostand",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Cyrano-de-Bergerac_1256/master/1256-h/1256-h.htm"},
+      {id:"rouge_h",    title:"Le Rouge et le Noir",             author:"Stendhal",        lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Le-Rouge-et-le-noir--chronique-du-XIXe-si-cle_798/master/798-h/798-h.htm"},
+    ]},
+  ],
+  de:[
+    {cat:"Formatierte Ausgabe 📄",desc:"HTML con tipografía original · B2–C1",books:[
+      {id:"verwandlung_h",title:"Die Verwandlung",               author:"Franz Kafka",     lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Die-Verwandlung_22367/master/22367-h/22367-h.htm"},
+      {id:"strafk_h",    title:"In der Strafkolonie",             author:"Franz Kafka",    lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"In-der-Strafkolonie_25791/master/25791-h/25791-h.htm"},
+    ]},
+  ],
+  pt:[
+    {cat:"Edição formatada 📄",desc:"HTML con tipografía original · B1–C2",books:[
+      {id:"casmurro_h", title:"Dom Casmurro",                    author:"Machado de Assis", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Dom-Casmurro_55752/master/55752-h/55752-h.htm"},
+      {id:"quincas_h",  title:"Quincas Borba",                   author:"Machado de Assis", lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Quincas-Borba_55682/master/55682-h/55682-h.htm"},
+      {id:"helena_h",   title:"Helena",                          author:"Machado de Assis", lv:"b1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Helena_67162/master/67162-h/67162-h.htm"},
+      {id:"amaro_h",    title:"O Crime do Padre Amaro",           author:"Eça de Queirós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"O-crime-do-padre-Amaro-scenas-da-vida-devota_31971/master/31971-h/31971-h.htm"},
+      {id:"mandarin_h", title:"O Mandarim",                      author:"Eça de Queirós",  lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"O-Mandarim_16384/master/16384-h/16384-h.htm"},
+      {id:"lusiadas_h", title:"Os Lusíadas",                     author:"Luís de Camões",  lv:"c2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Os-Lus-adas_3333/master/3333-h/3333-h.htm"},
+    ]},
+  ],
+  it:[
+    {cat:"Edizione formattata 📄",desc:"HTML con tipografía original · A2–C1",books:[
+      {id:"pinocchio_h",title:"Le avventure di Pinocchio",       author:"Carlo Collodi",    lv:"a2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"Le-avventure-di-Pinocchio-Storia-di-un-burattino_52484/master/52484-h/52484-h.htm"},
+      {id:"promessi_h", title:"I Promessi Sposi",                author:"Alessandro Manzoni",lv:"b2",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"I-promessi-sposiOpere-di-Alessando-Manzoni-vol.-1_45334/master/45334-h/45334-h.htm"},
+      {id:"canti_h",    title:"I Canti",                         author:"Giacomo Leopardi", lv:"c1",desc:"Edición HTML formateada de Gutenberg.",fmt:"html",hurl:G+"I-Canti_55236/master/55236-h/55236-h.htm"},
+    ]},
+  ],
+};
+
+// ── WIKISOURCE EXPORT SERVICE ──
+// ws-export.wmcloud.org generates PDF/EPUB on demand from Wikisource (browser-accessible)
+// URL pattern: https://ws-export.wmcloud.org/?lang={lang}&format={pdf|epub}&page={PageName}
+const WE = (lang,fmt,page) => `https://ws-export.wmcloud.org/?lang=${lang}&format=${fmt}&page=${encodeURIComponent(page)}`;
+
+// Add Wikisource PDF/EPUB entries to each language
+// These are generated on-demand — may take 10-30s to load on first request
+const WS_BOOKS = {
+  en:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · A2–C1",books:[
+      {id:"alice_ws_pdf",   title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Alice's_Adventures_in_Wonderland")},
+      {id:"frank_ws_pdf",   title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Frankenstein")},
+      {id:"dracula_ws_pdf", title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Dracula")},
+      {id:"jekyll_ws_pdf",  title:"Dr Jekyll and Mr Hyde",           author:"R.L. Stevenson", lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Strange_Case_of_Dr_Jekyll_and_Mr_Hyde")},
+      {id:"time_ws_pdf",    title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","The_Time_Machine")},
+      {id:"war_ws_pdf",     title:"The War of the Worlds",           author:"H. G. Wells",    lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","The_War_of_the_Worlds")},
+      {id:"treasure_ws_pdf",title:"Treasure Island",                 author:"R.L. Stevenson", lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Treasure_Island")},
+      {id:"moby_ws_pdf",    title:"Moby-Dick",                       author:"Herman Melville",lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("en","pdf","Moby-Dick")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · A2–C1",books:[
+      {id:"alice_ws_epub",  title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Alice's_Adventures_in_Wonderland")},
+      {id:"frank_ws_epub",  title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Frankenstein")},
+      {id:"dracula_ws_epub",title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Dracula")},
+      {id:"time_ws_epub",   title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","The_Time_Machine")},
+      {id:"treasure_ws_epub",title:"Treasure Island",                author:"R.L. Stevenson", lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("en","epub","Treasure_Island")},
+    ]},
+  ],
+  es:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B2–C2",books:[
+      {id:"quijote_ws_pdf",   title:"Don Quijote de la Mancha",      author:"Miguel de Cervantes",  lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","El_ingenioso_hidalgo_don_Quijote_de_la_Mancha")},
+      {id:"lazarillo_ws_pdf", title:"Lazarillo de Tormes",           author:"Anónimo",              lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","Vida_de_Lazarillo_de_Tormes")},
+      {id:"regenta_ws_pdf",   title:"La Regenta",                    author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"PDF con texto de Wikisource.", fmt:"pdf",hurl:WE("es","pdf","La_Regenta")},
+      {id:"becquer_ws_pdf",   title:"Rimas",                         author:"Gustavo A. Bécquer",   lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("es","pdf","Rimas_(Bécquer)")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B2–C2",books:[
+      {id:"quijote_ws_epub",  title:"Don Quijote de la Mancha",      author:"Miguel de Cervantes",  lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("es","epub","El_ingenioso_hidalgo_don_Quijote_de_la_Mancha")},
+      {id:"lazarillo_ws_epub",title:"Lazarillo de Tormes",           author:"Anónimo",              lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("es","epub","Vida_de_Lazarillo_de_Tormes")},
+      {id:"regenta_ws_epub",  title:"La Regenta",                    author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"EPUB con texto de Wikisource.",fmt:"epub",hurl:WE("es","epub","La_Regenta")},
+    ]},
+  ],
+  fr:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B1–C2",books:[
+      {id:"mousq_ws_pdf",   title:"Les Trois Mousquetaires",         author:"Alexandre Dumas",  lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Les_Trois_Mousquetaires")},
+      {id:"miser_ws_pdf",   title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Les_Misérables")},
+      {id:"bovary_ws_pdf",  title:"Madame Bovary",                   author:"Gustave Flaubert", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Madame_Bovary")},
+      {id:"germ_ws_pdf",    title:"Germinal",                        author:"Émile Zola",      lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Germinal")},
+      {id:"cyrano_ws_pdf",  title:"Cyrano de Bergerac",              author:"Edmond Rostand",  lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Cyrano_de_Bergerac")},
+      {id:"rouge_ws_pdf",   title:"Le Rouge et le Noir",             author:"Stendhal",        lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Le_Rouge_et_le_Noir")},
+      {id:"ndame_ws_pdf",   title:"Notre-Dame de Paris",             author:"Victor Hugo",     lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("fr","pdf","Notre-Dame_de_Paris")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B1–C2",books:[
+      {id:"mousq_ws_epub",  title:"Les Trois Mousquetaires",         author:"Alexandre Dumas",  lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Les_Trois_Mousquetaires")},
+      {id:"miser_ws_epub",  title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Les_Misérables")},
+      {id:"bovary_ws_epub", title:"Madame Bovary",                   author:"Gustave Flaubert", lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Madame_Bovary")},
+      {id:"germ_ws_epub",   title:"Germinal",                        author:"Émile Zola",      lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("fr","epub","Germinal")},
+    ]},
+  ],
+  de:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B2–C2",books:[
+      {id:"faust_ws_pdf",    title:"Faust — Erster Teil",            author:"J. W. von Goethe", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Faust_(Goethe)")},
+      {id:"verwandlung_ws_pdf",title:"Die Verwandlung",              author:"Franz Kafka",      lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Die_Verwandlung")},
+      {id:"zara_ws_pdf",     title:"Also sprach Zarathustra",        author:"F. Nietzsche",     lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Also_sprach_Zarathustra")},
+      {id:"werther_ws_pdf",  title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("de","pdf","Die_Leiden_des_jungen_Werthers")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B2–C2",books:[
+      {id:"faust_ws_epub",   title:"Faust — Erster Teil",            author:"J. W. von Goethe", lv:"c1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Faust_(Goethe)")},
+      {id:"verwandlung_ws_epub",title:"Die Verwandlung",             author:"Franz Kafka",      lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Die_Verwandlung")},
+      {id:"werther_ws_epub", title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("de","epub","Die_Leiden_des_jungen_Werthers")},
+    ]},
+  ],
+  pt:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · B1–C2",books:[
+      {id:"casmurro_ws_pdf",title:"Dom Casmurro",                    author:"Machado de Assis", lv:"b1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("pt","pdf","Dom_Casmurro")},
+      {id:"lusiadas_ws_pdf",title:"Os Lusíadas",                     author:"Luís de Camões",  lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("pt","pdf","Os_Lusíadas")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · B1–C2",books:[
+      {id:"casmurro_ws_epub",title:"Dom Casmurro",                   author:"Machado de Assis", lv:"b1",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("pt","epub","Dom_Casmurro")},
+      {id:"lusiadas_ws_epub",title:"Os Lusíadas",                    author:"Luís de Camões",  lv:"c2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("pt","epub","Os_Lusíadas")},
+    ]},
+  ],
+  it:[
+    {cat:"PDF · Wikisource 🔴",desc:"PDF generado desde Wikisource · A2–C2",books:[
+      {id:"pinocchio_ws_pdf",title:"Le avventure di Pinocchio",      author:"Carlo Collodi",    lv:"a2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","Le_avventure_di_Pinocchio")},
+      {id:"inferno_ws_pdf",  title:"Divina Commedia — Inferno",      author:"Dante Alighieri",  lv:"c2",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","Divina_Commedia")},
+      {id:"promessi_ws_pdf", title:"I Promessi Sposi",               author:"Alessandro Manzoni",lv:"b2",desc:"PDF con texto de Wikisource.", fmt:"pdf",hurl:WE("it","pdf","I_promessi_sposi")},
+      {id:"canti_ws_pdf",    title:"I Canti",                        author:"Giacomo Leopardi", lv:"c1",desc:"PDF con texto de Wikisource.",  fmt:"pdf",hurl:WE("it","pdf","I_Canti_(Leopardi)")},
+    ]},
+    {cat:"EPUB · Wikisource 🟣",desc:"EPUB generado desde Wikisource · A2–C2",books:[
+      {id:"pinocchio_ws_epub",title:"Le avventure di Pinocchio",     author:"Carlo Collodi",    lv:"a2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("it","epub","Le_avventure_di_Pinocchio")},
+      {id:"inferno_ws_epub",  title:"Divina Commedia — Inferno",     author:"Dante Alighieri",  lv:"c2",desc:"EPUB con texto de Wikisource.", fmt:"epub",hurl:WE("it","epub","Divina_Commedia")},
+      {id:"promessi_ws_epub", title:"I Promessi Sposi",              author:"Alessandro Manzoni",lv:"b2",desc:"EPUB con texto de Wikisource.",fmt:"epub",hurl:WE("it","epub","I_promessi_sposi")},
+    ]},
+  ],
+};
+
 const TRANS_TARGET = {en:'es',es:'en',fr:'es',de:'es',pt:'es',it:'es'};
 const TRANS_LABEL  = {en:'español',es:'inglés',fr:'español',de:'español',pt:'español',it:'español'};
 
@@ -670,6 +1022,424 @@ const LMETA = {
   de:{flag:"🇩🇪",badge:"🇩🇪 Deutsch",   rgb:"245,166,35",  tts:"de-DE"},
   pt:{flag:"🇵🇹",badge:"🇵🇹 Português", rgb:"74,222,128",  tts:"pt-PT"},
   it:{flag:"🇮🇹",badge:"🇮🇹 Italiano",  rgb:"192,132,252", tts:"it-IT"},
+};
+
+// ══════════════════════════════════════════════════════
+// VOCABULARY DATA — pinned + alphabetical per book
+// w: word, exp: explanation in original language, ex: book sentence
+// ══════════════════════════════════════════════════════
+
+const VOCAB = {
+  // ── ENGLISH ──
+  alice:{
+    words:[
+      {w:"adventure",   exp:"An exciting or unusual experience.",                                                     ex:"Alice started to her feet, for it flashed across her mind."},
+      {w:"Alice",       exp:"The curious young girl who falls into Wonderland.",                                      ex:"Alice was beginning to get very tired of sitting."},
+      {w:"appear",      exp:"To come into sight; to become visible.",                                                 ex:"A large cat appeared on a branch above her."},
+      {w:"beautiful",   exp:"Very pleasing to look at; attractive.",                                                  ex:"The flowers were beautiful but had no scent."},
+      {w:"bottle",      exp:"A container with a narrow neck; here marked 'Drink me'.",                               ex:"It was labelled 'Drink me' in large letters."},
+      {w:"cake",        exp:"A sweet baked food; here labelled 'Eat me'.",                                           ex:"She found a little cake with the words 'Eat me'."},
+      {w:"card",        exp:"A flat piece of thick paper; the Queen's soldiers are playing-cards.",                  ex:"The soldiers were flat playing-cards."},
+      {w:"Caterpillar", exp:"A larva; here a philosophical creature smoking a hookah.",                              ex:"The Caterpillar and Alice looked at each other in silence."},
+      {w:"corridor",    exp:"A long narrow passage in a building.",                                                   ex:"She found herself in a long low corridor."},
+      {w:"creature",    exp:"A living being, animal or fantastical being.",                                          ex:"All sorts of little birds and beasts gathered round her."},
+      {w:"curious",     exp:"Eager to know; also strange and unusual.",                                              ex:"Curiouser and curiouser! cried Alice."},
+      {w:"Dodo",        exp:"An extinct flightless bird; a character in the pool of tears.",                        ex:"The Dodo solemnly rose to its feet."},
+      {w:"door",        exp:"A movable barrier at the entrance to a room.",                                          ex:"She came upon a little door about fifteen inches high."},
+      {w:"dream",       exp:"A series of images during sleep; a wishful fantasy.",                                   ex:"Was it really a dream after all?"},
+      {w:"duchess",     exp:"A noblewoman; here a bad-tempered character with a baby.",                             ex:"The Duchess was sitting on a three-legged stool."},
+      {w:"eager",       exp:"Strongly wanting to do or have something.",                                             ex:"She was rather glad there was no one listening."},
+      {w:"enormous",    exp:"Very large in size.",                                                                   ex:"An enormous puppy was looking down at her."},
+      {w:"fall",        exp:"To drop downward; Alice falls into Wonderland.",                                        ex:"Down, down, down. Would the fall never come to an end?"},
+      {w:"fan",         exp:"A flat folding device for creating a cool breeze.",                                     ex:"She took up the fan and gloves."},
+      {w:"flamingo",    exp:"A pink wading bird; used as a croquet mallet in Wonderland.",                          ex:"The chief difficulty Alice found was managing her flamingo."},
+      {w:"foolish",     exp:"Lacking good sense; unwise.",                                                           ex:"It was foolish to cry so much."},
+      {w:"frightened",  exp:"Filled with fear or alarm.",                                                            ex:"Alice was rather frightened by this."},
+      {w:"garden",      exp:"An outdoor space with plants; Alice longs to reach the beautiful garden.",              ex:"She could see a beautiful garden beyond the door."},
+      {w:"gloves",      exp:"Hand coverings; the White Rabbit is always looking for his.",                          ex:"The White Rabbit dropped its white gloves and fan."},
+      {w:"grow",        exp:"To increase in size; Alice grows and shrinks throughout.",                              ex:"One side will make you grow taller."},
+      {w:"guinea-pig",  exp:"A small rodent; a character in the trial scene.",                                       ex:"Two guinea-pigs were immediately suppressed."},
+      {w:"hall",        exp:"A large entrance room; the hall of many doors.",                                        ex:"She found herself in a long hall lined with doors."},
+      {w:"hare",        exp:"A wild animal like a large rabbit; the March Hare hosts the tea party.",               ex:"The March Hare had a large teapot in front of him."},
+      {w:"head",        exp:"The upper part of the body; the Queen constantly orders heads cut off.",                ex:"Off with their heads! shouted the Queen of Hearts."},
+      {w:"hedgehog",    exp:"A small spiny mammal; used as a croquet ball in Wonderland.",                          ex:"The hedgehog had unrolled itself and was creeping away."},
+      {w:"hole",        exp:"An opening; Alice falls down the rabbit hole to begin the story.",                      ex:"In another moment Alice had followed the rabbit down the hole."},
+      {w:"jury",        exp:"A group of people who decide the verdict in a trial.",                                  ex:"Write that down, the King said to the jury."},
+      {w:"key",         exp:"A device for opening a lock; Alice finds a tiny golden key.",                           ex:"She found a little golden key on the glass table."},
+      {w:"kitten",      exp:"A young cat; Alice's kitten triggers the dream of Wonderland.",                        ex:"It was a black kitten and a white kitten."},
+      {w:"knight",      exp:"An armored warrior; the White Knight appears in later chapters.",                       ex:"The White Knight was sliding down the poker."},
+      {w:"lock",        exp:"A fastening device; the small door is locked.",                                         ex:"She tried the little door, but it was locked."},
+      {w:"mad",         exp:"Crazy; also the state of all Wonderland inhabitants.",                                  ex:"We're all mad here, said the Cheshire Cat."},
+      {w:"mock",        exp:"To make fun of; also the Mock Turtle character.",                                       ex:"The Mock Turtle sighed deeply."},
+      {w:"mushroom",    exp:"A type of fungus with magical properties in Wonderland.",                              ex:"One side will make you grow taller and the other shorter."},
+      {w:"nonsense",    exp:"Words or ideas that have no meaning or make no sense.",                                 ex:"It's no use going back to yesterday."},
+      {w:"pepper",      exp:"A spice; the Duchess uses too much pepper in her kitchen.",                            ex:"There was certainly too much pepper in the soup."},
+      {w:"pool",        exp:"A small area of still water; Alice cries a pool of tears.",                            ex:"Alice was swimming in her pool of tears."},
+      {w:"puppy",       exp:"A young dog; Alice encounters a gigantic puppy.",                                       ex:"An enormous puppy was looking down at her."},
+      {w:"queen",       exp:"A female ruler; the violent Queen of Hearts.",                                          ex:"Off with their heads! shouted the Queen."},
+      {w:"rabbit",      exp:"A small furry animal; the White Rabbit leads Alice into Wonderland.",                  ex:"The White Rabbit took a watch out of its waistcoat-pocket."},
+      {w:"riddle",      exp:"A puzzling question or statement.",                                                     ex:"Why is a raven like a writing-desk?"},
+      {w:"rose",        exp:"A flower; the cards are painting the white roses red.",                                 ex:"They were painting a rosebush white to make it look red."},
+      {w:"size",        exp:"The dimensions of something; Alice constantly changes size.",                           ex:"She had never before seen a rabbit with a waistcoat-pocket."},
+      {w:"soup",        exp:"A liquid food; the Mock Turtle sings about beautiful soup.",                           ex:"Beautiful Soup, so rich and green!"},
+      {w:"tea",         exp:"A hot drink; the subject of the mad tea party.",                                        ex:"Have some wine, the March Hare said encouragingly."},
+      {w:"thimble",     exp:"A cap worn to protect the finger when sewing.",                                         ex:"Alice humbly accepted the thimble."},
+      {w:"trial",       exp:"A formal legal hearing; Alice is called as a witness.",                                 ex:"Who stole the tarts? said the King."},
+      {w:"waistcoat",   exp:"A sleeveless garment worn over a shirt; the Rabbit's distinctive item.",               ex:"The rabbit took a watch out of its waistcoat-pocket."},
+      {w:"wise",        exp:"Having good judgement and knowledge.",                                                   ex:"The wise little Alice was not going to do that."},
+      {w:"wonder",      exp:"A feeling of amazement; also the place wonderland.",                                    ex:"Alice's Adventures in Wonderland."},
+      {w:"wretched",    exp:"In a very unhappy or unfortunate state.",                                               ex:"She felt a little irritated at the Caterpillar's making such very short remarks."},
+    ]
+  },
+  dracula:{
+    words:[
+      {w:"asylum",      exp:"A hospital for people with mental illness; Renfield is confined there.",                ex:"The Count had access to the asylum."},
+      {w:"bat",         exp:"A flying mammal; Dracula can transform into one.",                                      ex:"A bat flew close to her face."},
+      {w:"bite",        exp:"To cut with the teeth; the vampire's method of infection.",                             ex:"There were two puncture marks on her throat."},
+      {w:"blood",       exp:"The red liquid in the body; what vampires feed on.",                                    ex:"The lips were redder than ever, with gouts of fresh blood."},
+      {w:"castle",      exp:"A large fortified medieval building; Dracula's home.",                                  ex:"The castle is on the very edge of a terrible precipice."},
+      {w:"coffin",      exp:"A box in which a corpse is buried; vampires sleep in them.",                           ex:"Jonathan found the Count lying in his box upon the earth."},
+      {w:"Count",       exp:"A European nobleman; Dracula's title.",                                                 ex:"The Count smiled and his lips drew back over long sharp teeth."},
+      {w:"crucifix",    exp:"A cross with a figure of Christ; repels vampires.",                                    ex:"The old woman pressed a crucifix into his hand."},
+      {w:"curse",       exp:"A supernatural invocation causing harm.",                                               ex:"The nosferatu do not die like the bee when he stings once."},
+      {w:"daylight",    exp:"The light of the sun; fatal to vampires.",                                              ex:"Before the dawn had come he must return to his native earth."},
+      {w:"demon",       exp:"An evil supernatural being.",                                                           ex:"He was at once man and demon."},
+      {w:"diary",       exp:"A personal journal; the novel is told through diaries and letters.",                   ex:"I must keep writing in my diary."},
+      {w:"dust",        exp:"Fine dry particles; what Dracula crumbles to after death.",                            ex:"He crumbled into dust and vanished."},
+      {w:"earth",       exp:"Soil from his homeland; Dracula must sleep in his native earth.",                       ex:"The Count rested in a box filled with earth."},
+      {w:"evil",        exp:"Profoundly immoral; Dracula embodies evil.",                                            ex:"I shall cut off the head and fill the mouth with garlic."},
+      {w:"fangs",       exp:"Long sharp pointed teeth; a vampire's weapon.",                                         ex:"His lips drew back over his long sharp fangs."},
+      {w:"fear",        exp:"An unpleasant emotion caused by danger or threat.",                                     ex:"There was something about him that made me uneasy."},
+      {w:"fog",         exp:"A thick mist; Dracula often arrives in foggy weather.",                                 ex:"A heavy sea-fog rolled in from the sea."},
+      {w:"garlic",      exp:"A plant whose smell repels vampires.",                                                  ex:"The old woman hung garlic over the door."},
+      {w:"ghost",       exp:"The spirit of a dead person.",                                                          ex:"It seemed as though they were ghosts."},
+      {w:"grave",       exp:"A place of burial; vampires rise from their graves.",                                   ex:"We opened the grave and found her there."},
+      {w:"horror",      exp:"Intense fear or shock.",                                                                ex:"I was filled with horror and loathing."},
+      {w:"hunt",        exp:"To pursue and kill; Van Helsing hunts Dracula.",                                        ex:"We must hunt the monster down."},
+      {w:"hypnosis",    exp:"A state of focused attention; Dracula uses it to control victims.",                     ex:"She was under some terrible influence."},
+      {w:"immortal",    exp:"Living forever; not subject to death.",                                                 ex:"The nosferatu do not die like the bee."},
+      {w:"infection",   exp:"The process of being contaminated by a harmful agent.",                                  ex:"She had been bitten and must be turned."},
+      {w:"journal",     exp:"A personal diary; the novel is narrated through journals.",                             ex:"I keep a journal in shorthand."},
+      {w:"knife",       exp:"A sharp cutting blade; used to kill Dracula.",                                          ex:"The knife plunged into the throat."},
+      {w:"Mina",        exp:"The heroine of the novel, Jonathan Harker's fiancée.",                                  ex:"Mina was white and speechless with terror."},
+      {w:"mirror",      exp:"A reflective surface; vampires cast no reflection.",                                    ex:"There was no reflection of him in the mirror."},
+      {w:"mist",        exp:"A thin fog; Dracula can transform into mist.",                                          ex:"The mist crept under the door."},
+      {w:"moon",        exp:"The natural satellite of Earth; wolves howl at it.",                                    ex:"The full moon shone on the white snow."},
+      {w:"night",       exp:"The period of darkness; when vampires are active.",                                     ex:"Do you not think that there are things which you cannot understand?"},
+      {w:"nosferatu",   exp:"An old word for vampire, used by Van Helsing.",                                         ex:"The nosferatu do not die like the bee."},
+      {w:"pale",        exp:"Light in colour; often used to describe those drained of blood.",                      ex:"Her face was pale as death."},
+      {w:"professor",   exp:"Van Helsing's title; the expert vampire hunter.",                                       ex:"Professor Van Helsing was a man of iron nerve."},
+      {w:"Renfield",    exp:"A patient in the asylum who eats flies and worships Dracula.",                         ex:"Renfield was sitting quietly in the corner."},
+      {w:"shadow",      exp:"A dark shape; Dracula casts none.",                                                     ex:"No shadow fell upon the moonlit ground where he walked."},
+      {w:"silver",      exp:"A precious metal; a silver bullet kills supernatural creatures.",                       ex:"A stake through the heart and a silver bullet."},
+      {w:"soul",        exp:"The spiritual or immaterial part of a person.",                                         ex:"His soul was not his own."},
+      {w:"stake",       exp:"A pointed wooden post driven through a vampire's heart.",                               ex:"The hammer drove the stake through the heart."},
+      {w:"sun",         exp:"The star at the centre of our system; fatal to vampires.",                              ex:"The vampire has not power to live in the sunlight."},
+      {w:"superstition",exp:"A belief not based on reason or knowledge.",                                            ex:"The peasants believe strange things."},
+      {w:"throat",      exp:"The front part of the neck; where vampires bite.",                                      ex:"There were two small punctures on her throat."},
+      {w:"Transylvania",exp:"A historical region of Romania; Dracula's homeland.",                                   ex:"I am Dracula and I bid you welcome."},
+      {w:"undead",      exp:"Existing between life and death.",                                                      ex:"Un-Dead, as they call it in Eastern Europe."},
+      {w:"vampire",     exp:"An undead creature that feeds on human blood.",                                         ex:"The mouth was redder than ever for on the lips were gouts of blood."},
+      {w:"victim",      exp:"A person harmed by another; Dracula's prey.",                                           ex:"The poor girl was white and thin."},
+      {w:"wolf",        exp:"A wild canine; Dracula can transform into one.",                                        ex:"The wolves began to howl as though the moonlight had some peculiar effect."},
+    ]
+  },
+  frankenstein:{
+    words:[
+      {w:"abhor",       exp:"To regard with disgust and hatred.",                                                    ex:"I abhorred myself."},
+      {w:"abandoned",   exp:"Deserted; left alone without support.",                                                 ex:"I, the miserable and the abandoned."},
+      {w:"agony",       exp:"Extreme physical or mental pain.",                                                      ex:"I was seized by agony."},
+      {w:"ambition",    exp:"A strong desire to achieve something.",                                                 ex:"My father looked upon my studies with contempt."},
+      {w:"anatomy",     exp:"The scientific study of the structure of the human body.",                              ex:"I pursued my investigations with unrelenting ardour."},
+      {w:"beautiful",   exp:"Very pleasing; Frankenstein seeks beauty in his creation.",                             ex:"His limbs were in proportion and I had selected his features as beautiful."},
+      {w:"creature",    exp:"A living being; the monster created by Frankenstein.",                                  ex:"The creature had abandoned the companions of his travels."},
+      {w:"creation",    exp:"The act of bringing something into existence.",                                         ex:"Learn from me by my example how dangerous is the acquirement of knowledge."},
+      {w:"daemon",      exp:"An evil spirit or devil; Frankenstein calls his creature a daemon.",                   ex:"I called myself the murderer of William, of Justine, and of Clerval."},
+      {w:"death",       exp:"The end of life; a central theme of the novel.",                                        ex:"I was seized by a cold horror and clammy sweat."},
+      {w:"desolate",    exp:"Bleak and empty; how the creature feels without companionship.",                        ex:"I am alone and miserable; man will not associate with me."},
+      {w:"destroy",     exp:"To put an end to; Frankenstein seeks to destroy his creation.",                        ex:"I will not destroy the creature if it promises to leave Europe."},
+      {w:"disgust",     exp:"A strong feeling of revulsion.",                                                        ex:"The form of the monster on whom I had bestowed existence was forever before my eyes."},
+      {w:"electricity",exp:"The force that animated the creature on the stormy night.",                              ex:"The rain poured down in torrents, and the thunder deafened and blinded me."},
+      {w:"emotion",     exp:"A strong feeling such as love, fear, or joy.",                                          ex:"I was unable to compose my mind to study."},
+      {w:"exile",       exp:"The state of being barred from one's country.",                                         ex:"I was banished from my home."},
+      {w:"experiment",  exp:"A scientific procedure to test a hypothesis.",                                          ex:"I paused, examining and analysing all the minutiae of causation."},
+      {w:"fate",        exp:"The development of events outside a person's control.",                                 ex:"Destiny was too potent and her immutable laws had decreed my destruction."},
+      {w:"fiend",       exp:"An evil person or spirit.",                                                             ex:"Devil! Do you dare approach me?"},
+      {w:"filth",       exp:"Disgusting dirt; how the creature sees himself.",                                       ex:"Accursed creator! Why did you form a monster?"},
+      {w:"forest",      exp:"A large area of trees; where the creature lives.",                                     ex:"I lived in the forest, and fed on berries."},
+      {w:"glory",       exp:"Great beauty or fame; what Frankenstein seeks.",                                        ex:"I, who had ever been surrounded by amiable companions."},
+      {w:"god",         exp:"A supreme being; Frankenstein plays god by creating life.",                             ex:"I had worked hard for nearly two years for the sole purpose of infusing life."},
+      {w:"guilt",       exp:"A feeling of responsibility for wrongdoing.",                                           ex:"I called myself the murderer of William."},
+      {w:"hideousness", exp:"Extreme ugliness.",                                                                     ex:"His yellow skin scarcely covered the work of muscles and arteries beneath."},
+      {w:"horror",      exp:"Intense fear and shock.",                                                               ex:"With an anxiety that almost amounted to agony, I collected the instruments of life."},
+      {w:"humanity",    exp:"Human beings collectively; compassion.",                                                ex:"The creature sought warmth and companionship from humanity."},
+      {w:"ice",         exp:"Frozen water; the Arctic setting of the novel's frame.",                                ex:"I followed the monster to the icy regions of the north."},
+      {w:"intellect",   exp:"The faculty of reasoning and understanding.",                                           ex:"The creature was quick to learn."},
+      {w:"justice",     exp:"Fair treatment; Justine is unjustly executed.",                                         ex:"Justine Moritz, poor, poor girl, is the victim."},
+      {w:"knowledge",   exp:"Facts and information; Frankenstein's dangerous quest.",                                ex:"Seek happiness in tranquillity and avoid ambition."},
+      {w:"laboratory",  exp:"A room for scientific experiments.",                                                    ex:"In a solitary chamber I kept my workshop of filthy creation."},
+      {w:"life",        exp:"The condition that distinguishes living organisms from dead matter.",                   ex:"I collected the instruments of life around me."},
+      {w:"loneliness",  exp:"Sadness from being alone; the creature's main suffering.",                             ex:"I, the miserable and the abandoned, am an abortion."},
+      {w:"misery",      exp:"Great suffering or unhappiness.",                                                       ex:"No one can conceive the variety of feelings which bore me onwards."},
+      {w:"monster",     exp:"A frightening creature; Frankenstein's unnamed creation.",                              ex:"You are my creator but I am your master — obey!"},
+      {w:"murder",      exp:"The unlawful killing of a person.",                                                     ex:"I was the true murderer."},
+      {w:"nature",      exp:"The physical world; also human nature.",                                                ex:"The stars shone at intervals as the dark clouds passed from before them."},
+      {w:"noble",       exp:"Having or showing fine personal qualities.",                                            ex:"The creature aspired to be noble but was rejected."},
+      {w:"obsession",   exp:"An idea or thought that continually preoccupies the mind.",                            ex:"I pursued my undertaking with unremitting ardour."},
+      {w:"parent",      exp:"A father or mother; Frankenstein abandons his creature like a bad parent.",            ex:"I had no father who had watched my infant days."},
+      {w:"passion",     exp:"Strong and barely controllable emotion.",                                               ex:"My passion for science consumed all other pursuits."},
+      {w:"pitiful",     exp:"Deserving or arousing pity.",                                                           ex:"The poor, helpless, miserable wretch."},
+      {w:"pity",        exp:"The feeling of sorrow for someone else's misfortune.",                                  ex:"Did I request thee, Maker, from my clay to mould me Man?"},
+      {w:"pursuit",     exp:"The action of following or chasing something.",                                         ex:"I pursued my enemy across the frozen sea."},
+      {w:"ruin",        exp:"Physical destruction or catastrophic fall.",                                            ex:"My creation brought ruin upon all I loved."},
+      {w:"science",     exp:"Systematic study; Frankenstein's obsession.",                                           ex:"Learn from me how dangerous is the acquirement of knowledge."},
+      {w:"sorrow",      exp:"Deep distress caused by loss or disappointment.",                                       ex:"I am full of sorrow and despair."},
+      {w:"storm",       exp:"A violent weather event; lightning animates the creature.",                             ex:"It was on a dreary night of November that I beheld the accomplishment."},
+      {w:"sympathy",    exp:"Feelings of pity and sorrow for another's misfortune.",                                 ex:"I felt what the duties of a creator were."},
+      {w:"vengeance",   exp:"Punishment inflicted in return for an injury; revenge.",                                ex:"Cursed, cursed creator! Why did I live?"},
+      {w:"wretch",      exp:"A very unfortunate or unhappy person.",                                                 ex:"Cursed, cursed creator! Why did I live?"},
+    ]
+  },
+  quijote:{
+    words:[
+      {w:"andante",     exp:"Que anda errante; «caballero andante» busca aventuras por el mundo.",                  ex:"Quiero que se me llame don Quijote de la Mancha."},
+      {w:"armas",       exp:"Instrumentos de guerra; don Quijote lleva anticuadas armas de caballero.",            ex:"Limpió sus armas, que sin haber salido a ningún servicio estaban llenas de orín."},
+      {w:"aventura",    exp:"Empresa peligrosa o imprevista que se acomete.",                                       ex:"Y así, del poco dormir y del mucho leer, se le secó el celebro."},
+      {w:"bachiller",   exp:"Persona que ha obtenido el grado académico más básico universitario.",                 ex:"Tenía en su casa una ama que pasaba de los cuarenta."},
+      {w:"balsa",       exp:"Plataforma flotante; don Quijote confunde una simple barca con una nave encantada.",  ex:"En esto llegaron al río Ebro."},
+      {w:"barbero",     exp:"Persona que afeita y corta el pelo; el yelmo de Mambrino es en realidad una bacía.",  ex:"El barbero le puso el barbero en la cabeza."},
+      {w:"batalla",     exp:"Combate o enfrentamiento entre fuerzas opuestas.",                                     ex:"Don Quijote acometió con su lanza en ristre."},
+      {w:"caballero",   exp:"Hombre de clase noble que combate montado y sigue el código de honor.",               ex:"Yo sé quién soy, respondió don Quijote."},
+      {w:"caballo",     exp:"Animal de montar; Rocinante es el caballo flaco de don Quijote.",                     ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+      {w:"calidad",     exp:"Conjunto de propiedades o condiciones que caracterizan a algo.",                      ex:"La de su calidad no podía ser sino princesa."},
+      {w:"camino",      exp:"Vía o sendero por el que se transita.",                                               ex:"Siguieron su camino por la venta adelante."},
+      {w:"cordura",     exp:"Sensatez, juicio sano; lo opuesto a la locura.",                                      ex:"Al cabo se le secó el celebro y vino a perder el juicio."},
+      {w:"cueva",       exp:"Cavidad natural en la tierra; don Quijote baja a la Cueva de Montesinos.",            ex:"Don Quijote se descolgó a la cueva con una soga."},
+      {w:"dama",        exp:"Mujer noble; los caballeros luchan por su dama.",                                     ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+      {w:"derrota",     exp:"Acción de ser vencido en un combate o competición.",                                  ex:"Quedó don Quijote muy malparado en el suelo."},
+      {w:"desafío",     exp:"Acto de retar a alguien a un enfrentamiento.",                                        ex:"Te desafío a singular combate."},
+      {w:"disfraz",     exp:"Vestimenta con que alguien se disfraza para no ser reconocido.",                      ex:"Dorotea se disfrazó de princesa Micomicona."},
+      {w:"don",         exp:"Tratamiento de respeto que precede al nombre de pila.",                               ex:"Don Quijote de la Mancha."},
+      {w:"Dulcinea",    exp:"Nombre idealizado que don Quijote da a Aldonza Lorenzo, su dama imaginaria.",        ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+      {w:"encantamiento",exp:"Acción mágica que transforma la realidad; don Quijote justifica sus fracasos con encantamientos.", ex:"Sin duda los encantadores me persiguen."},
+      {w:"escudero",    exp:"Sirviente que acompaña al caballero y lleva sus armas.",                             ex:"Sancho Panza se llamaba un labrador vecino suyo."},
+      {w:"fama",        exp:"Renombre y gloria que se adquieren por las buenas acciones.",                        ex:"Quiso parecer a los que él había leído en sus libros."},
+      {w:"fantasma",    exp:"Aparición sobrenatural de un difunto.",                                              ex:"Pensó don Quijote que era algún encantamiento."},
+      {w:"gigante",     exp:"Ser de estatura y fuerza extraordinarias; los molinos de viento.",                  ex:"¿Qué gigantes? dijo Sancho Panza. Aquellos que allí ves, respondió su amo."},
+      {w:"gloria",      exp:"Fama y honor conquistados por las grandes acciones.",                                ex:"Felice edad y siglos dichosos aquellos a quien los antiguos pusieron nombre de dorados."},
+      {w:"hidalgo",     exp:"Noble de sangre de rango inferior que no tiene título.",                             ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme, vivía un hidalgo."},
+      {w:"honor",       exp:"Cualidad moral que obliga a actuar con rectitud y nobleza.",                         ex:"Más vale morir en pie que vivir de rodillas."},
+      {w:"ilusión",     exp:"Percepción equivocada de la realidad.",                                             ex:"Todo lo que veo y toco es encantamiento."},
+      {w:"ínsula",      exp:"Isla; Sancho sueña con gobernar una ínsula.",                                       ex:"¿Y bien, Sancho, ¿cómo te fue con tu gobierno?"},
+      {w:"justicia",    exp:"Principio moral de dar a cada uno lo que le corresponde.",                           ex:"Deshacer agravios y socorrer a los menesterosos."},
+      {w:"labrador",    exp:"Persona que labra la tierra; Sancho es un labrador.",                               ex:"Sancho Panza, que así se llamaba el labrador."},
+      {w:"lanza",       exp:"Arma de asta larga con punta de acero.",                                            ex:"Con estas razones perdía el pobre caballero el juicio."},
+      {w:"locura",      exp:"Estado mental alterado; pérdida del juicio.",                                       ex:"Viéndole don Quijote de aquella manera, con muestras de tanta tristeza."},
+      {w:"Mancha",      exp:"Región de España donde vivía don Quijote.",                                         ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme."},
+      {w:"molino",      exp:"Edificio con aspas para moler cereal.",                                             ex:"Acometió con su lanza al primero molino que estaba delante."},
+      {w:"mundo",       exp:"La Tierra y todo lo que existe en ella.",                                           ex:"Recorrió el mundo en busca de aventuras."},
+      {w:"novela",      exp:"Obra narrativa extensa en prosa.",                                                   ex:"El cura y el barbero hicieron escrutinio de la biblioteca."},
+      {w:"pastora",     exp:"Mujer que cuida ovejas; don Quijote quiere hacerse pastor.",                        ex:"Hagámonos pastores."},
+      {w:"penitencia",  exp:"Acto voluntario de sufrimiento como expiación de culpas.",                         ex:"Hizo don Quijote su penitencia en Sierra Morena."},
+      {w:"refrán",      exp:"Dicho popular que expresa una verdad general; Sancho los usa constantemente.",      ex:"Sancho Panza, que como todos los de su condición tenía la memoria llena de refranes."},
+      {w:"reino",       exp:"Estado gobernado por un rey o una reina.",                                          ex:"Prometió hacerle gobernador de una ínsula."},
+      {w:"Rocinante",   exp:"El caballo flaco y viejo de don Quijote.",                                          ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+      {w:"romance",     exp:"Poema narrativo popular; también historia de amor.",                                 ex:"Muchos años leyó libros de caballerías."},
+      {w:"Sancho",      exp:"Sancho Panza, el escudero de don Quijote.",                                         ex:"Sancho Panza no dijo nada."},
+      {w:"señor",       exp:"Título de respeto; Sancho llama siempre señor a don Quijote.",                     ex:"Señor, respondió Sancho Panza."},
+      {w:"venta",       exp:"Posada o mesón en un camino.",                                                      ex:"Llegaron a una venta que don Quijote tuvo por castillo."},
+      {w:"ventura",     exp:"Suerte o fortuna.",                                                                  ex:"¡Felice edad y siglos dichosos!"},
+      {w:"verdad",      exp:"Conformidad de las cosas con lo que se dice de ellas.",                             ex:"En esto de la verdad, señor cura, digo que tiene razón."},
+      {w:"victoria",    exp:"Triunfo en una batalla o competición.",                                             ex:"¡Santiago y cierra España!"},
+      {w:"viejo",       exp:"De avanzada edad; don Quijote es un hidalgo ya mayor.",                            ex:"Frisaba la edad de nuestro hidalgo con los cincuenta años."},
+      {w:"yelmo",       exp:"Pieza de armadura que cubre y protege la cabeza.",                                  ex:"Limpió su adarga, adobó su lanza y puso nombre a su rocín."},
+    ]
+  },
+  mousq:{
+    words:[
+      {w:"ami",         exp:"Ami(e): personne avec qui on a des liens d'affection et de confiance.",              ex:"Mon ami, dit Athos, tu es brave."},
+      {w:"amour",       exp:"Sentiment affectif intense envers une personne.",                                    ex:"Madame Bonacieux était jolie."},
+      {w:"arme",        exp:"Instrument servant à attaquer ou à se défendre.",                                    ex:"Il posa son arme sur la table."},
+      {w:"arrestation", exp:"Action d'arrêter quelqu'un au nom de la loi.",                                      ex:"Les gardes du cardinal firent l'arrestation."},
+      {w:"Athos",       exp:"L'un des trois mousquetaires, mystérieux et noble.",                                 ex:"Athos avait un calme parfait."},
+      {w:"Aramis",      exp:"L'un des trois mousquetaires, à moitié abbé.",                                      ex:"Aramis rougit comme une jeune fille."},
+      {w:"auberge",     exp:"Établissement où l'on peut manger et dormir.",                                       ex:"Ils s'arrêtèrent dans une auberge."},
+      {w:"blessure",    exp:"Lésion corporelle causée par un coup ou une arme.",                                  ex:"Sa blessure n'était pas mortelle."},
+      {w:"cardinal",    exp:"Haut dignitaire de l'Église catholique.",                                            ex:"Son Éminence le cardinal de Richelieu."},
+      {w:"complot",     exp:"Plan secret pour nuire à quelqu'un.",                                                ex:"Il y a un complot contre la reine."},
+      {w:"courage",     exp:"Capacité de faire face au danger sans se laisser abattre.",                         ex:"Tous pour un, un pour tous."},
+      {w:"D'Artagnan",  exp:"Le héros gascon qui aspire à devenir mousquetaire.",                                 ex:"D'Artagnan était brave et fougueux."},
+      {w:"danger",      exp:"Situation pouvant causer un dommage ou un risque.",                                  ex:"Nous étions tous en grand danger."},
+      {w:"duel",        exp:"Combat singulier entre deux personnes pour défendre leur honneur.",                  ex:"Il se mit en garde pour le duel."},
+      {w:"épée",        exp:"Arme blanche longue et fine.",                                                       ex:"Il tira son épée et se mit en garde."},
+      {w:"espion",      exp:"Personne qui recueille des informations secrètes.",                                  ex:"Milady était un véritable espion."},
+      {w:"ferme",       exp:"Domaine agricole; aussi: résolu, sans faiblesse.",                                   ex:"Sa volonté était ferme."},
+      {w:"fidèle",      exp:"Constant dans ses engagements et ses affections.",                                   ex:"Porthos était fidèle à ses amis."},
+      {w:"fortune",     exp:"Sort favorable ou ensemble des richesses.",                                          ex:"Il avait la fortune d'être gascon."},
+      {w:"garder",      exp:"Surveiller ou protéger quelqu'un.",                                                  ex:"Les gardes protégeaient le palais."},
+      {w:"honneur",     exp:"Qualité morale qui pousse à agir avec intégrité.",                                   ex:"Un gentilhomme ne recule jamais devant l'honneur."},
+      {w:"liberté",     exp:"État de quelqu'un qui n'est pas sous la contrainte.",                               ex:"Il méritait sa liberté."},
+      {w:"Milady",      exp:"La mystérieuse et dangereuse adversaire des mousquetaires.",                        ex:"Milady sourit, mais ce sourire était glacial."},
+      {w:"mission",     exp:"Tâche confiée à quelqu'un.",                                                        ex:"Ils avaient une mission secrète à accomplir."},
+      {w:"mousquetaire",exp:"Soldat d'élite de la garde royale française.",                                      ex:"Tous pour un, un pour tous!"},
+      {w:"nuit",        exp:"Période d'obscurité entre le coucher et le lever du soleil.",                       ex:"Ils partirent la nuit pour n'être pas vus."},
+      {w:"or",          exp:"Métal précieux; aussi: conjonction de transition.",                                  ex:"Or il se trouva que le cardinal était fort mécontent."},
+      {w:"Porthos",     exp:"L'un des trois mousquetaires, grand et vaniteux.",                                  ex:"Porthos tordait sa moustache avec orgueil."},
+      {w:"prisonnier",  exp:"Personne détenue contre sa volonté.",                                               ex:"Il était prisonnier dans la Bastille."},
+      {w:"reine",       exp:"Souveraine; ici Anne d'Autriche.",                                                  ex:"Sa Majesté la reine est en danger."},
+      {w:"roi",         exp:"Souverain masculin d'un royaume.",                                                  ex:"Le roi Louis XIII était à la chasse."},
+      {w:"ruse",        exp:"Moyen détourné pour tromper ou atteindre un but.",                                  ex:"Milady usait de ruse pour parvenir à ses fins."},
+      {w:"secret",      exp:"Ce qui est caché et ne doit pas être divulgué.",                                    ex:"Ce secret devait rester entre eux."},
+      {w:"serviteur",   exp:"Personne au service d'un maître.",                                                  ex:"Son serviteur Planchet l'attendait."},
+      {w:"soldat",      exp:"Homme servant dans une armée.",                                                     ex:"Les soldats du cardinal patrouillaient."},
+      {w:"trahison",    exp:"Acte de trahir la confiance de quelqu'un.",                                        ex:"C'était une trahison impardonnable."},
+      {w:"traversée",   exp:"Action de traverser un espace ou un obstacle.",                                    ex:"La traversée de la mer était périlleuse."},
+      {w:"valeur",      exp:"Courage et bravoure au combat.",                                                    ex:"Il avait fait preuve d'une grande valeur."},
+      {w:"vengeance",   exp:"Acte de punir quelqu'un en retour d'un tort subi.",                                ex:"La vengeance est un plat qui se mange froid."},
+      {w:"victoire",    exp:"Succès dans un combat ou une compétition.",                                        ex:"La victoire était enfin à eux."},
+      {w:"vrai",        exp:"Conforme à la réalité, authentique.",                                              ex:"Il n'était pas un vrai mousquetaire encore."},
+    ]
+  },
+  werther:{
+    words:[
+      {w:"Abschied",    exp:"Trennung, das Verlassen eines Menschen oder Ortes.",                                 ex:"Der Abschied war mir unmöglich."},
+      {w:"allein",      exp:"Ohne andere Personen; isoliert.",                                                   ex:"Ich bin so allein und freue mich so meines Lebens."},
+      {w:"Augen",       exp:"Die Organe des Sehens; Lottes Augen sind für Werther entscheidend.",               ex:"Ich sah Lotten an."},
+      {w:"Blick",       exp:"Das kurze Hinsehen; ein Blick kann tiefe Bedeutung haben.",                        ex:"Welch ein Blick!"},
+      {w:"Brief",       exp:"Schriftliche Mitteilung an eine Person.",                                           ex:"Am 10. Mai. — Ich habe eine wunderbare Heiterkeit meine ganze Seele eingenommen."},
+      {w:"Einsamkeit",  exp:"Der Zustand, allein zu sein; Isolierung.",                                         ex:"Ich bin so allein und freue mich so meines Lebens."},
+      {w:"Empfindung",  exp:"Wahrnehmung durch die Sinne; subjektives Gefühl.",                                 ex:"Meine Empfindungen sind so verworren."},
+      {w:"Erde",        exp:"Die Welt, der Boden; die Natur als Quelle des Trostes.",                           ex:"Wenn das liebe Tal um mich dampft."},
+      {w:"ewig",        exp:"Ohne Ende; für immer.",                                                             ex:"Du bist ewig in meinen Gedanken."},
+      {w:"Freude",      exp:"Positives Gefühl der Befriedigung und des Glücks.",                                 ex:"Welche Freude war das!"},
+      {w:"Freund",      exp:"Person, mit der man eine enge freundschaftliche Bindung hat.",                     ex:"Ich schreibe dir, lieber Freund."},
+      {w:"Gott",        exp:"Das höchste Wesen; Werther wendet sich in Verzweiflung an Gott.",                  ex:"Gott! Was ist der Mensch?"},
+      {w:"Herz",        exp:"Das Organ des Blutkreislaufs; auch Sitz der Gefühle.",                             ex:"Mein Herz ist so schwer."},
+      {w:"Hoffnung",    exp:"Erwartung, dass etwas Gewünschtes eintreten wird.",                                ex:"Die Hoffnung war nun begraben."},
+      {w:"Jugend",      exp:"Die Lebensphase zwischen Kindheit und Erwachsenensein.",                           ex:"In der Jugend ist alles möglich."},
+      {w:"Kinder",      exp:"Junge Menschen; Lotte kümmert sich um ihre Geschwister.",                          ex:"Lotte stand mit einem Korb am Arm."},
+      {w:"Kleid",       exp:"Ein Kleidungsstück; Lotte trägt ein einfaches weißes Kleid.",                     ex:"Sie trug ein einfaches weißes Kleid."},
+      {w:"Kunst",       exp:"Menschliche Kreativität in Form von Malerei, Musik usw.",                          ex:"Die Kunst ist lang und das Leben kurz."},
+      {w:"Leiden",      exp:"Schmerzen, körperliches oder seelisches Leid.",                                   ex:"Die Leiden des jungen Werthers."},
+      {w:"Liebe",       exp:"Tiefes Gefühl der Zuneigung und Leidenschaft.",                                   ex:"Ich liebe sie, Wilhelm, und ich bin dem Wahnsinn nahe."},
+      {w:"Lotte",       exp:"Die geliebte, aber unerreichbare Frau im Roman.",                                  ex:"Ich sah Lotten an."},
+      {w:"Mond",        exp:"Der natürliche Satellit der Erde; Symbol für Sehnsucht.",                         ex:"Der Mond schien durch die Bäume."},
+      {w:"Musik",       exp:"Die Kunst der Töne; Lotte und Werther spielen Klavier.",                          ex:"Wenn Lotte am Klavier spielte."},
+      {w:"Natur",       exp:"Die natürliche Welt; Werthers Naturbetrachtungen.",                               ex:"Wenn das liebe Tal um mich dampft."},
+      {w:"Regen",       exp:"Niederschlag in Form von Wassertropfen.",                                         ex:"Es regnete in Strömen."},
+      {w:"Ruhe",        exp:"Stille; auch: innerer Frieden.",                                                   ex:"Ich finde keine Ruhe mehr."},
+      {w:"Schmerz",     exp:"Körperlicher oder seelischer Schmerz.",                                           ex:"Ich leide viel, denn ich habe verloren."},
+      {w:"Seele",       exp:"Das innere Wesen eines Menschen; Geist und Gefühle.",                             ex:"Meine Seele glänzt mit ganzem Feuer."},
+      {w:"Sehnsucht",   exp:"Tiefe Sehnsucht nach etwas, was unerreichbar ist.",                               ex:"Eine unaussprechliche Sehnsucht ergriff mich."},
+      {w:"Stille",      exp:"Abwesenheit von Lärm; Ruhe.",                                                      ex:"In der tiefen Stille der Nacht."},
+      {w:"Tanz",        exp:"Rhythmische Körperbewegungen; das Tanzen verbindet Lotte und Werther.",            ex:"Ich tanzte mit ihr den ersten Contretanz."},
+      {w:"Tod",         exp:"Das Ende des Lebens; Werthers Selbstmord am Ende.",                               ex:"Ich gehe voran. Gehe zu meinem Vater."},
+      {w:"Tränen",      exp:"Flüssigkeit aus den Augen beim Weinen.",                                           ex:"Meine Tränen floßen."},
+      {w:"Traum",       exp:"Bilder und Gedanken während des Schlafs; auch Wunschbild.",                       ex:"Es war wie ein Traum."},
+      {w:"Trost",       exp:"Linderung von Schmerz oder Kummer.",                                              ex:"Es gibt keinen Trost für mich."},
+      {w:"Unglück",     exp:"Unheil; schlechtes Schicksal.",                                                   ex:"Welch ein Unglück ist das meinige!"},
+      {w:"Vernunft",    exp:"Die Fähigkeit, klar zu denken; im Gegensatz zu Gefühl.",                         ex:"Was hilft mir die Vernunft?"},
+      {w:"Verzweiflung",exp:"Totaler Verlust der Hoffnung.",                                                   ex:"Es ist alles so leer, so öde."},
+      {w:"Wahnsin",     exp:"Geisteskrankheit; auch extreme Leidenschaft.",                                   ex:"Ich bin dem Wahnsinn nahe, Wilhelm!"},
+      {w:"Wilhelm",     exp:"Werthers Briefpartner und bester Freund.",                                        ex:"Lieber Wilhelm, ich schreibe dir."},
+      {w:"Wonne",       exp:"Höchste Freude und Glückseligkeit.",                                              ex:"Was meines Lebens einzige Wonne war."},
+      {w:"Zärtlichkeit",exp:"Sanfte Zuneigung und Fürsorge.",                                                  ex:"Mit welcher Zärtlichkeit sah sie ihre Kinder an."},
+    ]
+  },
+  pinocchio:{
+    words:[
+      {w:"asino",       exp:"Asino: animale da soma; i ragazzi cattivi diventano asini.",                        ex:"Tutti i ragazzi che non studiano diventano asini."},
+      {w:"avaro",       exp:"Chi non vuole spendere o condividere i propri beni.",                               ex:"Il Gatto e la Volpe erano avari e bugiardi."},
+      {w:"avventura",   exp:"Esperienza eccitante e fuori dall'ordinario.",                                      ex:"Le avventure di Pinocchio."},
+      {w:"balena",      exp:"Grande mammifero marino; Pinocchio viene inghiottito da una.",                     ex:"Pinocchio fu inghiottito dal pescecane."},
+      {w:"bambino",     exp:"Essere umano in età infantile.",                                                    ex:"Pinocchio voleva diventare un bambino vero."},
+      {w:"bugiardo",    exp:"Chi dice bugie abitualmente.",                                                      ex:"Le bugie si riconoscono subito."},
+      {w:"burattino",   exp:"Bambola di legno mossa da fili.",                                                  ex:"C'era una volta un pezzo di legno."},
+      {w:"calzolaio",   exp:"Artigiano che fabbrica o ripara scarpe.",                                          ex:"Il calzolaio aveva aggiustato le scarpe."},
+      {w:"camminare",   exp:"Andare a piedi.",                                                                  ex:"Pinocchio cominciò a camminare."},
+      {w:"cattivo",     exp:"Che fa del male; moralmente negativo.",                                            ex:"I ragazzi cattivi non vanno a scuola."},
+      {w:"ciuchino",    exp:"Asinello; forma diminutiva di asino.",                                             ex:"Tutti i ragazzi che non studiano diventano ciuchini."},
+      {w:"coscienza",   exp:"La consapevolezza interiore del giusto e dello sbagliato.",                        ex:"Il Grillo-parlante era la sua coscienza."},
+      {w:"coraggio",    exp:"Capacità di affrontare pericoli o difficoltà.",                                    ex:"Pinocchio aveva paura ma andò avanti."},
+      {w:"fata",        exp:"Essere magico femminile che aiuta i buoni.",                                       ex:"La Fata dai capelli turchini gli sorrise."},
+      {w:"falegname",   exp:"Artigiano che lavora il legno.",                                                   ex:"Geppetto era un vecchio falegname."},
+      {w:"fame",        exp:"Il bisogno di mangiare.",                                                          ex:"Pinocchio aveva fame e nulla da mangiare."},
+      {w:"fuggire",     exp:"Allontanarsi velocemente da qualcosa.",                                            ex:"Pinocchio fuggì via di corsa."},
+      {w:"Gatto",       exp:"Il Gatto e la Volpe, i due impostori del romanzo.",                               ex:"Il Gatto era cieco e la Volpe zoppa."},
+      {w:"Geppetto",    exp:"Il falegname che intagliò Pinocchio e diventò il suo padre.",                      ex:"Geppetto lo chiamò Pinocchio."},
+      {w:"grillo",      exp:"Insetto saltatore; il Grillo-parlante è la coscienza di Pinocchio.",              ex:"Cri-cri-cri! disse il Grillo-parlante."},
+      {w:"inghiottire", exp:"Mandare giù attraverso la gola.",                                                  ex:"Il pescecane lo inghiottì d'un sol boccone."},
+      {w:"isola",       exp:"Terra circondata dall'acqua.",                                                     ex:"L'Isola delle api industriose."},
+      {w:"lavoro",      exp:"Attività fisica o mentale per guadagnare.",                                        ex:"Chi non lavora non mangia."},
+      {w:"legno",       exp:"Materiale ricavato dagli alberi; di cui è fatto Pinocchio.",                      ex:"C'era una volta un pezzo di legno."},
+      {w:"libertà",     exp:"La condizione di chi non è sotto la costrizione.",                                 ex:"Pinocchio era libero di fare ciò che voleva."},
+      {w:"lupo",        exp:"Animale selvatico predatore.",                                                     ex:"Nella foresta c'era il lupo."},
+      {w:"marachella",  exp:"Birichinata; azione monellesca.",                                                  ex:"Aveva fatto un'altra delle sue marachelle."},
+      {w:"mare",        exp:"Grande distesa d'acqua salata.",                                                   ex:"Pinocchio guardò il mare."},
+      {w:"mattina",     exp:"La parte del giorno dall'alba al mezzogiorno.",                                    ex:"La mattina seguente si alzò presto."},
+      {w:"mentire",     exp:"Dire cose false.",                                                                 ex:"Non mentire, Pinocchio, le bugie hanno le gambe corte."},
+      {w:"mestiere",    exp:"Attività lavorativa che si esercita abitualmente.",                                ex:"Bisogna imparare un mestiere."},
+      {w:"monello",     exp:"Bambino birichino che fa dispetti.",                                               ex:"Era un vero monello di strada."},
+      {w:"naso",        exp:"Parte del viso; nel romanzo cresce quando Pinocchio mente.",                       ex:"Il naso gli crebbe subito di quattro dita."},
+      {w:"obbedire",    exp:"Fare ciò che viene ordinato o richiesto.",                                        ex:"Devi obbedire e andare a scuola."},
+      {w:"Paese dei Balocchi",exp:"Il luogo dove i bambini non fanno nulla; rappresenta il vizio.",            ex:"Il Paese dei Balocchi era il paradiso dei bambini pigri."},
+      {w:"pericolo",    exp:"Situazione che può causare danno.",                                               ex:"Era in grande pericolo."},
+      {w:"pescecane",   exp:"Grande squalo; il mostro che inghiotte Pinocchio e Geppetto.",                    ex:"Un enorme pescecane aprì la bocca."},
+      {w:"piangere",    exp:"Versare lacrime per dolore o commozione.",                                        ex:"Pinocchio piangeva a dirotto."},
+      {w:"pigro",       exp:"Chi non vuole lavorare o fare sforzi.",                                           ex:"I ragazzi pigri vanno al Paese dei Balocchi."},
+      {w:"povero",      exp:"Privo di beni materiali; miserabile.",                                            ex:"Geppetto era povero ma onesto."},
+      {w:"promessa",    exp:"Dichiarazione con cui ci si impegna a fare qualcosa.",                            ex:"Pinocchio promise di essere buono."},
+      {w:"scuola",      exp:"Luogo dove si va ad imparare.",                                                   ex:"Domani andrò a scuola senz'altro."},
+      {w:"sentiero",    exp:"Stradina stretta in campagna o nel bosco.",                                       ex:"Seguì il sentiero nel bosco."},
+      {w:"uomo",        exp:"Essere umano adulto di sesso maschile.",                                          ex:"Pinocchio voleva diventare un bambino e poi un uomo."},
+      {w:"Volpe",       exp:"Animale furbo; la Volpe è uno dei personaggi ingannatori.",                       ex:"La Volpe disse: Vieni con noi."},
+    ]
+  },
+  casmurro:{
+    words:[
+      {w:"adulto",      exp:"Que chegou à maturidade; pessoa crescida.",                                        ex:"Já era adulto quando voltou ao Rio."},
+      {w:"amor",        exp:"Sentimento afetivo intenso; paixão.",                                              ex:"O amor de Bentinho por Capitu era imenso."},
+      {w:"amigo",       exp:"Pessoa com quem se tem laços de amizade.",                                         ex:"Escobar era o melhor amigo de Bentinho."},
+      {w:"angústia",    exp:"Estado de sofrimento moral intenso.",                                              ex:"A angústia não me deixava dormir."},
+      {w:"Bentinho",    exp:"O narrador e protagonista do romance.",                                            ex:"Bentinho era o nome que a minha mãe me dava."},
+      {w:"boca",        exp:"Abertura do rosto usada para comer e falar.",                                     ex:"A boca de Capitu tinha um sorriso enigmático."},
+      {w:"cabelo",      exp:"Fios que crescem na cabeça.",                                                      ex:"Os cabelos de Capitu eram longos e negros."},
+      {w:"Capitu",      exp:"A protagonista feminina, personagem central e enigmática.",                       ex:"Capitu olhava para mim, sem falar."},
+      {w:"casa",        exp:"Edifício destinado à habitação.",                                                  ex:"A casa da rua de Matacavalos."},
+      {w:"casamento",   exp:"União formal entre duas pessoas.",                                                 ex:"Casamos depois de alguns anos."},
+      {w:"ciúme",       exp:"Sentimento de desconfiança em relação à fidelidade.",                             ex:"Era o ciúme que me devorava."},
+      {w:"coração",     exp:"Órgão central do sistema circulatório; sede dos sentimentos.",                    ex:"O coração batia mais rápido ao vê-la."},
+      {w:"criança",     exp:"Ser humano na infância.",                                                         ex:"Fomos criados juntos desde crianças."},
+      {w:"Deus",        exp:"Ser supremo; invocado frequentemente pelo narrador.",                             ex:"Graças a Deus!"},
+      {w:"dúvida",      exp:"Estado de incerteza ou hesitação.",                                               ex:"A dúvida me consumia."},
+      {w:"Escobar",     exp:"O melhor amigo de Bentinho, cuja proximidade com Capitu é questionada.",          ex:"Escobar era um rapaz inteligente e sociável."},
+      {w:"filho",       exp:"Descendente direto de alguém.",                                                   ex:"O filho parecia-se com Escobar."},
+      {w:"infância",    exp:"Período da vida entre o nascimento e a adolescência.",                            ex:"A saudade da infância voltou-me ao coração."},
+      {w:"janela",      exp:"Abertura na parede para dar luz e ar.",                                           ex:"Capitu estava na janela quando a vi."},
+      {w:"lágrimas",    exp:"Líquido que sai dos olhos ao chorar.",                                           ex:"Os olhos de Capitu tinham lágrimas."},
+      {w:"memória",     exp:"Faculdade de reter e evocar o passado.",                                         ex:"Que me contes a tua vida, disse ela."},
+      {w:"mentira",     exp:"Afirmação contrária à verdade.",                                                  ex:"Será que era mentira tudo aquilo?"},
+      {w:"mãe",         exp:"Mulher que deu à luz; progenitora.",                                             ex:"Minha mãe resolveu que eu fosse para o seminário."},
+      {w:"morte",       exp:"Fim da vida.",                                                                    ex:"A morte de Escobar foi um choque."},
+      {w:"noite",       exp:"Período de escuridão entre o pôr do sol e o nascer do dia.",                     ex:"Era uma noite de verão."},
+      {w:"olhos",       exp:"Órgãos da visão; os olhos de Capitu são centrais no romance.",                   ex:"Olhos de ressaca, disse-me uma vez um poeta."},
+      {w:"passado",     exp:"Tempo já decorrido; o narrador vive de recordações.",                            ex:"O passado não me abandona."},
+      {w:"paixão",      exp:"Sentimento amoroso intenso e avassalador.",                                      ex:"A paixão de Bentinho por Capitu era irresistível."},
+      {w:"praia",       exp:"Faixa de areia à beira do mar.",                                                 ex:"Escobar morreu no mar, perto da praia."},
+      {w:"rua",         exp:"Via pública nas cidades.",                                                       ex:"A rua de Matacavalos."},
+      {w:"saudade",     exp:"Sentimento de falta e nostalgia, tipicamente lusófono.",                         ex:"A saudade da infância voltou-me ao coração."},
+      {w:"segredo",     exp:"Algo que se mantém oculto.",                                                     ex:"Capitu tinha os seus segredos."},
+      {w:"seminário",   exp:"Escola de formação de sacerdotes.",                                              ex:"Minha mãe resolveu que eu fosse para o seminário."},
+      {w:"silêncio",    exp:"Ausência de som; estado de quem não fala.",                                      ex:"Capitu ficou em silêncio."},
+      {w:"sorriso",     exp:"Expressão facial de alegria.",                                                   ex:"O sorriso de Capitu era enigmático."},
+      {w:"tempo",       exp:"A sucessão de momentos; o passar dos anos.",                                     ex:"O tempo passou rápido."},
+      {w:"traição",     exp:"Ato de trair a confiança de alguém.",                                           ex:"Capitu, dissera eu a mim mesmo, Capitu é que me traiu."},
+      {w:"tristeza",    exp:"Estado de quem está triste; melancolia.",                                        ex:"A tristeza tomou conta de mim."},
+      {w:"verdade",     exp:"Conformidade com a realidade.",                                                  ex:"Qual era a verdade afinal?"},
+      {w:"vizinho",     exp:"Pessoa que mora próxima.",                                                       ex:"Capitu era a filha do nosso vizinho."},
+      {w:"voz",         exp:"Som produzido pela fala.",                                                       ex:"A voz de Capitu era suave."},
+    ]
+  },
 };
 
 // ── STATE ──
@@ -705,9 +1475,268 @@ function selBook(id){
   S.book = b;
   document.getElementById('mtitle').textContent = b.title;
   document.getElementById('mauth').textContent  = b.author;
+  // Populate download links
+  document.getElementById('dl-links').innerHTML = getDlLinks(id);
   goTo('sm');
 }
 function exitR(){ stopAudio(); goTo('sm'); }
+
+// ── HTML / PDF / EPUB VIEWER ──
+function findDocBook(bookId){
+  for(const catalog of [HTML_BOOKS, WS_BOOKS]){
+    for(const lang of Object.keys(catalog)){
+      for(const cat of catalog[lang]){
+        const found = cat.books.find(b=>b.id===bookId);
+        if(found) return found;
+      }
+    }
+  }
+  return null;
+}
+
+function openDoc(bookId){
+  const book = findDocBook(bookId);
+  if(!book) return;
+
+  document.getElementById('doc-title').textContent = book.title + ' — ' + book.author;
+  const frame = document.getElementById('doc-frame');
+
+  if(book.fmt === 'epub'){
+    // EPUB: open download link in new tab (browser handles it)
+    // Also show info panel inside viewer
+    frame.src = 'about:blank';
+    frame.style.display = 'none';
+    // Show a download page inside the viewer
+    const docScreen = document.getElementById('sv-doc');
+    // Remove old err div if any
+    let err = docScreen.querySelector('.doc-err');
+    if(!err){ err = document.createElement('div'); err.className='doc-err'; docScreen.appendChild(err); }
+    err.style.display = 'flex';
+    err.innerHTML = `
+      <div style="font-size:3rem">📗</div>
+      <p><strong>${esc(book.title)}</strong><br>${esc(book.author)}</p>
+      <p>Los archivos EPUB se abren con una app de lectura.<br>
+      Pulsa el botón para descargarlo en tu dispositivo.</p>
+      <a href="${book.hurl}" target="_blank" download
+         style="background:var(--ac);color:#fff;border:none;padding:.7rem 1.4rem;
+                border-radius:var(--rs);font-size:.92rem;font-weight:600;
+                text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+        📥 Descargar EPUB
+      </a>
+      <p style="font-size:.78rem;opacity:.6">Generado por Wikisource · ws-export.wmcloud.org</p>`;
+    goTo('sv-doc');
+  } else {
+    // HTML or PDF: load in iframe
+    let err = document.getElementById('sv-doc').querySelector('.doc-err');
+    if(err) err.style.display = 'none';
+    frame.style.display = 'block';
+    // For Wikisource PDF, add a loading notice
+    if(book.hurl.includes('ws-export')){
+      frame.src = 'about:blank';
+      let err2 = document.getElementById('sv-doc').querySelector('.doc-err');
+      if(!err2){ err2=document.createElement('div'); err2.className='doc-err'; document.getElementById('sv-doc').appendChild(err2); }
+      err2.style.display='flex';
+      err2.innerHTML=`<div class="lsp"></div><p>Generando ${book.fmt.toUpperCase()} desde Wikisource…<br><span style="font-size:.78rem;opacity:.6">Puede tardar 15–30 segundos la primera vez.</span></p>`;
+      setTimeout(()=>{
+        err2.style.display='none';
+        frame.style.display='block';
+        frame.src = book.hurl;
+      }, 100);
+    } else {
+      frame.src = book.hurl;
+    }
+    goTo('sv-doc');
+  }
+}
+
+function closeDoc(){
+  document.getElementById('doc-frame').src = 'about:blank';
+  document.getElementById('doc-frame').style.display = 'block';
+  const err = document.getElementById('sv-doc').querySelector('.doc-err');
+  if(err) err.style.display = 'none';
+  goTo('sb');
+}
+
+// ── VOCABULARY ──
+let _vocabAll = [];   // current book's full word list
+let _vocabFiltered = [];
+
+function openVocab(){
+  if(!S.book) return;
+  const data = VOCAB[S.book.id];
+  document.getElementById('vocab-title').textContent = S.book.title;
+  document.getElementById('vocab-search').value = '';
+
+  if(!data || !data.words || data.words.length === 0){
+    document.getElementById('vocab-body').innerHTML =
+      '<p style="color:var(--dm);font-size:.88rem;padding:1rem 0">No hay vocabulario predefinido para este libro todavía.</p>';
+    goTo('sv');
+    return;
+  }
+
+  // Sort alphabetically, deduplicate
+  const seen = new Set();
+  _vocabAll = [...data.words]
+    .filter(x=>{ if(seen.has(x.w.toLowerCase())) return false; seen.add(x.w.toLowerCase()); return true; })
+    .sort((a,b)=>a.w.localeCompare(b.w));
+  _vocabFiltered = _vocabAll;
+
+  renderVocab();
+  goTo('sv');
+}
+
+function renderVocab(){
+  const body = document.getElementById('vocab-body');
+  if(!_vocabFiltered.length){
+    body.innerHTML = '<p style="color:var(--dm);font-size:.88rem;padding:.5rem 0">Sin resultados.</p>';
+    return;
+  }
+  body.innerHTML = `<div class="alpha-list">
+    ${_vocabFiltered.map(v=>`
+      <div class="vw-row" onclick="openWordSheet('${esc(v.w)}','${esc(v.exp)}','${esc(v.ex)}')">
+        <span class="vw-word">${esc(v.w)}</span>
+        <span class="vw-hint">${esc(v.exp)}</span>
+        <span class="vw-arr">›</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+function filterVocab(q){
+  q = q.toLowerCase().trim();
+  _vocabFiltered = q
+    ? _vocabAll.filter(v=>v.w.toLowerCase().includes(q) || v.exp.toLowerCase().includes(q))
+    : _vocabAll;
+  renderVocab();
+}
+
+// ── WORD DETAIL SHEET ──
+let _sheetWord = '';
+let _sheetSi   = -1;
+
+// Find the best sentence from the loaded book that contains the word.
+// Prefers sentences where the word appears as a whole word (not substring).
+// Falls back to any sentence containing the string, then to the preset example.
+function findBookSentence(word){
+  if(!S.sents.length) return null;
+  const wl = word.toLowerCase().trim();
+  // Try whole-word match first (surrounded by non-letters)
+  const wholeRe = new RegExp('(?<![\\w\\u00C0-\\u024F])' + wl.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?![\\w\\u00C0-\\u024F])', 'i');
+  for(let i=0;i<S.sents.length;i++){
+    if(wholeRe.test(S.sents[i])) return {si:i, text:S.sents[i]};
+  }
+  // Fall back: any sentence containing the string
+  for(let i=0;i<S.sents.length;i++){
+    if(S.sents[i].toLowerCase().includes(wl)) return {si:i, text:S.sents[i]};
+  }
+  return null;
+}
+
+// Highlight the word inside an example sentence for display
+function highlightWord(sentence, word){
+  const re = new RegExp('(' + word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return esc(sentence).replace(re, '<strong style="color:var(--ac)">$1</strong>');
+}
+
+function openWordSheet(word, exp, ex){
+  _sheetWord = word;
+  _sheetSi   = -1;
+  _ctxWord   = word;
+  _ctxSi     = 0;
+
+  document.getElementById('ws-word').textContent = word;
+  document.getElementById('ws-exp').textContent  = exp;
+  document.getElementById('ws-ex').innerHTML =
+    '<span style="color:var(--dmr);font-size:.82rem">Buscando frase…</span>';
+  document.getElementById('ws-trans-wrap').innerHTML =
+    `<div class="ws-tld"><div class="sp2"></div> Traduciendo…</div>`;
+  document.getElementById('word-sheet').classList.add('show');
+
+  // 1. Try to find a real sentence from the already-loaded book text
+  const found = findBookSentence(word);
+  if(found){
+    _sheetSi = found.si;
+    _ctxSi   = found.si;
+    document.getElementById('ws-ex').innerHTML = highlightWord(found.text, word);
+  } else {
+    // 2. Book not loaded (or word not in loaded fragment): ask Claude for a real quote
+    fetchBookExample(word, exp, ex);
+  }
+
+  translateWord(word);
+}
+
+async function fetchBookExample(word, exp, fallbackEx){
+  const exEl = document.getElementById('ws-ex');
+  const api  = await getSample();
+  if(!api){
+    // No API: show preset example, warn if word absent
+    const hasWord = fallbackEx.toLowerCase().includes(word.toLowerCase());
+    exEl.innerHTML = highlightWord(fallbackEx, word)
+      + (hasWord ? '' : `<span style="display:block;font-size:.7rem;color:var(--dmr);margin-top:.3rem;font-style:normal">⚠️ La frase de ejemplo puede no contener la palabra exacta</span>`);
+    return;
+  }
+  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const srcLang = langNames[S.lang]||S.lang;
+  const prompt = `Dame UNA frase corta (máximo 20 palabras) extraída o inspirada en "${S.book?.title||'el libro'}" de ${S.book?.author||''} en ${srcLang} que contenga la palabra "${word}".
+La frase DEBE contener exactamente la palabra "${word}".
+Responde SOLO con la frase, sin comillas ni explicación.`;
+  try{
+    const res = await api(prompt, {modelTier:'quick'});
+    const sentence = res.text.trim().replace(/^["«»""]|["«»""]$/g,'');
+    if(sentence.toLowerCase().includes(word.toLowerCase())){
+      exEl.innerHTML = highlightWord(sentence, word);
+    } else {
+      // Claude returned something without the word — use fallback
+      exEl.innerHTML = highlightWord(fallbackEx, word);
+    }
+  } catch{
+    exEl.innerHTML = highlightWord(fallbackEx, word);
+  }
+}
+
+async function translateWord(word){
+  const target=TRANS_TARGET[S.lang]||'es';
+  const label=TRANS_LABEL[S.lang]||'español';
+  const key=word.toLowerCase().trim()+'|'+target;
+  const wrap=document.getElementById('ws-trans-wrap');
+  if(S.cache[key]){wrap.innerHTML=renderTransHtml(S.cache[key].t,S.cache[key].alts,label,word);return;}
+  const api=await getSample();
+  if(!api){wrap.innerHTML='<div style="color:var(--dm);font-size:.82rem">Sin traducción disponible.</div>';return;}
+  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const prompt=`Traduce del ${langNames[S.lang]||S.lang} al ${label} la palabra "${word}" del libro "${S.book?.title||''}".
+Responde SOLO con JSON: {"t":"traducción","alts":["alt1","alt2"]}`;
+  try{
+    const res=await api(prompt,{modelTier:'quick',cache:true});
+    const p=JSON.parse(res.text.replace(/\`\`\`json|\`\`\`/g,'').trim());
+    const t=p.t||'',alts=(p.alts||[]).slice(0,3);
+    S.cache[key]={t,alts};wrap.innerHTML=renderTransHtml(t,alts,label,word);
+  }catch{wrap.innerHTML='<div style="color:var(--dm);font-size:.82rem">Sin traducción disponible.</div>';}
+}
+
+
+function renderTransHtml(t, alts, label, word){
+  const rfhBtn = _sheetSi >= 0
+    ? `<button class="rfh-btn" style="margin-top:.5rem" onclick="closeWordSheet();ctxReadFrom()">▶ Leer desde aquí</button>`
+    : '';
+  return `
+    <div class="ws-label">En ${label}</div>
+    <div class="ws-trans">${esc(t)}</div>
+    ${alts&&alts.length?`
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem">
+        ${alts.map(a=>`<span style="background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:.12rem .4rem;font-size:.76rem">${esc(a)}</span>`).join('')}
+      </div>`:''}
+    ${rfhBtn}`;
+}
+
+function closeWordSheet(e){
+  if(e && e.target !== document.getElementById('word-sheet')) return;
+  document.getElementById('word-sheet').classList.remove('show');
+}
+
+// Close sheet on Escape
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') document.getElementById('word-sheet').classList.remove('show');
+});
 
 // ── FONT SIZE — 5 levels, persistent ──
 const FONT_LEVELS = ['fs0','fs1','fs2','fs3','fs4'];
@@ -788,147 +1817,169 @@ function relTime(ts){
   return `hace ${Math.floor(hrs/24)} día${Math.floor(hrs/24)>1?'s':''}`;
 }
 
-// ── LOAD BOOK — progressive streaming ──
+// ── LOAD BOOK — fast first-paint + background full load ──
+// Strategy:
+//   1. Fetch only the first ~40 KB (enough for ~1500 words)
+//   2. Open the reader immediately with that text
+//   3. Continue downloading the rest in the background
+//   4. Append silently — user can read while the rest arrives
+
+const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
+const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
+
 async function startRead(mode){
   S.mode=mode; S.cache={}; S.hist=[]; S.si=0; stopAudio();
   dismissResume();
 
-  // Show loading screen with animated bar
-  goTo('sld');
-  document.getElementById('ltx').textContent = 'Descargando "'+S.book.title+'"…';
-  const bar = document.getElementById('load-bar');
+  const bar  = document.getElementById('load-bar');
   const wrap = document.getElementById('load-bar-wrap');
   wrap.classList.add('show');
-  bar.style.width = '8%';
+  bar.style.width = '5%';
+
+  // Show "Opening…" briefly on the loading screen
+  goTo('sld');
+  document.getElementById('ltx').textContent = 'Abriendo "'+S.book.title+'"…';
 
   try{
-    // ── Latin-1 books: must load as ArrayBuffer (no streaming decode possible)
-    if(S.book.enc === 'latin1'){
-      bar.style.width = '40%';
-      const res = await fetch(S.book.url);
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      bar.style.width = '80%';
-      const buf = await res.arrayBuffer();
-      const text = cleanGutenberg(new TextDecoder('iso-8859-1').decode(buf));
-      bar.style.width = '100%';
-      await finishLoad(text, mode);
+    const res = await fetch(S.book.url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
 
-    } else {
-      // ── UTF-8 books: stream chunk by chunk, show text as it arrives ──
-      const res = await fetch(S.book.url);
-      if(!res.ok) throw new Error('HTTP '+res.status);
+    const total    = parseInt(res.headers.get('content-length')||'0');
+    const reader   = res.body.getReader();
+    const isLatin1 = S.book.enc === 'latin1';
+    const dec      = new TextDecoder(isLatin1 ? 'iso-8859-1' : 'utf-8');
 
-      const total = parseInt(res.headers.get('content-length')||'0');
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let received = 0, raw = '';
+    let chunks = [];        // Uint8Array chunks received so far
+    let received = 0;
+    let openedReader = false;
 
-      // Show reader immediately with a spinner paragraph
-      S.raw=''; S.paras=[]; S.sents=[];
-      renderReader();     // renders empty skeleton
-      goTo('sr');         // switch to reader NOW
-      wrap.classList.add('show'); // keep bar visible
-
-      // Inject a live loading indicator at the bottom of content
-      const liveEl = document.createElement('p');
-      liveEl.id = 'live-loading';
-      liveEl.style.cssText = 'color:var(--dm);font-size:.82rem;text-align:center;padding:1rem 0;';
-      liveEl.textContent = 'Cargando texto…';
-      document.getElementById('rc').appendChild(liveEl);
-
-      let chunksDone = false;
-      while(!chunksDone){
-        const {done, value} = await reader.read();
-        if(done){ chunksDone = true; break; }
-        received += value.length;
-        raw += decoder.decode(value, {stream:true});
-
-        // Update progress bar
-        if(total > 0){
-          bar.style.width = Math.min(10 + (received/total)*85, 95)+'%';
-        } else {
-          bar.style.width = Math.min((bar.style.width?parseFloat(bar.style.width):10)+5, 90)+'%';
-        }
-
-        // Every ~15 KB, re-render what we have so far
-        if(received % 15000 < 4096 || done){
-          const partial = cleanGutenberg(raw);
-          updateReaderContent(partial);
-        }
-      }
-
-      // Final full render
-      bar.style.width = '100%';
-      const fullText = cleanGutenberg(raw);
-      await finishLoad(fullText, mode, /*alreadyInReader*/ true);
+    // ── Read until we have enough for the first screen ──
+    while(received < FIRST_CHUNK_BYTES){
+      const {done, value} = await reader.read();
+      if(done) break;
+      chunks.push(value);
+      received += value.length;
+      bar.style.width = Math.min(5 + (received / FIRST_CHUNK_BYTES) * 40, 45) + '%';
     }
+
+    // Decode and clean what we have so far
+    const firstBuf  = mergeChunks(chunks);
+    const firstText = cleanGutenberg(dec.decode(firstBuf, {stream: true}));
+    const firstWords = firstText.split(/\s+/).slice(0, 1500).join(' ');
+
+    // Open the reader NOW with the first ~1500 words
+    S.raw   = firstWords;
+    S.paras = firstWords.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
+    S.sents = firstWords.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+    renderReader();
+    goTo('sr');
+    appendLoadingFooter(true);  // show "Cargando más…" at bottom
+    if(mode==='audio') startAudio();
+    bar.style.width = '50%';
+
+    // ── Continue reading the rest in the background ──
+    let raw = dec.decode(firstBuf, {stream: true});
+    let sinceLastAppend = received;
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      chunks.push(value);
+      received += value.length;
+      raw += dec.decode(value, {stream: true});
+
+      if(total > 0)
+        bar.style.width = Math.min(50 + (received/total)*48, 98) + '%';
+
+      // Every APPEND_EVERY_BYTES, update the reader content
+      if(received - sinceLastAppend >= APPEND_EVERY_BYTES){
+        sinceLastAppend = received;
+        const partial = cleanGutenberg(raw);
+        backgroundAppend(partial);
+      }
+    }
+
+    // Final decode flush and render
+    raw += dec.decode(); // flush
+    const fullText = cleanGutenberg(raw);
+    bar.style.width = '100%';
+    backgroundAppend(fullText, /*final*/ true);
+    showResumeBar();
 
   } catch(e){
     console.error(e);
     bar.style.width = '0%';
     wrap.classList.remove('show');
-    toast('Error al cargar el libro. Comprueba tu conexión a Internet.');
+    toast('Error al cargar el libro. Comprueba tu conexión.');
     goTo('sm');
   } finally {
-    setTimeout(()=>{ bar.style.width='0%'; wrap.classList.remove('show'); }, 600);
+    setTimeout(()=>{ bar.style.width='0%'; wrap.classList.remove('show'); }, 700);
   }
 }
 
-// Called each time we have more data during streaming
-function updateReaderContent(text){
-  const paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(p=>p.length>0);
-  const content = document.getElementById('rc');
-  if(!content) return;
-  const liveEl = document.getElementById('live-loading');
-
-  // Replace all paragraphs except the live spinner
-  let html = '';
-  for(const para of paras){
-    if(!para) continue;
-    const isH = para.length<70 && !/[.,:;!?]/.test(para);
-    if(isH){ html += '<h3>'+esc(para)+'</h3>'; continue; }
-    html += '<p>'+para.split(/(\s+)/).map(tok=>{
-      if(!/\S/.test(tok)) return tok;
-      return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
-    }).join('')+'</p>';
-  }
-  content.innerHTML = html;
-  // Re-append spinner at the end
-  const newLive = document.createElement('p');
-  newLive.id = 'live-loading';
-  newLive.style.cssText = 'color:var(--dm);font-size:.82rem;text-align:center;padding:1rem 0;';
-  newLive.textContent = 'Cargando más texto…';
-  content.appendChild(newLive);
+function mergeChunks(chunks){
+  const total = chunks.reduce((n,c)=>n+c.length,0);
+  const out   = new Uint8Array(total);
+  let offset  = 0;
+  for(const c of chunks){ out.set(c, offset); offset += c.length; }
+  return out;
 }
 
-// Finalise after all data is received
-async function finishLoad(text, mode, alreadyInReader=false){
+function appendLoadingFooter(show){
+  const rc = document.getElementById('rc');
+  if(!rc) return;
+  const existing = document.getElementById('loading-footer');
+  if(existing) existing.remove();
+  if(!show) return;
+  const el = document.createElement('p');
+  el.id = 'loading-footer';
+  el.style.cssText = 'color:var(--dmr);font-size:.78rem;text-align:center;padding:1.5rem 0;font-style:italic;';
+  el.textContent = '⏳ Cargando resto del libro…';
+  rc.appendChild(el);
+}
+
+// Update reader content without losing scroll position
+function backgroundAppend(text, isFinal=false){
+  const rc = document.getElementById('rc');
+  if(!rc) return;
+
+  // Update state
   S.raw   = text;
-  S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(p=>p.length>0);
+  S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
   S.sents = text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
 
-  if(!alreadyInReader){
-    renderReader();
-    goTo('sr');
-  } else {
-    // Final full render (remove spinner, add all words)
-    const content = document.getElementById('rc');
-    let html = '';
-    for(const para of S.paras){
-      if(!para) continue;
-      const isH = para.length<70 && !/[.,:;!?]/.test(para);
-      if(isH){ html += '<h3>'+esc(para)+'</h3>'; continue; }
-      html += '<p>'+para.split(/(\s+)/).map(tok=>{
-        if(!/\S/.test(tok)) return tok;
-        return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
-      }).join('')+'</p>';
-    }
-    content.innerHTML = html;
+  // Save scroll position
+  const pane      = document.getElementById('tpn');
+  const scrollPct = pane && pane.scrollHeight > pane.clientHeight
+    ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight) : 0;
+
+  // Re-render all content (with data-si sentence tags)
+  renderReaderContent();
+
+  // Restore scroll
+  if(pane && scrollPct > 0){
+    requestAnimationFrame(()=>{
+      pane.scrollTop = scrollPct * (pane.scrollHeight - pane.clientHeight);
+    });
   }
 
-  // Show resume bar if we have a bookmark for this book
-  showResumeBar();
+  if(isFinal){
+    appendLoadingFooter(false);
+    // Update sentence index mapping for TTS
+    if(S.mode==='audio' && S.playing) hlSent(S.si);
+  } else {
+    appendLoadingFooter(true);
+  }
+}
 
+// Finalise after all data is received (kept for compatibility)
+async function finishLoad(text, mode, alreadyInReader=false){
+  S.raw   = text;
+  S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
+  S.sents = text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+  if(!alreadyInReader){ renderReader(); goTo('sr'); }
+  else { renderReaderContent(); }
+  showResumeBar();
   if(mode==='audio') startAudio();
 }
 
@@ -943,40 +1994,83 @@ function cleanGutenberg(t){
 }
 
 // ── RENDER READER ──
+// Each word-span gets data-si (sentence index) so TTS can highlight
+// and "read from here" can find the right sentence instantly.
 let _bmSaveTimer = null;
+
+// Build paragraph HTML with data-si word spans (used by both renderReader and backgroundAppend)
+function buildParaHtml(){
+  const allWords = [];
+  const paraData = S.paras.map(para=>{
+    if(!para) return {isH:false, words:[]};
+    const isH = para.length<70 && !/[.,:;!?]/.test(para);
+    if(isH) return {isH:true, text:para, words:[]};
+    const tokens = para.split(/(\s+)/);
+    const words  = tokens.filter(t=>/\S/.test(t));
+    words.forEach(w => allWords.push(w.toLowerCase().replace(/[^\w]/g,'')));
+    return {isH:false, tokens, words};
+  });
+
+  const wordSentIdx = new Array(allWords.length).fill(0);
+  let wPos = 0;
+  for(let si=0; si<S.sents.length; si++){
+    const sentWords = S.sents[si].split(/\s+/)
+      .map(w=>w.toLowerCase().replace(/[^\w]/g,'')).filter(w=>w.length>0);
+    let matched=0;
+    for(let w=wPos; w<allWords.length && matched<sentWords.length; w++){
+      if(allWords[w]===sentWords[matched]){ wordSentIdx[w]=si; matched++; }
+      else if(matched>0){ wordSentIdx[w]=si; }
+    }
+    wPos = Math.min(wPos+sentWords.length, allWords.length);
+  }
+
+  let globalWordIdx=0, html='';
+  for(const pd of paraData){
+    if(!pd) continue;
+    if(pd.isH){ html+='<h3>'+esc(pd.text)+'</h3>'; continue; }
+    if(!pd.tokens) continue;
+    html+='<p>';
+    pd.tokens.forEach(tok=>{
+      if(!/\S/.test(tok)){ html+=tok; return; }
+      const si=wordSentIdx[globalWordIdx]??0;
+      html+=`<span class="rw" data-si="${si}" data-wi="${globalWordIdx}" onclick="clickW(this)">${esc(tok)}</span>`;
+      globalWordIdx++;
+    });
+    html+='</p>';
+  }
+  return html;
+}
+
+// Re-render only the word content (no topbar/listener reset) — used by background loading
+function renderReaderContent(){
+  const content = document.getElementById('rc');
+  if(!content) return;
+  content.innerHTML = buildParaHtml();
+}
 
 function renderReader(){
   document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
   document.getElementById('actl').style.display = S.mode==='audio' ? 'flex' : 'none';
-  const content = document.getElementById('rc');
-  content.innerHTML = S.paras.map(para=>{
-    if(!para) return '';
-    const isH = para.length<70 && !/[.,:;!?]/.test(para);
-    if(isH) return '<h3>'+esc(para)+'</h3>';
-    return '<p>'+para.split(/(\s+)/).map(tok=>{
-      if(!/\S/.test(tok)) return tok;
-      return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
-    }).join('')+'</p>';
-  }).join('');
 
+  const content = document.getElementById('rc');
+  content.innerHTML = buildParaHtml();
+
+  // Replace pane to remove stale listeners
   const pane = document.getElementById('tpn');
-  // Remove old listeners by cloning (avoids duplicate handlers on re-render)
   const newPane = pane.cloneNode(false);
-  newPane.appendChild(content);
-  pane.parentNode.replaceChild(newPane, pane);
   newPane.id = 'tpn';
   newPane.appendChild(content);
-
+  pane.parentNode.replaceChild(newPane, pane);
   newPane.addEventListener('mouseup', onSel);
   newPane.addEventListener('touchend', onSel, {passive:true});
   newPane.addEventListener('scroll', ()=>{
     updProg();
-    // Debounced bookmark save — 2 seconds after scroll stops
     clearTimeout(_bmSaveTimer);
     _bmSaveTimer = setTimeout(saveBookmark, 2000);
   }, {passive:true});
   updProg();
 }
+
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -990,10 +2084,63 @@ function onSel(){
     translate(txt);
   },50);
 }
+// ── CONTEXT MENU ──
+let _ctxWord = '';
+let _ctxSi   = 0;
+
 function clickW(el){
+  // Single tap on a word: show small context menu near the word
   document.querySelectorAll('.rw.hl').forEach(e=>e.classList.remove('hl'));
   el.classList.add('hl');
-  translate(el.textContent.trim());
+  _ctxWord = el.textContent.trim();
+  _ctxSi   = parseInt(el.dataset.si ?? '0');
+
+  const menu = document.getElementById('ctx-menu');
+  const rect = el.getBoundingClientRect();
+
+  // Position menu below the word, keeping within viewport
+  let top  = rect.bottom + 6;
+  let left = rect.left;
+  if(top + 100 > window.innerHeight) top = rect.top - 106;
+  if(left + 170 > window.innerWidth) left = window.innerWidth - 174;
+  menu.style.top  = top  + 'px';
+  menu.style.left = left + 'px';
+  menu.classList.add('show');
+}
+
+function hideCtxMenu(){ document.getElementById('ctx-menu').classList.remove('show'); }
+
+// Close menu on tap outside
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
+    hideCtxMenu();
+}, true);
+document.addEventListener('touchstart', e=>{
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
+    hideCtxMenu();
+}, {passive:true});
+
+// Context menu actions (wired after DOM ready, see boot)
+function ctxTranslate(){
+  hideCtxMenu();
+  translate(_ctxWord);
+}
+function ctxReadFrom(){
+  hideCtxMenu();
+  readFromSentence(_ctxSi);
+}
+
+// Read from a specific sentence index
+function readFromSentence(si){
+  if(S.mode !== 'audio'){
+    // Switch to audio mode on the fly
+    S.mode = 'audio';
+    document.getElementById('actl').style.display = 'flex';
+  }
+  stopAudio();
+  S.playing = true;
+  speakS(si);
+  toast('▶ Leyendo desde la frase '+(si+1));
 }
 function updProg(){
   const p = document.getElementById('tpn');
@@ -1003,7 +2150,14 @@ function updProg(){
       : 0)+'%';
 }
 
-// ── TRANSLATION — MyMemory API (gratuita) ──
+// ── TRANSLATION — Claude sample capability ──
+let _sampleApi = null;
+async function getSample(){
+  if(_sampleApi) return _sampleApi;
+  _sampleApi = await claude.use('sample');
+  return _sampleApi;
+}
+
 async function translate(word){
   if(!word) return;
   openPanel();
@@ -1014,47 +2168,49 @@ async function translate(word){
     <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${S.lang}|${target}`;
+  const api = await getSample();
+  if(!api){
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
+    return;
+  }
+  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
+Responde SOLO con JSON (sin markdown): {"t":"traducción principal","alts":["alt1","alt2"]}
+Palabra: "${word}"`;
   try{
-    const r  = await fetch(url, {signal:AbortSignal.timeout(8000)});
-    const js = await r.json();
-    const t  = js?.responseData?.translatedText||'';
-    if(!t || js.responseStatus===403 || t.toLowerCase()===word.toLowerCase())
-      throw new Error('no trans');
-    const alts = (js.matches||[]).map(m=>m.translation)
-      .filter(x=>x&&x.toLowerCase()!==t.toLowerCase())
-      .filter((x,i,a)=>a.indexOf(x)===i).slice(0,3);
-    const res = {t, alts};
-    S.cache[key] = res;
-    showTrans(word, res, label);
-    addHist(word, t);
+    const res = await api(prompt, {modelTier:'quick', cache:true});
+    const parsed = JSON.parse(res.text.replace(/\`\`\`json|\`\`\`/g,'').trim());
+    const result = {t:parsed.t||'', alts:(parsed.alts||[]).slice(0,3)};
+    S.cache[key]=result; showTrans(word,result,label); addHist(word,result.t);
   } catch{
-    tbody.innerHTML = `<div class="tw">${esc(word)}</div>
-      <div style="color:var(--dm);font-size:.82rem;line-height:1.6;margin-top:.4rem">
-        No se encontró traducción.<br>
-        <span style="font-size:.74rem;opacity:.7">Límite diario de MyMemory (~500 palabras/IP).</span>
-      </div>`;
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">No se encontró traducción.</div>`;
   }
 }
 
+
 function showTrans(word, res, label){
   const tbody = document.getElementById('tbody');
+  // Find real sentence from loaded book that contains the word
+  const found = findBookSentence(word);
+  const exHtml = found
+    ? `<div style="margin-top:.8rem">
+        <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Frase del libro</div>
+        <div style="font-size:.82rem;color:var(--dm);font-style:italic;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.6">${highlightWord(found.text, word)}</div>
+       </div>`
+    : '';
+  const rfhHtml = `<button class="rfh-btn" onclick="ctxReadFrom()">▶ Leer desde esta palabra</button>`;
   tbody.innerHTML = `
     <div class="tw">${esc(word)}</div>
     <div>
       <div style="font-size:1rem;font-weight:600;margin-bottom:.4rem">${esc(res.t)}</div>
-      ${res.alts&&res.alts.length ? `
+      ${res.alts&&res.alts.length?`
         <div style="margin-bottom:.6rem">
-          <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;
-            letter-spacing:.07em;margin-bottom:.3rem">Alternativas</div>
-          ${res.alts.map(a=>`<span style="display:inline-block;background:var(--sf2);
-            border:1px solid var(--bd);border-radius:6px;
-            padding:.12rem .4rem;font-size:.76rem;margin:.12rem .12rem .12rem 0">${esc(a)}</span>`).join('')}
-        </div>` : ''}
-      <div style="font-size:.7rem;color:var(--dmr);margin-top:.4rem">
-        <a href="https://mymemory.translated.net" target="_blank"
-          style="color:var(--ac);text-decoration:none">MyMemory API</a>
-      </div>
+          <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Alternativas</div>
+          ${res.alts.map(a=>`<span style="display:inline-block;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:.12rem .4rem;font-size:.76rem;margin:.12rem .12rem .12rem 0">${esc(a)}</span>`).join('')}
+        </div>`:''}
+      ${exHtml}
+      ${rfhHtml}
+      <div style="font-size:.7rem;color:var(--dmr);margin-top:.6rem">Traducción: Claude AI</div>
     </div>
     <div id="hlist"></div>`;
   renderHist();
@@ -1064,6 +2220,7 @@ function addHist(word, trad){
   S.hist = [{w:word,t:trad}, ...S.hist.filter(h=>h.w!==word)].slice(0,20);
   renderHist();
 }
+
 function renderHist(){
   const el = document.getElementById('hlist');
   if(!el||S.hist.length<2) return;
@@ -1075,78 +2232,62 @@ function renderHist(){
       </div>`).join('') + '</div>';
 }
 
-// ── TRANS PANEL ──
-function openPanel(){
-  S.panelOpen = true;
-  const p = document.getElementById('tpanel');
-  p.classList.remove('clo');
-  if(window.innerWidth<=620) p.classList.add('mob');
+// ── TTS — claude.use('tts') ──
+let _ttsApi = null;
+async function getTts(){
+  if(_ttsApi) return _ttsApi;
+  _ttsApi = await claude.use('tts');
+  return _ttsApi;
 }
-function togPanel(){
-  S.panelOpen = !S.panelOpen;
-  const p = document.getElementById('tpanel');
-  p.classList.toggle('clo', !S.panelOpen);
-  if(window.innerWidth<=620) p.classList.toggle('mob', S.panelOpen);
-}
-function togMob(){ document.getElementById('tpanel').classList.toggle('mob'); }
-
-// ── WEB SPEECH TTS ──
-const syn = window.speechSynthesis||null;
-function bestVoice(lang){
-  if(!syn) return null;
-  const vs=syn.getVoices(), code=LMETA[lang].tts, base=code.split('-')[0];
-  return vs.find(v=>v.lang===code)
-      || vs.find(v=>v.lang.startsWith(base+'-'))
-      || vs.find(v=>v.lang.startsWith(base))
-      || null;
-}
-function startAudio(){
-  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
+async function startAudio(){
+  const tts = await getTts();
+  if(!tts){ toast('Audio no disponible.'); return; }
   S.playing=true; speakS(S.si);
 }
-function speakS(i){
-  if(!syn||i>=S.sents.length) return;
-  S.si=i; hlSent(i);
-  const u = new SpeechSynthesisUtterance(S.sents[i]);
-  u.lang = LMETA[S.lang].tts; u.rate = S.rate;
-  const v = bestVoice(S.lang); if(v) u.voice=v;
-  u.onend  = ()=>{ clrHl(); if(S.playing&&S.si+1<S.sents.length) speakS(S.si+1); else{S.playing=false;updBtn();} };
-  u.onerror= ()=>{ S.playing=false; updBtn(); };
-  syn.cancel(); syn.speak(u); updBtn();
+async function speakS(i){
+  i=Math.max(0,Math.min(i,S.sents.length-1));
+  if(i>=S.sents.length){S.playing=false;updBtn();return;}
+  S.si=i; hlSent(i); updBtn();
+  const tts=await getTts(); if(!tts)return;
+  const langCode=LMETA[S.lang].tts.split('-')[0];
+  try{
+    await tts.speak(S.sents[i],{language:langCode,rate:S.rate});
+    clrHl();
+    if(S.playing){
+      const next=S.si+1;
+      if(next<S.sents.length) speakS(next);
+      else{S.playing=false;updBtn();toast('Fin del texto cargado');}
+    }
+  }catch(e){
+    if(e?.code==='viewer_stopped'||e?.code==='interrupted')return;
+    S.playing=false;updBtn();
+  }
 }
 function hlSent(i){
   clrHl();
-  const sent = S.sents[i]; if(!sent) return;
-  const first = sent.trim().split(/\s+/)[0].toLowerCase();
-  const spans = document.querySelectorAll('.rw');
-  for(let j=0; j<spans.length; j++){
-    if(spans[j].textContent.trim().toLowerCase()===first){
-      const count = Math.min(sent.split(/\s+/).length, spans.length-j);
-      for(let k=0;k<count;k++) spans[j+k].classList.add('sk');
-      spans[j].scrollIntoView({behavior:'smooth', block:'center'});
-      break;
-    }
-  }
+  const spans=document.querySelectorAll(`.rw[data-si="${i}"]`);
+  if(!spans.length)return;
+  spans.forEach(s=>s.classList.add('sk'));
+  spans[0].scrollIntoView({behavior:'smooth',block:'center'});
 }
-function clrHl(){ document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk')); }
+function clrHl(){document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk'));}
 function updBtn(){
-  const b = document.getElementById('bplay'); if(!b) return;
-  b.textContent = S.playing ? '⏸' : '▶';
-  b.classList.toggle('pon', S.playing);
+  const b=document.getElementById('bplay');if(!b)return;
+  b.textContent=S.playing?'⏸':'▶';b.classList.toggle('pon',S.playing);
 }
-function stopAudio(){ if(syn) syn.cancel(); S.playing=false; clrHl(); updBtn(); }
-function togPlay(){ if(!syn) return; S.playing ? stopAudio() : (S.playing=true, speakS(S.si)); }
-function prevS(){ stopAudio(); if(S.si>0){S.playing=true; speakS(S.si-1);} }
-function nextS(){ stopAudio(); if(S.si<S.sents.length-1){S.playing=true; speakS(S.si+1);} }
-function chRate(v){ S.rate=parseFloat(v); if(S.playing){stopAudio();S.playing=true;speakS(S.si);} }
-if(syn) syn.addEventListener('voiceschanged',()=>{});
+async function stopAudio(){
+  const tts=await getTts();
+  if(tts)try{await tts.stop();}catch{}
+  S.playing=false;clrHl();updBtn();
+}
+async function togPlay(){
+  if(S.playing)await stopAudio();
+  else{S.playing=true;speakS(S.si);}
+}
+function prevS(){if(S.si<=0)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si-1);});}
+function nextS(){if(S.si>=S.sents.length-1)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si+1);});}
+function chRate(v){S.rate=parseFloat(v);if(S.playing){stopAudio().then(()=>{S.playing=true;speakS(S.si);});}}
 
-// ── TOAST ──
-function toast(msg, dur=4000){
-  const el = document.getElementById('toast');
-  el.textContent=msg; el.classList.add('on');
-  setTimeout(()=>el.classList.remove('on'), dur);
-}
 
 // ── KEYBOARD ──
 document.addEventListener('keydown', e=>{
@@ -1159,35 +2300,116 @@ document.querySelectorAll('.lc').forEach(c=>{
   c.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') c.click(); });
 });
 
-// ── BOOKMARK INDICATOR on library cards ──
+// ── LIBRARY RENDER (text + HTML/PDF books) ──
+function renderBookCard(b, lang, isDoc){
+  let bm = null;
+  if(!isDoc){
+    try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
+  }
+  const pct = bm ? Math.round(bm.pct*100) : 0;
+  const resumeBadge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
+  const onclick = isDoc ? `openDoc('${b.id}','doc')` : `selBook('${b.id}')`;
+
+  // Format badge
+  let fmtBadge = '';
+  if(b.fmt==='html') fmtBadge = `<span class="fmt-badge fmt-html">HTML</span>`;
+  else if(b.fmt==='pdf')  fmtBadge = `<span class="fmt-badge fmt-pdf">PDF</span>`;
+  else if(b.fmt==='epub') fmtBadge = `<span class="fmt-badge fmt-epub">EPUB</span>`;
+  else fmtBadge = `<span class="fmt-badge fmt-txt">TXT</span>`;
+
+  const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
+
+  return `<div class="bc ${b.lv}" onclick="${onclick}">
+    ${resumeBadge}
+    <div class="btt">${b.title}</div>
+    <div class="ba">${b.author}</div>
+    <div class="bm">
+      <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
+      ${fmtBadge}
+      ${audioIcon}
+    </div>
+    <div class="bdsc">${b.desc}</div>
+  </div>`;
+}
+
 function renderLib(lang){
-  document.getElementById('lby').innerHTML = (BOOKS[lang]||[]).map(c=>`
+  // Merge text books + HTML/PDF books + Wikisource PDF/EPUB
+  const textCats = (BOOKS[lang]||[]).map(c=>({...c, isDoc:false}));
+  const docCats  = (HTML_BOOKS[lang]||[]).map(c=>({...c, isDoc:true}));
+  const wsCats   = (WS_BOOKS[lang]||[]).map(c=>({...c, isDoc:true}));
+  const allCats  = [...textCats, ...docCats, ...wsCats];
+
+  document.getElementById('lby').innerHTML = allCats.map(c=>`
     <div class="cs">
       <div class="ch"><span class="ct">${c.cat}</span><span class="cd">${c.desc}</span></div>
       <div class="bg">
-        ${c.books.map(b=>{
-          let bm = null;
-          try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
-          const pct = bm ? Math.round(bm.pct*100) : 0;
-          const badge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-          return `<div class="bc ${b.lv}" onclick="selBook('${b.id}')">
-            ${badge}
-            <div class="btt">${b.title}</div>
-            <div class="ba">${b.author}</div>
-            <div class="bm">
-              <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
-              <span class="sp">🎧</span>
-            </div>
-            <div class="bdsc">${b.desc}</div>
-          </div>`;
-        }).join('')}
+        ${c.books.map(b=>renderBookCard(b, lang, c.isDoc)).join('')}
       </div>
     </div>`).join('');
 }
 
+// ── THEME ──
+const THEME_ICONS = {dark:'🌙', light:'☀️', auto:'⚙️'};
+
+function setTheme(mode, menuId){
+  // Apply to <html>
+  const root = document.documentElement;
+  if(mode === 'auto'){
+    root.removeAttribute('data-theme');
+  } else {
+    root.setAttribute('data-theme', mode);
+  }
+  // Persist
+  try { localStorage.setItem('libreo_theme', mode); } catch{}
+  // Update meta theme-color
+  const dark = mode==='dark' || (mode==='auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0e1117' : '#f4f6fb');
+  // Mark active option in all menus
+  document.querySelectorAll('.theme-opt').forEach(el=>{
+    const optMode = el.textContent.includes('Oscuro') ? 'dark'
+                  : el.textContent.includes('Claro')  ? 'light' : 'auto';
+    el.classList.toggle('active', optMode === mode);
+  });
+  // Update all theme button icons
+  document.querySelectorAll('.theme-btn, .cb[onclick*="toggleThemeMenu"]').forEach(btn=>{
+    btn.textContent = THEME_ICONS[mode] || '🌓';
+  });
+  closeAllThemeMenus();
+}
+
+function toggleThemeMenu(screenId){
+  const menuId = 'theme-menu-' + screenId;
+  const menu = document.getElementById(menuId);
+  if(!menu) return;
+  const isOpen = menu.classList.contains('show');
+  closeAllThemeMenus();
+  if(!isOpen) menu.classList.add('show');
+}
+
+function closeAllThemeMenus(){
+  document.querySelectorAll('.theme-menu').forEach(m => m.classList.remove('show'));
+}
+
+function loadTheme(){
+  try{
+    const saved = localStorage.getItem('libreo_theme') || 'auto';
+    setTheme(saved, null);
+  } catch { setTheme('auto', null); }
+}
+
+// Close menus on outside click
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.theme-wrap')) closeAllThemeMenus();
+}, true);
+
 // ── BOOT ──
 setupPWA();
 loadFont();
+loadTheme();
+// Wire context menu buttons
+document.getElementById('ctx-translate').addEventListener('click', ctxTranslate);
+document.getElementById('ctx-readfrom').addEventListener('click',  ctxReadFrom);
+getSample().catch(()=>{});
 </script>
 </body>
 </html>
