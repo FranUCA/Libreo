@@ -2520,12 +2520,15 @@ function backgroundAppend(text, isFinal=false){
   const rc = document.getElementById('rc');
   if(!rc) return;
 
-  // Update paras and raw, but only update sents if NOT currently playing
-  // (replacing S.sents mid-playback causes index corruption and jumps)
   S.raw   = text;
   S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-  if(!S.playing){
-    S.sents = splitSents(text);
+  S.sents = splitSents(text);
+
+  // While audio is playing, skip DOM rebuild entirely — data-si would
+  // become stale and cause jumps. Rebuild will happen when audio stops.
+  if(S.playing){
+    if(isFinal) appendLoadingFooter(false);
+    return;
   }
 
   // Save scroll position
@@ -2533,23 +2536,16 @@ function backgroundAppend(text, isFinal=false){
   const scrollPct = pane && pane.scrollHeight > pane.clientHeight
     ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight) : 0;
 
-  // Re-render all content (with data-si sentence tags)
   renderReaderContent();
 
-  // Restore scroll
   if(pane && scrollPct > 0){
     requestAnimationFrame(()=>{
       pane.scrollTop = scrollPct * (pane.scrollHeight - pane.clientHeight);
     });
   }
 
-  if(isFinal){
-    appendLoadingFooter(false);
-    // Update sentence index mapping for TTS
-    if(S.mode==='audio' && S.playing) hlSent(S.si);
-  } else {
-    appendLoadingFooter(true);
-  }
+  if(isFinal) appendLoadingFooter(false);
+  else appendLoadingFooter(true);
 }
 
 // Finalise after all data is received (kept for compatibility)
@@ -2578,46 +2574,21 @@ function cleanGutenberg(t){
 // and "read from here" can find the right sentence instantly.
 let _bmSaveTimer = null;
 
-// Build paragraph HTML with data-si word spans (used by both renderReader and backgroundAppend)
+// Build paragraph HTML with data-si word spans.
+// Simple approach: render each sentence as its own block, tagged with its index.
+// This guarantees data-si is always exactly correct.
 function buildParaHtml(){
-  const allWords = [];
-  const paraData = S.paras.map(para=>{
-    if(!para) return {isH:false, words:[]};
-    const isH = para.length<70 && !/[.,:;!?]/.test(para);
-    if(isH) return {isH:true, text:para, words:[]};
-    const tokens = para.split(/(\s+)/);
-    const words  = tokens.filter(t=>/\S/.test(t));
-    words.forEach(w => allWords.push(w.toLowerCase().replace(/[^\w]/g,'')));
-    return {isH:false, tokens, words};
-  });
-
-  const wordSentIdx = new Array(allWords.length).fill(0);
-  let wPos = 0;
-  for(let si=0; si<S.sents.length; si++){
-    const sentWords = S.sents[si].split(/\s+/)
-      .map(w=>w.toLowerCase().replace(/[^\w]/g,'')).filter(w=>w.length>0);
-    let matched=0;
-    for(let w=wPos; w<allWords.length && matched<sentWords.length; w++){
-      if(allWords[w]===sentWords[matched]){ wordSentIdx[w]=si; matched++; }
-      else if(matched>0){ wordSentIdx[w]=si; }
-    }
-    wPos = Math.min(wPos+sentWords.length, allWords.length);
-  }
-
-  let globalWordIdx=0, html='';
-  for(const pd of paraData){
-    if(!pd) continue;
-    if(pd.isH){ html+='<h3>'+esc(pd.text)+'</h3>'; continue; }
-    if(!pd.tokens) continue;
-    html+='<p>';
-    pd.tokens.forEach(tok=>{
-      if(!/\S/.test(tok)){ html+=tok; return; }
-      const si=wordSentIdx[globalWordIdx]??0;
-      html+=`<span class="rw" data-si="${si}" data-wi="${globalWordIdx}" onclick="clickW(this)">${esc(tok)}</span>`;
-      globalWordIdx++;
+  if(!S.sents.length) return '';
+  let html = '';
+  S.sents.forEach((sent, si) => {
+    const tokens = sent.split(/(\s+)/);
+    html += '<p>';
+    tokens.forEach(tok => {
+      if(!/\S/.test(tok)){ html += tok; return; }
+      html += `<span class="rw" data-si="${si}" onclick="clickW(this)">${esc(tok)}</span>`;
     });
-    html+='</p>';
-  }
+    html += '</p>';
+  });
   return html;
 }
 
@@ -2890,6 +2861,8 @@ function updBtn(){
 function stopAudio(){
   if(syn) syn.cancel();
   S.playing=false; clrHl(); updBtn();
+  // If backgroundAppend skipped a DOM rebuild, do it now
+  if(S.raw) renderReaderContent();
 }
 function togPlay(){
   if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
@@ -2899,13 +2872,13 @@ function togPlay(){
 function prevS(){
   if(S.si <= 0) return;
   const was = S.playing;
-  syn.cancel(); S.playing = was;
+  ++_ttsGen; syn.cancel(); S.playing = was;
   speakS(S.si - 1);
 }
 function nextS(){
   if(S.si >= S.sents.length - 1) return;
   const was = S.playing;
-  syn.cancel(); S.playing = was;
+  ++_ttsGen; syn.cancel(); S.playing = was;
   speakS(S.si + 1);
 }
 function chRate(v){
@@ -2914,11 +2887,13 @@ function chRate(v){
 }
 // Called from word-tap context menu (also activates audio if not in that mode)
 function readFromSentenceGesture(si){
-  if(S.mode !== 'audio'){
-    S.mode = 'audio';
-    document.getElementById('actl').style.display = 'flex';
-  }
-  stopAudio();
+  // Show audio controls
+  document.getElementById('actl').style.display = 'flex';
+  // Stop current audio cleanly (this also rebuilds DOM if needed)
+  if(syn) syn.cancel();
+  ++_ttsGen;  // invalidate any pending onend
+  clrHl(); updBtn();
+  // Now start from the requested sentence
   S.playing = true;
   speakS(si);
   toast('▶ Leyendo desde la frase ' + (si + 1));
