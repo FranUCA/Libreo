@@ -307,6 +307,16 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   cursor:pointer;margin-top:.7rem;transition:background .15s;}
 .rfh-btn:hover,.rfh-btn:active{background:var(--ac);color:#fff;}
 
+/* ── PDF VIEWER SCREEN ── */
+#sv-doc{flex-direction:column;height:100%;overflow:hidden;}
+.doc-topbar{display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.doc-title{font-family:Georgia,serif;font-size:.88rem;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+#doc-frame{flex:1;border:none;width:100%;background:#fff;}
+.doc-err{flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1rem;padding:2rem;text-align:center;}
+.doc-err p{color:var(--dm);font-size:.9rem;line-height:1.6;}
 /* ── RESUME BADGE on book cards ── */
 .resume-badge{position:absolute;top:6px;right:6px;
   background:var(--ac);color:#fff;font-size:.6rem;font-weight:700;
@@ -535,7 +545,16 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 </div>
 
 
-<!-- LOADING<!-- LOADING -->
+<!-- LOADING<!-- PDF VIEWER -->
+<div id="sv-doc" class="sc">
+  <div class="doc-topbar">
+    <button class="bbtn" onclick="closeDoc()">← Volver</button>
+    <span class="doc-title" id="doc-title"></span>
+  </div>
+  <iframe id="doc-frame" title="Visor PDF" sandbox="allow-same-origin allow-scripts"></iframe>
+</div>
+
+<!-- LOADING -->
 <div id="sld" class="sc">
   <div class="lsp"></div>
   <div class="ltx" id="ltx">Cargando…</div>
@@ -634,6 +653,14 @@ const BOOKS = {
        url:G+"The-War-of-the-Worlds_36/master/36.txt"},
       {id:"journey", title:"Journey to the Centre of the Earth",author:"Jules Verne", lv:"b1",desc:"Exploración al interior del planeta.",
        url:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857.txt"},
+    ]},
+    {cat:"Asimov — Fundación 🌌",desc:"PDF · C1",books:[
+      {id:"foundation",    title:"Foundation",                     author:"Isaac Asimov",lv:"c1",desc:"Hari Seldon funda la Fundación para preservar el conocimiento.",
+       fmt:"pdf",hurl:"https://raw.githubusercontent.com/GSimas/Asimov/master/Books/Foundation/Foundation%20Trilogy.pdf"},
+      {id:"found_empire",  title:"Foundation and Empire",          author:"Isaac Asimov",lv:"c1",desc:"La Fundación se enfrenta al Imperio moribundo y al Mulo.",
+       fmt:"pdf",hurl:"https://raw.githubusercontent.com/GSimas/Asimov/master/Books/Foundation_Empire/Foundation%20Trilogy.pdf"},
+      {id:"found_earth",   title:"Foundation and Earth",           author:"Isaac Asimov",lv:"c1",desc:"Golan Trevize busca el origen de la humanidad: la Tierra.",
+       fmt:"pdf",hurl:"https://raw.githubusercontent.com/GSimas/Asimov/master/Books/Foundation_Earth/Foundation%20and%20Earth.pdf"},
     ]},
   ],
 
@@ -1905,6 +1932,102 @@ const VOCAB = {
     {w:"Virgilio",exp:"Il poeta latino, guida di Dante attraverso Inferno e Purgatorio.",ex:"Virgilio mi apparve e disse: Seguimi.",},
     {w:"viaggio",exp:"Il cammino di Dante attraverso i tre regni.",ex:"Il viaggio di Dante è anche un viaggio dell anima.",},
   ]},
+  foundation:{words:[
+    {w:"asteroid",exp:"A small rocky body orbiting the sun.",ex:"The asteroid belt lay between Mars and Jupiter."},
+    {w:"barbarism",exp:"The state of being primitive or uncivilised.",ex:"Thirty thousand years of barbarism would follow the fall."},
+    {w:"century",exp:"A period of one hundred years.",ex:"The Empire had ruled for twelve thousand years."},
+    {w:"collapse",exp:"A sudden fall or breakdown of a structure or system.",ex:"The collapse of the Empire was inevitable."},
+    {w:"crisis",exp:"A time of intense difficulty requiring a decision.",ex:"Each Seldon Crisis had a single solution."},
+    {w:"decay",exp:"The gradual decline of a structure or civilisation.",ex:"The signs of decay were everywhere on Trantor."},
+    {w:"diplomat",exp:"A person who represents a government in negotiations.",ex:"The diplomat spoke carefully to avoid war."},
+    {w:"empire",exp:"A group of states under a single supreme authority.",ex:"The Galactic Empire spanned a hundred thousand worlds."},
+    {w:"encyclopedia",exp:"A reference work containing information on many subjects.",ex:"The Encyclopedia Galactica would preserve all human knowledge."},
+    {w:"fall",exp:"The sudden decline of a great power.",ex:"The fall of the Empire could not be prevented."},
+    {w:"Foundation",exp:"The organisation established by Seldon to shorten the dark age.",ex:"He called his sanctuary the Foundation."},
+    {w:"galaxy",exp:"A system of millions of stars held together by gravity.",ex:"The galaxy contained over a million inhabited worlds."},
+    {w:"hologram",exp:"A three-dimensional image formed by light.",ex:"The hologram of Seldon appeared before the assembled crowd."},
+    {w:"humanity",exp:"All human beings collectively.",ex:"Seldon worked to preserve the future of humanity."},
+    {w:"inevitable",exp:"Certain to happen and impossible to avoid.",ex:"The fall of the Empire was mathematically inevitable."},
+    {w:"knowledge",exp:"Facts and information acquired through experience.",ex:"All the knowledge of humanity must be preserved."},
+    {w:"mayor",exp:"The head of a city or small government.",ex:"The mayor of Terminus faced the barbarian threat alone."},
+    {w:"mathematics",exp:"The science of numbers and their operations.",ex:"Psychohistory was a branch of advanced mathematics."},
+    {w:"planet",exp:"A large body in orbit around a star.",ex:"Terminus was a small planet at the edge of the galaxy."},
+    {w:"prediction",exp:"A statement about what will happen in the future.",ex:"Seldon predictions were encoded into the Plan."},
+    {w:"preserve",exp:"To maintain something in its original state.",ex:"The Foundation was created to preserve human knowledge."},
+    {w:"psychohistory",exp:"Seldon fictional science of predicting mass human behaviour.",ex:"Psychohistory could predict the fall of civilisations."},
+    {w:"religion",exp:"A system of faith used here as a political tool.",ex:"The Foundation used religion to control the barbarian worlds."},
+    {w:"Seldon",exp:"Hari Seldon, the mathematician who founded the Foundation.",ex:"Seldon had foreseen this crisis centuries before."},
+    {w:"trade",exp:"The buying and selling of goods.",ex:"Trade was the weapon the Foundation used most effectively."},
+    {w:"Terminus",exp:"The planet at the edge of the galaxy where the Foundation is located.",ex:"Terminus had no mineral resources worth speaking of."},
+    {w:"threat",exp:"A statement of an intention to inflict harm.",ex:"The threat from the barbarian kingdoms was real."},
+    {w:"vault",exp:"A secure room; the Time Vault held Seldon recordings.",ex:"The Time Vault opened at the moment of crisis."},
+    {w:"warlord",exp:"A military commander who controls a region by force.",ex:"The warlords fought over the ruins of the Empire."},
+    {w:"weapon",exp:"A device used in combat.",ex:"Trade was a more powerful weapon than any battle fleet."},
+  ]},
+  found_empire:{words:[
+    {w:"armada",exp:"A large fleet of warships.",ex:"The Imperial armada approached the Foundation worlds."},
+    {w:"battle",exp:"A fight between armed forces.",ex:"The battle was decided before a shot was fired."},
+    {w:"Bel",exp:"Bel Riose, the last great general of the Empire.",ex:"Bel Riose was the finest military mind of his age."},
+    {w:"blockade",exp:"The sealing off of a place to prevent supplies getting in.",ex:"The Imperial blockade cut off all trade routes."},
+    {w:"clairvoyant",exp:"Having the supposed power to see future events.",ex:"Seldon was not clairvoyant but mathematical."},
+    {w:"defeat",exp:"Failure to win; being beaten by an opponent.",ex:"The defeat of the Foundation seemed inevitable."},
+    {w:"destiny",exp:"The events that will happen to a particular person.",ex:"The Plan determined the destiny of the Foundation."},
+    {w:"empire",exp:"A political unit made up of territories under one ruler.",ex:"The dying Empire had one last great soldier."},
+    {w:"enemy",exp:"A person or group that is hostile to another.",ex:"The Empire became the greatest enemy the Foundation had faced."},
+    {w:"fleet",exp:"A group of warships operating together.",ex:"The Imperial fleet numbered ten thousand ships."},
+    {w:"general",exp:"A senior officer in an army or fleet.",ex:"The general was brilliant but his Empire was doomed."},
+    {w:"government",exp:"The system by which a state is controlled.",ex:"The Foundation government debated how to respond."},
+    {w:"inevitability",exp:"The quality of being certain to happen.",ex:"The Plan relied on the inevitability of Imperial decay."},
+    {w:"merchant",exp:"A person who buys and sells goods.",ex:"The merchants of the Foundation spread across the galaxy."},
+    {w:"Mule",exp:"A mutant with mental powers who disrupts the Seldon Plan.",ex:"The Mule was not a man who could be predicted."},
+    {w:"mutation",exp:"A change in the genetic material of an organism.",ex:"The Mule was a genetic mutation of enormous power."},
+    {w:"plan",exp:"The Seldon Plan, the mathematical blueprint for history.",ex:"Nothing in the Plan had prepared them for the Mule."},
+    {w:"power",exp:"The ability to control people or events.",ex:"His power over minds was absolute and terrifying."},
+    {w:"psychic",exp:"Relating to or denoting mental powers beyond science.",ex:"His psychic abilities allowed him to control emotions."},
+    {w:"refuge",exp:"A place providing safety from danger.",ex:"They sought refuge on a hidden Foundation world."},
+    {w:"resistance",exp:"The refusal to accept or comply with something.",ex:"Resistance to the Mule was emotionally impossible."},
+    {w:"Second Foundation",exp:"A secret group of psychohistorians guarding the Plan.",ex:"The Second Foundation existed somewhere at the other end."},
+    {w:"spy",exp:"A person who secretly collects information.",ex:"The Mule sent spies to find the Second Foundation."},
+    {w:"surrender",exp:"The act of giving up resistance.",ex:"The Foundation worlds surrendered one by one."},
+    {w:"trader",exp:"A person who buys and sells goods; heroes of the Foundation.",ex:"The traders of the Foundation were its true ambassadors."},
+    {w:"triumph",exp:"A great victory or achievement.",ex:"His triumph was complete yet somehow hollow."},
+    {w:"unknown",exp:"Not known; the Mule was an unknown variable.",ex:"The Mule was the great unknown that broke the Plan."},
+    {w:"victory",exp:"Success in a contest or conflict.",ex:"Victory over the Foundation came easily to the Mule."},
+    {w:"war",exp:"A state of armed conflict between groups.",ex:"The war was decided not by weapons but by minds."},
+    {w:"weakness",exp:"A lack of strength or power.",ex:"The Empire rotted from within through weakness and corruption."},
+  ]},
+  found_earth:{words:[
+    {w:"ancient",exp:"Belonging to the very distant past.",ex:"Earth was the most ancient mystery of all."},
+    {w:"android",exp:"A robot with a human appearance.",ex:"The android served without question or emotion."},
+    {w:"asteroid",exp:"A small rocky body orbiting the sun.",ex:"They searched among the asteroids for signs of old colonies."},
+    {w:"Aurora",exp:"One of the oldest Spacer worlds, now abandoned.",ex:"Aurora had once been the most powerful world in the galaxy."},
+    {w:"consciousness",exp:"The state of being aware of one s own existence.",ex:"Gaia shared a single consciousness across the whole planet."},
+    {w:"decision",exp:"A conclusion reached after consideration.",ex:"Trevize had made the decision but did not know why."},
+    {w:"Earth",exp:"The original home world of humanity, now radioactive.",ex:"Earth was the legendary origin of all human life."},
+    {w:"evolution",exp:"The gradual development of living things over time.",ex:"The evolution of humanity had been guided from the start."},
+    {w:"Gaia",exp:"A planet with a unified group consciousness.",ex:"Gaia was not a world but a single living mind."},
+    {w:"Galaxia",exp:"The future state where all matter shares one consciousness.",ex:"Galaxia would unite every star and planet in one mind."},
+    {w:"harmony",exp:"The state of being in agreement and peaceful coexistence.",ex:"On Gaia, harmony between all living things was absolute."},
+    {w:"humanity",exp:"The human race; here traced back to a single origin.",ex:"All humanity had originated on one small world."},
+    {w:"intuition",exp:"The ability to understand something instinctively.",ex:"Trevize had been chosen for his gift of intuition."},
+    {w:"isolation",exp:"The state of being separated from others.",ex:"The Spacers had lived in isolation for generations."},
+    {w:"legend",exp:"A traditional story about the past.",ex:"Earth had become a legend, its location forgotten."},
+    {w:"memory",exp:"The ability to retain and recall past experience.",ex:"The memory banks held records from before the Empire."},
+    {w:"mystery",exp:"Something that is not fully understood.",ex:"The mystery of Earth origin had never been solved."},
+    {w:"origin",exp:"The point where something begins.",ex:"The origin of humanity lay buried on a radioactive world."},
+    {w:"R. Daneel",exp:"A robot who has guided humanity for twenty thousand years.",ex:"R. Daneel Olivaw had watched over humanity since the beginning."},
+    {w:"radioactive",exp:"Emitting radiation; Earth surface is deadly.",ex:"The surface of Earth was dangerously radioactive."},
+    {w:"robot",exp:"A machine designed to carry out complex tasks automatically.",ex:"The ancient robot had survived for twenty thousand years."},
+    {w:"Robots",exp:"Artificial beings who guided humanity secretly from the start.",ex:"Robots had protected humanity long before the Foundation."},
+    {w:"search",exp:"An attempt to find something.",ex:"The search for Earth consumed their entire voyage."},
+    {w:"Solaria",exp:"A world of hermits; each person lives alone on a vast estate.",ex:"On Solaria, human contact was considered obscene."},
+    {w:"telepathy",exp:"The supposed communication of thoughts between minds.",ex:"The Gaians communicated through a form of telepathy."},
+    {w:"Trantor",exp:"The former capital of the Galactic Empire.",ex:"Trantor had fallen and was now a world of farms."},
+    {w:"Trevize",exp:"The protagonist, chosen for his gift of intuition.",ex:"Trevize had been right, but he did not know why."},
+    {w:"voyage",exp:"A long journey by water or through space.",ex:"The voyage took them from Terminus to the edge of the galaxy."},
+    {w:"wisdom",exp:"The quality of having experience and good judgement.",ex:"Twenty thousand years of wisdom lay in that robot mind."},
+    {w:"world",exp:"A planet; here each world has its own culture.",ex:"Each world they visited held a piece of the puzzle."},
+  ]},
 
 };
 
@@ -2887,17 +3010,23 @@ document.querySelectorAll('.lc').forEach(c=>{
 
 // ── LIBRARY RENDER (text + HTML/PDF books) ──
 function renderBookCard(b, lang){
+  const isDoc = !!b.fmt;
   let bm = null;
-  try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
+  if(!isDoc){
+    try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
+  }
   const pct = bm ? Math.round(bm.pct*100) : 0;
   const resumeBadge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-  return `<div class="bc ${b.lv}" onclick="selBook('${b.id}')">
+  const onclick = isDoc ? `openDoc('${b.id}')` : `selBook('${b.id}')`;
+  const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
+  const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
+  return `<div class="bc ${b.lv}" onclick="${onclick}">
     ${resumeBadge}
     <div class="btt">${b.title}</div>
     <div class="ba">${b.author}</div>
     <div class="bm">
       <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
-      <span class="sp">🎧</span>
+      ${fmtBadge}${audioIcon}
     </div>
     <div class="bdsc">${b.desc}</div>
   </div>`;
@@ -2911,6 +3040,31 @@ function renderLib(lang){
         ${c.books.map(b=>renderBookCard(b, lang)).join('')}
       </div>
     </div>`).join('');
+}
+
+// ── PDF VIEWER ──
+function findDocBook(id){
+  for(const lang of Object.keys(BOOKS)){
+    for(const cat of BOOKS[lang]){
+      const b = cat.books.find(x=>x.id===id);
+      if(b && b.fmt) return b;
+    }
+  }
+  return null;
+}
+
+function openDoc(id){
+  const book = findDocBook(id);
+  if(!book) return;
+  document.getElementById('doc-title').textContent = book.title + ' — ' + book.author;
+  const frame = document.getElementById('doc-frame');
+  frame.src = book.hurl;
+  goTo('sv-doc');
+}
+
+function closeDoc(){
+  document.getElementById('doc-frame').src = 'about:blank';
+  goTo('sb');
 }
 
 // ── THEME ──
