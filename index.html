@@ -2462,8 +2462,9 @@ async function startRead(){
 
     // Show reader immediately with full text
     S.raw   = fullText;
+    // Build paras first (single newlines → space), then sents from the SAME para text
     S.paras = fullText.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-    S.sents = splitSents(fullText);
+    S.sents = splitSentsFromParas(S.paras);
     renderReader();
     goTo('sr');
     showResumeBar();
@@ -2507,7 +2508,7 @@ function backgroundAppend(text, isFinal=false){
 
   S.raw   = text;
   S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-  S.sents = splitSents(text);
+  S.sents = splitSentsFromParas(S.paras);
 
   // While audio is playing, skip DOM rebuild entirely — data-si would
   // become stale and cause jumps. Set flag so stopAudio() rebuilds when done.
@@ -2538,7 +2539,7 @@ function backgroundAppend(text, isFinal=false){
 async function finishLoad(text, mode, alreadyInReader=false){
   S.raw   = text;
   S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-  S.sents = splitSents(text);
+  S.sents = splitSentsFromParas(S.paras);
   if(!alreadyInReader){ renderReader(); goTo('sr'); }
   else { renderReaderContent(); }
   showResumeBar();
@@ -2569,7 +2570,7 @@ function buildParaHtml(){
   if(!S.paras.length) return '';
 
   // Rebuild the full text exactly as it was before splitting into paras
-  const fullText = S.paras.join('\n\n');
+  const fullText = S.paras.join('');  //  as para separator (never in text)
 
   // Build a char→sentenceIndex map using exact substring search
   // charSi[i] = sentence index for character at position i in fullText
@@ -2808,6 +2809,21 @@ function renderHist(){
 //  - Don't split on common abbreviations (Mr. Mrs. Dr. St. etc.)
 //  - Don't split if the char before . is a single uppercase letter (initials)
 //  - Minimum 15 chars per sentence to skip headers and stray fragments
+// Run splitSents on each paragraph independently, then merge.
+// This ensures paragraph boundaries are respected — chapter headings,
+// preamble text and body paragraphs never merge into one giant sentence.
+// Returns a flat array of sentences in document order.
+function splitSentsFromParas(paras){
+  const result = [];
+  for(const para of paras){
+    if(!para || para.length < 15) continue;
+    const ss = splitSents(para);
+    if(ss.length) for(const s of ss) result.push(s);
+    else if(para.length >= 15) result.push(para); // keep unsplit para as one sentence
+  }
+  return result;
+}
+
 function splitSents(text){
   if(!text) return [];
   // Protect abbreviations: "Mr. " -> "Mr\u25ce " so the dot is not a sentence boundary.
@@ -2920,7 +2936,7 @@ function nextS(){
 }
 function chRate(v){
   S.rate = parseFloat(v);
-  if(S.playing){ syn.cancel(); speakS(S.si); }
+  if(S.playing){ ++_ttsGen; syn.cancel(); speakS(S.si); }
 }
 // Called from word-tap context menu (also activates audio if not in that mode)
 function readFromSentenceGesture(si){
