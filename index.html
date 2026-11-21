@@ -756,416 +756,346 @@ const LMETA = {
 // ══════════════════════════════════════════════════════
 
 const VOCAB = {
-  // ── ENGLISH ──
-  alice:{
-    words:[
-      {w:"adventure",   exp:"An exciting or unusual experience.",                                                     ex:"Alice started to her feet, for it flashed across her mind."},
-      {w:"Alice",       exp:"The curious young girl who falls into Wonderland.",                                      ex:"Alice was beginning to get very tired of sitting."},
-      {w:"appear",      exp:"To come into sight; to become visible.",                                                 ex:"A large cat appeared on a branch above her."},
-      {w:"beautiful",   exp:"Very pleasing to look at; attractive.",                                                  ex:"The flowers were beautiful but had no scent."},
-      {w:"bottle",      exp:"A container with a narrow neck; here marked 'Drink me'.",                               ex:"It was labelled 'Drink me' in large letters."},
-      {w:"cake",        exp:"A sweet baked food; here labelled 'Eat me'.",                                           ex:"She found a little cake with the words 'Eat me'."},
-      {w:"card",        exp:"A flat piece of thick paper; the Queen's soldiers are playing-cards.",                  ex:"The soldiers were flat playing-cards."},
-      {w:"Caterpillar", exp:"A larva; here a philosophical creature smoking a hookah.",                              ex:"The Caterpillar and Alice looked at each other in silence."},
-      {w:"corridor",    exp:"A long narrow passage in a building.",                                                   ex:"She found herself in a long low corridor."},
-      {w:"creature",    exp:"A living being, animal or fantastical being.",                                          ex:"All sorts of little birds and beasts gathered round her."},
-      {w:"curious",     exp:"Eager to know; also strange and unusual.",                                              ex:"Curiouser and curiouser! cried Alice."},
-      {w:"Dodo",        exp:"An extinct flightless bird; a character in the pool of tears.",                        ex:"The Dodo solemnly rose to its feet."},
-      {w:"door",        exp:"A movable barrier at the entrance to a room.",                                          ex:"She came upon a little door about fifteen inches high."},
-      {w:"dream",       exp:"A series of images during sleep; a wishful fantasy.",                                   ex:"Was it really a dream after all?"},
-      {w:"duchess",     exp:"A noblewoman; here a bad-tempered character with a baby.",                             ex:"The Duchess was sitting on a three-legged stool."},
-      {w:"eager",       exp:"Strongly wanting to do or have something.",                                             ex:"She was rather glad there was no one listening."},
-      {w:"enormous",    exp:"Very large in size.",                                                                   ex:"An enormous puppy was looking down at her."},
-      {w:"fall",        exp:"To drop downward; Alice falls into Wonderland.",                                        ex:"Down, down, down. Would the fall never come to an end?"},
-      {w:"fan",         exp:"A flat folding device for creating a cool breeze.",                                     ex:"She took up the fan and gloves."},
-      {w:"flamingo",    exp:"A pink wading bird; used as a croquet mallet in Wonderland.",                          ex:"The chief difficulty Alice found was managing her flamingo."},
-      {w:"foolish",     exp:"Lacking good sense; unwise.",                                                           ex:"It was foolish to cry so much."},
-      {w:"frightened",  exp:"Filled with fear or alarm.",                                                            ex:"Alice was rather frightened by this."},
-      {w:"garden",      exp:"An outdoor space with plants; Alice longs to reach the beautiful garden.",              ex:"She could see a beautiful garden beyond the door."},
-      {w:"gloves",      exp:"Hand coverings; the White Rabbit is always looking for his.",                          ex:"The White Rabbit dropped its white gloves and fan."},
-      {w:"grow",        exp:"To increase in size; Alice grows and shrinks throughout.",                              ex:"One side will make you grow taller."},
-      {w:"guinea-pig",  exp:"A small rodent; a character in the trial scene.",                                       ex:"Two guinea-pigs were immediately suppressed."},
-      {w:"hall",        exp:"A large entrance room; the hall of many doors.",                                        ex:"She found herself in a long hall lined with doors."},
-      {w:"hare",        exp:"A wild animal like a large rabbit; the March Hare hosts the tea party.",               ex:"The March Hare had a large teapot in front of him."},
-      {w:"head",        exp:"The upper part of the body; the Queen constantly orders heads cut off.",                ex:"Off with their heads! shouted the Queen of Hearts."},
-      {w:"hedgehog",    exp:"A small spiny mammal; used as a croquet ball in Wonderland.",                          ex:"The hedgehog had unrolled itself and was creeping away."},
-      {w:"hole",        exp:"An opening; Alice falls down the rabbit hole to begin the story.",                      ex:"In another moment Alice had followed the rabbit down the hole."},
-      {w:"jury",        exp:"A group of people who decide the verdict in a trial.",                                  ex:"Write that down, the King said to the jury."},
-      {w:"key",         exp:"A device for opening a lock; Alice finds a tiny golden key.",                           ex:"She found a little golden key on the glass table."},
-      {w:"kitten",      exp:"A young cat; Alice's kitten triggers the dream of Wonderland.",                        ex:"It was a black kitten and a white kitten."},
-      {w:"knight",      exp:"An armored warrior; the White Knight appears in later chapters.",                       ex:"The White Knight was sliding down the poker."},
-      {w:"lock",        exp:"A fastening device; the small door is locked.",                                         ex:"She tried the little door, but it was locked."},
-      {w:"mad",         exp:"Crazy; also the state of all Wonderland inhabitants.",                                  ex:"We're all mad here, said the Cheshire Cat."},
-      {w:"mock",        exp:"To make fun of; also the Mock Turtle character.",                                       ex:"The Mock Turtle sighed deeply."},
-      {w:"mushroom",    exp:"A type of fungus with magical properties in Wonderland.",                              ex:"One side will make you grow taller and the other shorter."},
-      {w:"nonsense",    exp:"Words or ideas that have no meaning or make no sense.",                                 ex:"It's no use going back to yesterday."},
-      {w:"pepper",      exp:"A spice; the Duchess uses too much pepper in her kitchen.",                            ex:"There was certainly too much pepper in the soup."},
-      {w:"pool",        exp:"A small area of still water; Alice cries a pool of tears.",                            ex:"Alice was swimming in her pool of tears."},
-      {w:"puppy",       exp:"A young dog; Alice encounters a gigantic puppy.",                                       ex:"An enormous puppy was looking down at her."},
-      {w:"queen",       exp:"A female ruler; the violent Queen of Hearts.",                                          ex:"Off with their heads! shouted the Queen."},
-      {w:"rabbit",      exp:"A small furry animal; the White Rabbit leads Alice into Wonderland.",                  ex:"The White Rabbit took a watch out of its waistcoat-pocket."},
-      {w:"riddle",      exp:"A puzzling question or statement.",                                                     ex:"Why is a raven like a writing-desk?"},
-      {w:"rose",        exp:"A flower; the cards are painting the white roses red.",                                 ex:"They were painting a rosebush white to make it look red."},
-      {w:"size",        exp:"The dimensions of something; Alice constantly changes size.",                           ex:"She had never before seen a rabbit with a waistcoat-pocket."},
-      {w:"soup",        exp:"A liquid food; the Mock Turtle sings about beautiful soup.",                           ex:"Beautiful Soup, so rich and green!"},
-      {w:"tea",         exp:"A hot drink; the subject of the mad tea party.",                                        ex:"Have some wine, the March Hare said encouragingly."},
-      {w:"thimble",     exp:"A cap worn to protect the finger when sewing.",                                         ex:"Alice humbly accepted the thimble."},
-      {w:"trial",       exp:"A formal legal hearing; Alice is called as a witness.",                                 ex:"Who stole the tarts? said the King."},
-      {w:"waistcoat",   exp:"A sleeveless garment worn over a shirt; the Rabbit's distinctive item.",               ex:"The rabbit took a watch out of its waistcoat-pocket."},
-      {w:"wise",        exp:"Having good judgement and knowledge.",                                                   ex:"The wise little Alice was not going to do that."},
-      {w:"wonder",      exp:"A feeling of amazement; also the place wonderland.",                                    ex:"Alice's Adventures in Wonderland."},
-      {w:"wretched",    exp:"In a very unhappy or unfortunate state.",                                               ex:"She felt a little irritated at the Caterpillar's making such very short remarks."},
-    ]
-  },
-  dracula:{
-    words:[
-      {w:"asylum",      exp:"A hospital for people with mental illness; Renfield is confined there.",                ex:"The Count had access to the asylum."},
-      {w:"bat",         exp:"A flying mammal; Dracula can transform into one.",                                      ex:"A bat flew close to her face."},
-      {w:"bite",        exp:"To cut with the teeth; the vampire's method of infection.",                             ex:"There were two puncture marks on her throat."},
-      {w:"blood",       exp:"The red liquid in the body; what vampires feed on.",                                    ex:"The lips were redder than ever, with gouts of fresh blood."},
-      {w:"castle",      exp:"A large fortified medieval building; Dracula's home.",                                  ex:"The castle is on the very edge of a terrible precipice."},
-      {w:"coffin",      exp:"A box in which a corpse is buried; vampires sleep in them.",                           ex:"Jonathan found the Count lying in his box upon the earth."},
-      {w:"Count",       exp:"A European nobleman; Dracula's title.",                                                 ex:"The Count smiled and his lips drew back over long sharp teeth."},
-      {w:"crucifix",    exp:"A cross with a figure of Christ; repels vampires.",                                    ex:"The old woman pressed a crucifix into his hand."},
-      {w:"curse",       exp:"A supernatural invocation causing harm.",                                               ex:"The nosferatu do not die like the bee when he stings once."},
-      {w:"daylight",    exp:"The light of the sun; fatal to vampires.",                                              ex:"Before the dawn had come he must return to his native earth."},
-      {w:"demon",       exp:"An evil supernatural being.",                                                           ex:"He was at once man and demon."},
-      {w:"diary",       exp:"A personal journal; the novel is told through diaries and letters.",                   ex:"I must keep writing in my diary."},
-      {w:"dust",        exp:"Fine dry particles; what Dracula crumbles to after death.",                            ex:"He crumbled into dust and vanished."},
-      {w:"earth",       exp:"Soil from his homeland; Dracula must sleep in his native earth.",                       ex:"The Count rested in a box filled with earth."},
-      {w:"evil",        exp:"Profoundly immoral; Dracula embodies evil.",                                            ex:"I shall cut off the head and fill the mouth with garlic."},
-      {w:"fangs",       exp:"Long sharp pointed teeth; a vampire's weapon.",                                         ex:"His lips drew back over his long sharp fangs."},
-      {w:"fear",        exp:"An unpleasant emotion caused by danger or threat.",                                     ex:"There was something about him that made me uneasy."},
-      {w:"fog",         exp:"A thick mist; Dracula often arrives in foggy weather.",                                 ex:"A heavy sea-fog rolled in from the sea."},
-      {w:"garlic",      exp:"A plant whose smell repels vampires.",                                                  ex:"The old woman hung garlic over the door."},
-      {w:"ghost",       exp:"The spirit of a dead person.",                                                          ex:"It seemed as though they were ghosts."},
-      {w:"grave",       exp:"A place of burial; vampires rise from their graves.",                                   ex:"We opened the grave and found her there."},
-      {w:"horror",      exp:"Intense fear or shock.",                                                                ex:"I was filled with horror and loathing."},
-      {w:"hunt",        exp:"To pursue and kill; Van Helsing hunts Dracula.",                                        ex:"We must hunt the monster down."},
-      {w:"hypnosis",    exp:"A state of focused attention; Dracula uses it to control victims.",                     ex:"She was under some terrible influence."},
-      {w:"immortal",    exp:"Living forever; not subject to death.",                                                 ex:"The nosferatu do not die like the bee."},
-      {w:"infection",   exp:"The process of being contaminated by a harmful agent.",                                  ex:"She had been bitten and must be turned."},
-      {w:"journal",     exp:"A personal diary; the novel is narrated through journals.",                             ex:"I keep a journal in shorthand."},
-      {w:"knife",       exp:"A sharp cutting blade; used to kill Dracula.",                                          ex:"The knife plunged into the throat."},
-      {w:"Mina",        exp:"The heroine of the novel, Jonathan Harker's fiancée.",                                  ex:"Mina was white and speechless with terror."},
-      {w:"mirror",      exp:"A reflective surface; vampires cast no reflection.",                                    ex:"There was no reflection of him in the mirror."},
-      {w:"mist",        exp:"A thin fog; Dracula can transform into mist.",                                          ex:"The mist crept under the door."},
-      {w:"moon",        exp:"The natural satellite of Earth; wolves howl at it.",                                    ex:"The full moon shone on the white snow."},
-      {w:"night",       exp:"The period of darkness; when vampires are active.",                                     ex:"Do you not think that there are things which you cannot understand?"},
-      {w:"nosferatu",   exp:"An old word for vampire, used by Van Helsing.",                                         ex:"The nosferatu do not die like the bee."},
-      {w:"pale",        exp:"Light in colour; often used to describe those drained of blood.",                      ex:"Her face was pale as death."},
-      {w:"professor",   exp:"Van Helsing's title; the expert vampire hunter.",                                       ex:"Professor Van Helsing was a man of iron nerve."},
-      {w:"Renfield",    exp:"A patient in the asylum who eats flies and worships Dracula.",                         ex:"Renfield was sitting quietly in the corner."},
-      {w:"shadow",      exp:"A dark shape; Dracula casts none.",                                                     ex:"No shadow fell upon the moonlit ground where he walked."},
-      {w:"silver",      exp:"A precious metal; a silver bullet kills supernatural creatures.",                       ex:"A stake through the heart and a silver bullet."},
-      {w:"soul",        exp:"The spiritual or immaterial part of a person.",                                         ex:"His soul was not his own."},
-      {w:"stake",       exp:"A pointed wooden post driven through a vampire's heart.",                               ex:"The hammer drove the stake through the heart."},
-      {w:"sun",         exp:"The star at the centre of our system; fatal to vampires.",                              ex:"The vampire has not power to live in the sunlight."},
-      {w:"superstition",exp:"A belief not based on reason or knowledge.",                                            ex:"The peasants believe strange things."},
-      {w:"throat",      exp:"The front part of the neck; where vampires bite.",                                      ex:"There were two small punctures on her throat."},
-      {w:"Transylvania",exp:"A historical region of Romania; Dracula's homeland.",                                   ex:"I am Dracula and I bid you welcome."},
-      {w:"undead",      exp:"Existing between life and death.",                                                      ex:"Un-Dead, as they call it in Eastern Europe."},
-      {w:"vampire",     exp:"An undead creature that feeds on human blood.",                                         ex:"The mouth was redder than ever for on the lips were gouts of blood."},
-      {w:"victim",      exp:"A person harmed by another; Dracula's prey.",                                           ex:"The poor girl was white and thin."},
-      {w:"wolf",        exp:"A wild canine; Dracula can transform into one.",                                        ex:"The wolves began to howl as though the moonlight had some peculiar effect."},
-    ]
-  },
-  frankenstein:{
-    words:[
-      {w:"abhor",       exp:"To regard with disgust and hatred.",                                                    ex:"I abhorred myself."},
-      {w:"abandoned",   exp:"Deserted; left alone without support.",                                                 ex:"I, the miserable and the abandoned."},
-      {w:"agony",       exp:"Extreme physical or mental pain.",                                                      ex:"I was seized by agony."},
-      {w:"ambition",    exp:"A strong desire to achieve something.",                                                 ex:"My father looked upon my studies with contempt."},
-      {w:"anatomy",     exp:"The scientific study of the structure of the human body.",                              ex:"I pursued my investigations with unrelenting ardour."},
-      {w:"beautiful",   exp:"Very pleasing; Frankenstein seeks beauty in his creation.",                             ex:"His limbs were in proportion and I had selected his features as beautiful."},
-      {w:"creature",    exp:"A living being; the monster created by Frankenstein.",                                  ex:"The creature had abandoned the companions of his travels."},
-      {w:"creation",    exp:"The act of bringing something into existence.",                                         ex:"Learn from me by my example how dangerous is the acquirement of knowledge."},
-      {w:"daemon",      exp:"An evil spirit or devil; Frankenstein calls his creature a daemon.",                   ex:"I called myself the murderer of William, of Justine, and of Clerval."},
-      {w:"death",       exp:"The end of life; a central theme of the novel.",                                        ex:"I was seized by a cold horror and clammy sweat."},
-      {w:"desolate",    exp:"Bleak and empty; how the creature feels without companionship.",                        ex:"I am alone and miserable; man will not associate with me."},
-      {w:"destroy",     exp:"To put an end to; Frankenstein seeks to destroy his creation.",                        ex:"I will not destroy the creature if it promises to leave Europe."},
-      {w:"disgust",     exp:"A strong feeling of revulsion.",                                                        ex:"The form of the monster on whom I had bestowed existence was forever before my eyes."},
-      {w:"electricity",exp:"The force that animated the creature on the stormy night.",                              ex:"The rain poured down in torrents, and the thunder deafened and blinded me."},
-      {w:"emotion",     exp:"A strong feeling such as love, fear, or joy.",                                          ex:"I was unable to compose my mind to study."},
-      {w:"exile",       exp:"The state of being barred from one's country.",                                         ex:"I was banished from my home."},
-      {w:"experiment",  exp:"A scientific procedure to test a hypothesis.",                                          ex:"I paused, examining and analysing all the minutiae of causation."},
-      {w:"fate",        exp:"The development of events outside a person's control.",                                 ex:"Destiny was too potent and her immutable laws had decreed my destruction."},
-      {w:"fiend",       exp:"An evil person or spirit.",                                                             ex:"Devil! Do you dare approach me?"},
-      {w:"filth",       exp:"Disgusting dirt; how the creature sees himself.",                                       ex:"Accursed creator! Why did you form a monster?"},
-      {w:"forest",      exp:"A large area of trees; where the creature lives.",                                     ex:"I lived in the forest, and fed on berries."},
-      {w:"glory",       exp:"Great beauty or fame; what Frankenstein seeks.",                                        ex:"I, who had ever been surrounded by amiable companions."},
-      {w:"god",         exp:"A supreme being; Frankenstein plays god by creating life.",                             ex:"I had worked hard for nearly two years for the sole purpose of infusing life."},
-      {w:"guilt",       exp:"A feeling of responsibility for wrongdoing.",                                           ex:"I called myself the murderer of William."},
-      {w:"hideousness", exp:"Extreme ugliness.",                                                                     ex:"His yellow skin scarcely covered the work of muscles and arteries beneath."},
-      {w:"horror",      exp:"Intense fear and shock.",                                                               ex:"With an anxiety that almost amounted to agony, I collected the instruments of life."},
-      {w:"humanity",    exp:"Human beings collectively; compassion.",                                                ex:"The creature sought warmth and companionship from humanity."},
-      {w:"ice",         exp:"Frozen water; the Arctic setting of the novel's frame.",                                ex:"I followed the monster to the icy regions of the north."},
-      {w:"intellect",   exp:"The faculty of reasoning and understanding.",                                           ex:"The creature was quick to learn."},
-      {w:"justice",     exp:"Fair treatment; Justine is unjustly executed.",                                         ex:"Justine Moritz, poor, poor girl, is the victim."},
-      {w:"knowledge",   exp:"Facts and information; Frankenstein's dangerous quest.",                                ex:"Seek happiness in tranquillity and avoid ambition."},
-      {w:"laboratory",  exp:"A room for scientific experiments.",                                                    ex:"In a solitary chamber I kept my workshop of filthy creation."},
-      {w:"life",        exp:"The condition that distinguishes living organisms from dead matter.",                   ex:"I collected the instruments of life around me."},
-      {w:"loneliness",  exp:"Sadness from being alone; the creature's main suffering.",                             ex:"I, the miserable and the abandoned, am an abortion."},
-      {w:"misery",      exp:"Great suffering or unhappiness.",                                                       ex:"No one can conceive the variety of feelings which bore me onwards."},
-      {w:"monster",     exp:"A frightening creature; Frankenstein's unnamed creation.",                              ex:"You are my creator but I am your master — obey!"},
-      {w:"murder",      exp:"The unlawful killing of a person.",                                                     ex:"I was the true murderer."},
-      {w:"nature",      exp:"The physical world; also human nature.",                                                ex:"The stars shone at intervals as the dark clouds passed from before them."},
-      {w:"noble",       exp:"Having or showing fine personal qualities.",                                            ex:"The creature aspired to be noble but was rejected."},
-      {w:"obsession",   exp:"An idea or thought that continually preoccupies the mind.",                            ex:"I pursued my undertaking with unremitting ardour."},
-      {w:"parent",      exp:"A father or mother; Frankenstein abandons his creature like a bad parent.",            ex:"I had no father who had watched my infant days."},
-      {w:"passion",     exp:"Strong and barely controllable emotion.",                                               ex:"My passion for science consumed all other pursuits."},
-      {w:"pitiful",     exp:"Deserving or arousing pity.",                                                           ex:"The poor, helpless, miserable wretch."},
-      {w:"pity",        exp:"The feeling of sorrow for someone else's misfortune.",                                  ex:"Did I request thee, Maker, from my clay to mould me Man?"},
-      {w:"pursuit",     exp:"The action of following or chasing something.",                                         ex:"I pursued my enemy across the frozen sea."},
-      {w:"ruin",        exp:"Physical destruction or catastrophic fall.",                                            ex:"My creation brought ruin upon all I loved."},
-      {w:"science",     exp:"Systematic study; Frankenstein's obsession.",                                           ex:"Learn from me how dangerous is the acquirement of knowledge."},
-      {w:"sorrow",      exp:"Deep distress caused by loss or disappointment.",                                       ex:"I am full of sorrow and despair."},
-      {w:"storm",       exp:"A violent weather event; lightning animates the creature.",                             ex:"It was on a dreary night of November that I beheld the accomplishment."},
-      {w:"sympathy",    exp:"Feelings of pity and sorrow for another's misfortune.",                                 ex:"I felt what the duties of a creator were."},
-      {w:"vengeance",   exp:"Punishment inflicted in return for an injury; revenge.",                                ex:"Cursed, cursed creator! Why did I live?"},
-      {w:"wretch",      exp:"A very unfortunate or unhappy person.",                                                 ex:"Cursed, cursed creator! Why did I live?"},
-    ]
-  },
-  quijote:{
-    words:[
-      {w:"andante",     exp:"Que anda errante; «caballero andante» busca aventuras por el mundo.",                  ex:"Quiero que se me llame don Quijote de la Mancha."},
-      {w:"armas",       exp:"Instrumentos de guerra; don Quijote lleva anticuadas armas de caballero.",            ex:"Limpió sus armas, que sin haber salido a ningún servicio estaban llenas de orín."},
-      {w:"aventura",    exp:"Empresa peligrosa o imprevista que se acomete.",                                       ex:"Y así, del poco dormir y del mucho leer, se le secó el celebro."},
-      {w:"bachiller",   exp:"Persona que ha obtenido el grado académico más básico universitario.",                 ex:"Tenía en su casa una ama que pasaba de los cuarenta."},
-      {w:"balsa",       exp:"Plataforma flotante; don Quijote confunde una simple barca con una nave encantada.",  ex:"En esto llegaron al río Ebro."},
-      {w:"barbero",     exp:"Persona que afeita y corta el pelo; el yelmo de Mambrino es en realidad una bacía.",  ex:"El barbero le puso el barbero en la cabeza."},
-      {w:"batalla",     exp:"Combate o enfrentamiento entre fuerzas opuestas.",                                     ex:"Don Quijote acometió con su lanza en ristre."},
-      {w:"caballero",   exp:"Hombre de clase noble que combate montado y sigue el código de honor.",               ex:"Yo sé quién soy, respondió don Quijote."},
-      {w:"caballo",     exp:"Animal de montar; Rocinante es el caballo flaco de don Quijote.",                     ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
-      {w:"calidad",     exp:"Conjunto de propiedades o condiciones que caracterizan a algo.",                      ex:"La de su calidad no podía ser sino princesa."},
-      {w:"camino",      exp:"Vía o sendero por el que se transita.",                                               ex:"Siguieron su camino por la venta adelante."},
-      {w:"cordura",     exp:"Sensatez, juicio sano; lo opuesto a la locura.",                                      ex:"Al cabo se le secó el celebro y vino a perder el juicio."},
-      {w:"cueva",       exp:"Cavidad natural en la tierra; don Quijote baja a la Cueva de Montesinos.",            ex:"Don Quijote se descolgó a la cueva con una soga."},
-      {w:"dama",        exp:"Mujer noble; los caballeros luchan por su dama.",                                     ex:"Dulcinea del Toboso, dama de sus pensamientos."},
-      {w:"derrota",     exp:"Acción de ser vencido en un combate o competición.",                                  ex:"Quedó don Quijote muy malparado en el suelo."},
-      {w:"desafío",     exp:"Acto de retar a alguien a un enfrentamiento.",                                        ex:"Te desafío a singular combate."},
-      {w:"disfraz",     exp:"Vestimenta con que alguien se disfraza para no ser reconocido.",                      ex:"Dorotea se disfrazó de princesa Micomicona."},
-      {w:"don",         exp:"Tratamiento de respeto que precede al nombre de pila.",                               ex:"Don Quijote de la Mancha."},
-      {w:"Dulcinea",    exp:"Nombre idealizado que don Quijote da a Aldonza Lorenzo, su dama imaginaria.",        ex:"Dulcinea del Toboso, dama de sus pensamientos."},
-      {w:"encantamiento",exp:"Acción mágica que transforma la realidad; don Quijote justifica sus fracasos con encantamientos.", ex:"Sin duda los encantadores me persiguen."},
-      {w:"escudero",    exp:"Sirviente que acompaña al caballero y lleva sus armas.",                             ex:"Sancho Panza se llamaba un labrador vecino suyo."},
-      {w:"fama",        exp:"Renombre y gloria que se adquieren por las buenas acciones.",                        ex:"Quiso parecer a los que él había leído en sus libros."},
-      {w:"fantasma",    exp:"Aparición sobrenatural de un difunto.",                                              ex:"Pensó don Quijote que era algún encantamiento."},
-      {w:"gigante",     exp:"Ser de estatura y fuerza extraordinarias; los molinos de viento.",                  ex:"¿Qué gigantes? dijo Sancho Panza. Aquellos que allí ves, respondió su amo."},
-      {w:"gloria",      exp:"Fama y honor conquistados por las grandes acciones.",                                ex:"Felice edad y siglos dichosos aquellos a quien los antiguos pusieron nombre de dorados."},
-      {w:"hidalgo",     exp:"Noble de sangre de rango inferior que no tiene título.",                             ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme, vivía un hidalgo."},
-      {w:"honor",       exp:"Cualidad moral que obliga a actuar con rectitud y nobleza.",                         ex:"Más vale morir en pie que vivir de rodillas."},
-      {w:"ilusión",     exp:"Percepción equivocada de la realidad.",                                             ex:"Todo lo que veo y toco es encantamiento."},
-      {w:"ínsula",      exp:"Isla; Sancho sueña con gobernar una ínsula.",                                       ex:"¿Y bien, Sancho, ¿cómo te fue con tu gobierno?"},
-      {w:"justicia",    exp:"Principio moral de dar a cada uno lo que le corresponde.",                           ex:"Deshacer agravios y socorrer a los menesterosos."},
-      {w:"labrador",    exp:"Persona que labra la tierra; Sancho es un labrador.",                               ex:"Sancho Panza, que así se llamaba el labrador."},
-      {w:"lanza",       exp:"Arma de asta larga con punta de acero.",                                            ex:"Con estas razones perdía el pobre caballero el juicio."},
-      {w:"locura",      exp:"Estado mental alterado; pérdida del juicio.",                                       ex:"Viéndole don Quijote de aquella manera, con muestras de tanta tristeza."},
-      {w:"Mancha",      exp:"Región de España donde vivía don Quijote.",                                         ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme."},
-      {w:"molino",      exp:"Edificio con aspas para moler cereal.",                                             ex:"Acometió con su lanza al primero molino que estaba delante."},
-      {w:"mundo",       exp:"La Tierra y todo lo que existe en ella.",                                           ex:"Recorrió el mundo en busca de aventuras."},
-      {w:"novela",      exp:"Obra narrativa extensa en prosa.",                                                   ex:"El cura y el barbero hicieron escrutinio de la biblioteca."},
-      {w:"pastora",     exp:"Mujer que cuida ovejas; don Quijote quiere hacerse pastor.",                        ex:"Hagámonos pastores."},
-      {w:"penitencia",  exp:"Acto voluntario de sufrimiento como expiación de culpas.",                         ex:"Hizo don Quijote su penitencia en Sierra Morena."},
-      {w:"refrán",      exp:"Dicho popular que expresa una verdad general; Sancho los usa constantemente.",      ex:"Sancho Panza, que como todos los de su condición tenía la memoria llena de refranes."},
-      {w:"reino",       exp:"Estado gobernado por un rey o una reina.",                                          ex:"Prometió hacerle gobernador de una ínsula."},
-      {w:"Rocinante",   exp:"El caballo flaco y viejo de don Quijote.",                                          ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
-      {w:"romance",     exp:"Poema narrativo popular; también historia de amor.",                                 ex:"Muchos años leyó libros de caballerías."},
-      {w:"Sancho",      exp:"Sancho Panza, el escudero de don Quijote.",                                         ex:"Sancho Panza no dijo nada."},
-      {w:"señor",       exp:"Título de respeto; Sancho llama siempre señor a don Quijote.",                     ex:"Señor, respondió Sancho Panza."},
-      {w:"venta",       exp:"Posada o mesón en un camino.",                                                      ex:"Llegaron a una venta que don Quijote tuvo por castillo."},
-      {w:"ventura",     exp:"Suerte o fortuna.",                                                                  ex:"¡Felice edad y siglos dichosos!"},
-      {w:"verdad",      exp:"Conformidad de las cosas con lo que se dice de ellas.",                             ex:"En esto de la verdad, señor cura, digo que tiene razón."},
-      {w:"victoria",    exp:"Triunfo en una batalla o competición.",                                             ex:"¡Santiago y cierra España!"},
-      {w:"viejo",       exp:"De avanzada edad; don Quijote es un hidalgo ya mayor.",                            ex:"Frisaba la edad de nuestro hidalgo con los cincuenta años."},
-      {w:"yelmo",       exp:"Pieza de armadura que cubre y protege la cabeza.",                                  ex:"Limpió su adarga, adobó su lanza y puso nombre a su rocín."},
-    ]
-  },
-  mousq:{
-    words:[
-      {w:"ami",         exp:"Ami(e): personne avec qui on a des liens d'affection et de confiance.",              ex:"Mon ami, dit Athos, tu es brave."},
-      {w:"amour",       exp:"Sentiment affectif intense envers une personne.",                                    ex:"Madame Bonacieux était jolie."},
-      {w:"arme",        exp:"Instrument servant à attaquer ou à se défendre.",                                    ex:"Il posa son arme sur la table."},
-      {w:"arrestation", exp:"Action d'arrêter quelqu'un au nom de la loi.",                                      ex:"Les gardes du cardinal firent l'arrestation."},
-      {w:"Athos",       exp:"L'un des trois mousquetaires, mystérieux et noble.",                                 ex:"Athos avait un calme parfait."},
-      {w:"Aramis",      exp:"L'un des trois mousquetaires, à moitié abbé.",                                      ex:"Aramis rougit comme une jeune fille."},
-      {w:"auberge",     exp:"Établissement où l'on peut manger et dormir.",                                       ex:"Ils s'arrêtèrent dans une auberge."},
-      {w:"blessure",    exp:"Lésion corporelle causée par un coup ou une arme.",                                  ex:"Sa blessure n'était pas mortelle."},
-      {w:"cardinal",    exp:"Haut dignitaire de l'Église catholique.",                                            ex:"Son Éminence le cardinal de Richelieu."},
-      {w:"complot",     exp:"Plan secret pour nuire à quelqu'un.",                                                ex:"Il y a un complot contre la reine."},
-      {w:"courage",     exp:"Capacité de faire face au danger sans se laisser abattre.",                         ex:"Tous pour un, un pour tous."},
-      {w:"D'Artagnan",  exp:"Le héros gascon qui aspire à devenir mousquetaire.",                                 ex:"D'Artagnan était brave et fougueux."},
-      {w:"danger",      exp:"Situation pouvant causer un dommage ou un risque.",                                  ex:"Nous étions tous en grand danger."},
-      {w:"duel",        exp:"Combat singulier entre deux personnes pour défendre leur honneur.",                  ex:"Il se mit en garde pour le duel."},
-      {w:"épée",        exp:"Arme blanche longue et fine.",                                                       ex:"Il tira son épée et se mit en garde."},
-      {w:"espion",      exp:"Personne qui recueille des informations secrètes.",                                  ex:"Milady était un véritable espion."},
-      {w:"ferme",       exp:"Domaine agricole; aussi: résolu, sans faiblesse.",                                   ex:"Sa volonté était ferme."},
-      {w:"fidèle",      exp:"Constant dans ses engagements et ses affections.",                                   ex:"Porthos était fidèle à ses amis."},
-      {w:"fortune",     exp:"Sort favorable ou ensemble des richesses.",                                          ex:"Il avait la fortune d'être gascon."},
-      {w:"garder",      exp:"Surveiller ou protéger quelqu'un.",                                                  ex:"Les gardes protégeaient le palais."},
-      {w:"honneur",     exp:"Qualité morale qui pousse à agir avec intégrité.",                                   ex:"Un gentilhomme ne recule jamais devant l'honneur."},
-      {w:"liberté",     exp:"État de quelqu'un qui n'est pas sous la contrainte.",                               ex:"Il méritait sa liberté."},
-      {w:"Milady",      exp:"La mystérieuse et dangereuse adversaire des mousquetaires.",                        ex:"Milady sourit, mais ce sourire était glacial."},
-      {w:"mission",     exp:"Tâche confiée à quelqu'un.",                                                        ex:"Ils avaient une mission secrète à accomplir."},
-      {w:"mousquetaire",exp:"Soldat d'élite de la garde royale française.",                                      ex:"Tous pour un, un pour tous!"},
-      {w:"nuit",        exp:"Période d'obscurité entre le coucher et le lever du soleil.",                       ex:"Ils partirent la nuit pour n'être pas vus."},
-      {w:"or",          exp:"Métal précieux; aussi: conjonction de transition.",                                  ex:"Or il se trouva que le cardinal était fort mécontent."},
-      {w:"Porthos",     exp:"L'un des trois mousquetaires, grand et vaniteux.",                                  ex:"Porthos tordait sa moustache avec orgueil."},
-      {w:"prisonnier",  exp:"Personne détenue contre sa volonté.",                                               ex:"Il était prisonnier dans la Bastille."},
-      {w:"reine",       exp:"Souveraine; ici Anne d'Autriche.",                                                  ex:"Sa Majesté la reine est en danger."},
-      {w:"roi",         exp:"Souverain masculin d'un royaume.",                                                  ex:"Le roi Louis XIII était à la chasse."},
-      {w:"ruse",        exp:"Moyen détourné pour tromper ou atteindre un but.",                                  ex:"Milady usait de ruse pour parvenir à ses fins."},
-      {w:"secret",      exp:"Ce qui est caché et ne doit pas être divulgué.",                                    ex:"Ce secret devait rester entre eux."},
-      {w:"serviteur",   exp:"Personne au service d'un maître.",                                                  ex:"Son serviteur Planchet l'attendait."},
-      {w:"soldat",      exp:"Homme servant dans une armée.",                                                     ex:"Les soldats du cardinal patrouillaient."},
-      {w:"trahison",    exp:"Acte de trahir la confiance de quelqu'un.",                                        ex:"C'était une trahison impardonnable."},
-      {w:"traversée",   exp:"Action de traverser un espace ou un obstacle.",                                    ex:"La traversée de la mer était périlleuse."},
-      {w:"valeur",      exp:"Courage et bravoure au combat.",                                                    ex:"Il avait fait preuve d'une grande valeur."},
-      {w:"vengeance",   exp:"Acte de punir quelqu'un en retour d'un tort subi.",                                ex:"La vengeance est un plat qui se mange froid."},
-      {w:"victoire",    exp:"Succès dans un combat ou une compétition.",                                        ex:"La victoire était enfin à eux."},
-      {w:"vrai",        exp:"Conforme à la réalité, authentique.",                                              ex:"Il n'était pas un vrai mousquetaire encore."},
-    ]
-  },
-  werther:{
-    words:[
-      {w:"Abschied",    exp:"Trennung, das Verlassen eines Menschen oder Ortes.",                                 ex:"Der Abschied war mir unmöglich."},
-      {w:"allein",      exp:"Ohne andere Personen; isoliert.",                                                   ex:"Ich bin so allein und freue mich so meines Lebens."},
-      {w:"Augen",       exp:"Die Organe des Sehens; Lottes Augen sind für Werther entscheidend.",               ex:"Ich sah Lotten an."},
-      {w:"Blick",       exp:"Das kurze Hinsehen; ein Blick kann tiefe Bedeutung haben.",                        ex:"Welch ein Blick!"},
-      {w:"Brief",       exp:"Schriftliche Mitteilung an eine Person.",                                           ex:"Am 10. Mai. — Ich habe eine wunderbare Heiterkeit meine ganze Seele eingenommen."},
-      {w:"Einsamkeit",  exp:"Der Zustand, allein zu sein; Isolierung.",                                         ex:"Ich bin so allein und freue mich so meines Lebens."},
-      {w:"Empfindung",  exp:"Wahrnehmung durch die Sinne; subjektives Gefühl.",                                 ex:"Meine Empfindungen sind so verworren."},
-      {w:"Erde",        exp:"Die Welt, der Boden; die Natur als Quelle des Trostes.",                           ex:"Wenn das liebe Tal um mich dampft."},
-      {w:"ewig",        exp:"Ohne Ende; für immer.",                                                             ex:"Du bist ewig in meinen Gedanken."},
-      {w:"Freude",      exp:"Positives Gefühl der Befriedigung und des Glücks.",                                 ex:"Welche Freude war das!"},
-      {w:"Freund",      exp:"Person, mit der man eine enge freundschaftliche Bindung hat.",                     ex:"Ich schreibe dir, lieber Freund."},
-      {w:"Gott",        exp:"Das höchste Wesen; Werther wendet sich in Verzweiflung an Gott.",                  ex:"Gott! Was ist der Mensch?"},
-      {w:"Herz",        exp:"Das Organ des Blutkreislaufs; auch Sitz der Gefühle.",                             ex:"Mein Herz ist so schwer."},
-      {w:"Hoffnung",    exp:"Erwartung, dass etwas Gewünschtes eintreten wird.",                                ex:"Die Hoffnung war nun begraben."},
-      {w:"Jugend",      exp:"Die Lebensphase zwischen Kindheit und Erwachsenensein.",                           ex:"In der Jugend ist alles möglich."},
-      {w:"Kinder",      exp:"Junge Menschen; Lotte kümmert sich um ihre Geschwister.",                          ex:"Lotte stand mit einem Korb am Arm."},
-      {w:"Kleid",       exp:"Ein Kleidungsstück; Lotte trägt ein einfaches weißes Kleid.",                     ex:"Sie trug ein einfaches weißes Kleid."},
-      {w:"Kunst",       exp:"Menschliche Kreativität in Form von Malerei, Musik usw.",                          ex:"Die Kunst ist lang und das Leben kurz."},
-      {w:"Leiden",      exp:"Schmerzen, körperliches oder seelisches Leid.",                                   ex:"Die Leiden des jungen Werthers."},
-      {w:"Liebe",       exp:"Tiefes Gefühl der Zuneigung und Leidenschaft.",                                   ex:"Ich liebe sie, Wilhelm, und ich bin dem Wahnsinn nahe."},
-      {w:"Lotte",       exp:"Die geliebte, aber unerreichbare Frau im Roman.",                                  ex:"Ich sah Lotten an."},
-      {w:"Mond",        exp:"Der natürliche Satellit der Erde; Symbol für Sehnsucht.",                         ex:"Der Mond schien durch die Bäume."},
-      {w:"Musik",       exp:"Die Kunst der Töne; Lotte und Werther spielen Klavier.",                          ex:"Wenn Lotte am Klavier spielte."},
-      {w:"Natur",       exp:"Die natürliche Welt; Werthers Naturbetrachtungen.",                               ex:"Wenn das liebe Tal um mich dampft."},
-      {w:"Regen",       exp:"Niederschlag in Form von Wassertropfen.",                                         ex:"Es regnete in Strömen."},
-      {w:"Ruhe",        exp:"Stille; auch: innerer Frieden.",                                                   ex:"Ich finde keine Ruhe mehr."},
-      {w:"Schmerz",     exp:"Körperlicher oder seelischer Schmerz.",                                           ex:"Ich leide viel, denn ich habe verloren."},
-      {w:"Seele",       exp:"Das innere Wesen eines Menschen; Geist und Gefühle.",                             ex:"Meine Seele glänzt mit ganzem Feuer."},
-      {w:"Sehnsucht",   exp:"Tiefe Sehnsucht nach etwas, was unerreichbar ist.",                               ex:"Eine unaussprechliche Sehnsucht ergriff mich."},
-      {w:"Stille",      exp:"Abwesenheit von Lärm; Ruhe.",                                                      ex:"In der tiefen Stille der Nacht."},
-      {w:"Tanz",        exp:"Rhythmische Körperbewegungen; das Tanzen verbindet Lotte und Werther.",            ex:"Ich tanzte mit ihr den ersten Contretanz."},
-      {w:"Tod",         exp:"Das Ende des Lebens; Werthers Selbstmord am Ende.",                               ex:"Ich gehe voran. Gehe zu meinem Vater."},
-      {w:"Tränen",      exp:"Flüssigkeit aus den Augen beim Weinen.",                                           ex:"Meine Tränen floßen."},
-      {w:"Traum",       exp:"Bilder und Gedanken während des Schlafs; auch Wunschbild.",                       ex:"Es war wie ein Traum."},
-      {w:"Trost",       exp:"Linderung von Schmerz oder Kummer.",                                              ex:"Es gibt keinen Trost für mich."},
-      {w:"Unglück",     exp:"Unheil; schlechtes Schicksal.",                                                   ex:"Welch ein Unglück ist das meinige!"},
-      {w:"Vernunft",    exp:"Die Fähigkeit, klar zu denken; im Gegensatz zu Gefühl.",                         ex:"Was hilft mir die Vernunft?"},
-      {w:"Verzweiflung",exp:"Totaler Verlust der Hoffnung.",                                                   ex:"Es ist alles so leer, so öde."},
-      {w:"Wahnsin",     exp:"Geisteskrankheit; auch extreme Leidenschaft.",                                   ex:"Ich bin dem Wahnsinn nahe, Wilhelm!"},
-      {w:"Wilhelm",     exp:"Werthers Briefpartner und bester Freund.",                                        ex:"Lieber Wilhelm, ich schreibe dir."},
-      {w:"Wonne",       exp:"Höchste Freude und Glückseligkeit.",                                              ex:"Was meines Lebens einzige Wonne war."},
-      {w:"Zärtlichkeit",exp:"Sanfte Zuneigung und Fürsorge.",                                                  ex:"Mit welcher Zärtlichkeit sah sie ihre Kinder an."},
-    ]
-  },
-  pinocchio:{
-    words:[
-      {w:"asino",       exp:"Asino: animale da soma; i ragazzi cattivi diventano asini.",                        ex:"Tutti i ragazzi che non studiano diventano asini."},
-      {w:"avaro",       exp:"Chi non vuole spendere o condividere i propri beni.",                               ex:"Il Gatto e la Volpe erano avari e bugiardi."},
-      {w:"avventura",   exp:"Esperienza eccitante e fuori dall'ordinario.",                                      ex:"Le avventure di Pinocchio."},
-      {w:"balena",      exp:"Grande mammifero marino; Pinocchio viene inghiottito da una.",                     ex:"Pinocchio fu inghiottito dal pescecane."},
-      {w:"bambino",     exp:"Essere umano in età infantile.",                                                    ex:"Pinocchio voleva diventare un bambino vero."},
-      {w:"bugiardo",    exp:"Chi dice bugie abitualmente.",                                                      ex:"Le bugie si riconoscono subito."},
-      {w:"burattino",   exp:"Bambola di legno mossa da fili.",                                                  ex:"C'era una volta un pezzo di legno."},
-      {w:"calzolaio",   exp:"Artigiano che fabbrica o ripara scarpe.",                                          ex:"Il calzolaio aveva aggiustato le scarpe."},
-      {w:"camminare",   exp:"Andare a piedi.",                                                                  ex:"Pinocchio cominciò a camminare."},
-      {w:"cattivo",     exp:"Che fa del male; moralmente negativo.",                                            ex:"I ragazzi cattivi non vanno a scuola."},
-      {w:"ciuchino",    exp:"Asinello; forma diminutiva di asino.",                                             ex:"Tutti i ragazzi che non studiano diventano ciuchini."},
-      {w:"coscienza",   exp:"La consapevolezza interiore del giusto e dello sbagliato.",                        ex:"Il Grillo-parlante era la sua coscienza."},
-      {w:"coraggio",    exp:"Capacità di affrontare pericoli o difficoltà.",                                    ex:"Pinocchio aveva paura ma andò avanti."},
-      {w:"fata",        exp:"Essere magico femminile che aiuta i buoni.",                                       ex:"La Fata dai capelli turchini gli sorrise."},
-      {w:"falegname",   exp:"Artigiano che lavora il legno.",                                                   ex:"Geppetto era un vecchio falegname."},
-      {w:"fame",        exp:"Il bisogno di mangiare.",                                                          ex:"Pinocchio aveva fame e nulla da mangiare."},
-      {w:"fuggire",     exp:"Allontanarsi velocemente da qualcosa.",                                            ex:"Pinocchio fuggì via di corsa."},
-      {w:"Gatto",       exp:"Il Gatto e la Volpe, i due impostori del romanzo.",                               ex:"Il Gatto era cieco e la Volpe zoppa."},
-      {w:"Geppetto",    exp:"Il falegname che intagliò Pinocchio e diventò il suo padre.",                      ex:"Geppetto lo chiamò Pinocchio."},
-      {w:"grillo",      exp:"Insetto saltatore; il Grillo-parlante è la coscienza di Pinocchio.",              ex:"Cri-cri-cri! disse il Grillo-parlante."},
-      {w:"inghiottire", exp:"Mandare giù attraverso la gola.",                                                  ex:"Il pescecane lo inghiottì d'un sol boccone."},
-      {w:"isola",       exp:"Terra circondata dall'acqua.",                                                     ex:"L'Isola delle api industriose."},
-      {w:"lavoro",      exp:"Attività fisica o mentale per guadagnare.",                                        ex:"Chi non lavora non mangia."},
-      {w:"legno",       exp:"Materiale ricavato dagli alberi; di cui è fatto Pinocchio.",                      ex:"C'era una volta un pezzo di legno."},
-      {w:"libertà",     exp:"La condizione di chi non è sotto la costrizione.",                                 ex:"Pinocchio era libero di fare ciò che voleva."},
-      {w:"lupo",        exp:"Animale selvatico predatore.",                                                     ex:"Nella foresta c'era il lupo."},
-      {w:"marachella",  exp:"Birichinata; azione monellesca.",                                                  ex:"Aveva fatto un'altra delle sue marachelle."},
-      {w:"mare",        exp:"Grande distesa d'acqua salata.",                                                   ex:"Pinocchio guardò il mare."},
-      {w:"mattina",     exp:"La parte del giorno dall'alba al mezzogiorno.",                                    ex:"La mattina seguente si alzò presto."},
-      {w:"mentire",     exp:"Dire cose false.",                                                                 ex:"Non mentire, Pinocchio, le bugie hanno le gambe corte."},
-      {w:"mestiere",    exp:"Attività lavorativa che si esercita abitualmente.",                                ex:"Bisogna imparare un mestiere."},
-      {w:"monello",     exp:"Bambino birichino che fa dispetti.",                                               ex:"Era un vero monello di strada."},
-      {w:"naso",        exp:"Parte del viso; nel romanzo cresce quando Pinocchio mente.",                       ex:"Il naso gli crebbe subito di quattro dita."},
-      {w:"obbedire",    exp:"Fare ciò che viene ordinato o richiesto.",                                        ex:"Devi obbedire e andare a scuola."},
-      {w:"Paese dei Balocchi",exp:"Il luogo dove i bambini non fanno nulla; rappresenta il vizio.",            ex:"Il Paese dei Balocchi era il paradiso dei bambini pigri."},
-      {w:"pericolo",    exp:"Situazione che può causare danno.",                                               ex:"Era in grande pericolo."},
-      {w:"pescecane",   exp:"Grande squalo; il mostro che inghiotte Pinocchio e Geppetto.",                    ex:"Un enorme pescecane aprì la bocca."},
-      {w:"piangere",    exp:"Versare lacrime per dolore o commozione.",                                        ex:"Pinocchio piangeva a dirotto."},
-      {w:"pigro",       exp:"Chi non vuole lavorare o fare sforzi.",                                           ex:"I ragazzi pigri vanno al Paese dei Balocchi."},
-      {w:"povero",      exp:"Privo di beni materiali; miserabile.",                                            ex:"Geppetto era povero ma onesto."},
-      {w:"promessa",    exp:"Dichiarazione con cui ci si impegna a fare qualcosa.",                            ex:"Pinocchio promise di essere buono."},
-      {w:"scuola",      exp:"Luogo dove si va ad imparare.",                                                   ex:"Domani andrò a scuola senz'altro."},
-      {w:"sentiero",    exp:"Stradina stretta in campagna o nel bosco.",                                       ex:"Seguì il sentiero nel bosco."},
-      {w:"uomo",        exp:"Essere umano adulto di sesso maschile.",                                          ex:"Pinocchio voleva diventare un bambino e poi un uomo."},
-      {w:"Volpe",       exp:"Animale furbo; la Volpe è uno dei personaggi ingannatori.",                       ex:"La Volpe disse: Vieni con noi."},
-    ]
-  },
-  casmurro:{
-    words:[
-      {w:"adulto",      exp:"Que chegou à maturidade; pessoa crescida.",                                        ex:"Já era adulto quando voltou ao Rio."},
-      {w:"amor",        exp:"Sentimento afetivo intenso; paixão.",                                              ex:"O amor de Bentinho por Capitu era imenso."},
-      {w:"amigo",       exp:"Pessoa com quem se tem laços de amizade.",                                         ex:"Escobar era o melhor amigo de Bentinho."},
-      {w:"angústia",    exp:"Estado de sofrimento moral intenso.",                                              ex:"A angústia não me deixava dormir."},
-      {w:"Bentinho",    exp:"O narrador e protagonista do romance.",                                            ex:"Bentinho era o nome que a minha mãe me dava."},
-      {w:"boca",        exp:"Abertura do rosto usada para comer e falar.",                                     ex:"A boca de Capitu tinha um sorriso enigmático."},
-      {w:"cabelo",      exp:"Fios que crescem na cabeça.",                                                      ex:"Os cabelos de Capitu eram longos e negros."},
-      {w:"Capitu",      exp:"A protagonista feminina, personagem central e enigmática.",                       ex:"Capitu olhava para mim, sem falar."},
-      {w:"casa",        exp:"Edifício destinado à habitação.",                                                  ex:"A casa da rua de Matacavalos."},
-      {w:"casamento",   exp:"União formal entre duas pessoas.",                                                 ex:"Casamos depois de alguns anos."},
-      {w:"ciúme",       exp:"Sentimento de desconfiança em relação à fidelidade.",                             ex:"Era o ciúme que me devorava."},
-      {w:"coração",     exp:"Órgão central do sistema circulatório; sede dos sentimentos.",                    ex:"O coração batia mais rápido ao vê-la."},
-      {w:"criança",     exp:"Ser humano na infância.",                                                         ex:"Fomos criados juntos desde crianças."},
-      {w:"Deus",        exp:"Ser supremo; invocado frequentemente pelo narrador.",                             ex:"Graças a Deus!"},
-      {w:"dúvida",      exp:"Estado de incerteza ou hesitação.",                                               ex:"A dúvida me consumia."},
-      {w:"Escobar",     exp:"O melhor amigo de Bentinho, cuja proximidade com Capitu é questionada.",          ex:"Escobar era um rapaz inteligente e sociável."},
-      {w:"filho",       exp:"Descendente direto de alguém.",                                                   ex:"O filho parecia-se com Escobar."},
-      {w:"infância",    exp:"Período da vida entre o nascimento e a adolescência.",                            ex:"A saudade da infância voltou-me ao coração."},
-      {w:"janela",      exp:"Abertura na parede para dar luz e ar.",                                           ex:"Capitu estava na janela quando a vi."},
-      {w:"lágrimas",    exp:"Líquido que sai dos olhos ao chorar.",                                           ex:"Os olhos de Capitu tinham lágrimas."},
-      {w:"memória",     exp:"Faculdade de reter e evocar o passado.",                                         ex:"Que me contes a tua vida, disse ela."},
-      {w:"mentira",     exp:"Afirmação contrária à verdade.",                                                  ex:"Será que era mentira tudo aquilo?"},
-      {w:"mãe",         exp:"Mulher que deu à luz; progenitora.",                                             ex:"Minha mãe resolveu que eu fosse para o seminário."},
-      {w:"morte",       exp:"Fim da vida.",                                                                    ex:"A morte de Escobar foi um choque."},
-      {w:"noite",       exp:"Período de escuridão entre o pôr do sol e o nascer do dia.",                     ex:"Era uma noite de verão."},
-      {w:"olhos",       exp:"Órgãos da visão; os olhos de Capitu são centrais no romance.",                   ex:"Olhos de ressaca, disse-me uma vez um poeta."},
-      {w:"passado",     exp:"Tempo já decorrido; o narrador vive de recordações.",                            ex:"O passado não me abandona."},
-      {w:"paixão",      exp:"Sentimento amoroso intenso e avassalador.",                                      ex:"A paixão de Bentinho por Capitu era irresistível."},
-      {w:"praia",       exp:"Faixa de areia à beira do mar.",                                                 ex:"Escobar morreu no mar, perto da praia."},
-      {w:"rua",         exp:"Via pública nas cidades.",                                                       ex:"A rua de Matacavalos."},
-      {w:"saudade",     exp:"Sentimento de falta e nostalgia, tipicamente lusófono.",                         ex:"A saudade da infância voltou-me ao coração."},
-      {w:"segredo",     exp:"Algo que se mantém oculto.",                                                     ex:"Capitu tinha os seus segredos."},
-      {w:"seminário",   exp:"Escola de formação de sacerdotes.",                                              ex:"Minha mãe resolveu que eu fosse para o seminário."},
-      {w:"silêncio",    exp:"Ausência de som; estado de quem não fala.",                                      ex:"Capitu ficou em silêncio."},
-      {w:"sorriso",     exp:"Expressão facial de alegria.",                                                   ex:"O sorriso de Capitu era enigmático."},
-      {w:"tempo",       exp:"A sucessão de momentos; o passar dos anos.",                                     ex:"O tempo passou rápido."},
-      {w:"traição",     exp:"Ato de trair a confiança de alguém.",                                           ex:"Capitu, dissera eu a mim mesmo, Capitu é que me traiu."},
-      {w:"tristeza",    exp:"Estado de quem está triste; melancolia.",                                        ex:"A tristeza tomou conta de mim."},
-      {w:"verdade",     exp:"Conformidade com a realidade.",                                                  ex:"Qual era a verdade afinal?"},
-      {w:"vizinho",     exp:"Pessoa que mora próxima.",                                                       ex:"Capitu era a filha do nosso vizinho."},
-      {w:"voz",         exp:"Som produzido pela fala.",                                                       ex:"A voz de Capitu era suave."},
-    ]
-  },
+  alice:{words:[
+    {w:"adventure",exp:"An exciting or unusual experience.",ex:"Alice started to her feet, for it flashed across her mind."},
+    {w:"appear",exp:"To come into sight; to become visible.",ex:"A large cat appeared on a branch above her."},
+    {w:"beautiful",exp:"Very pleasing to look at; attractive.",ex:"She could see a beautiful garden beyond the door."},
+    {w:"bottle",exp:"A container with a narrow neck; here marked Drink me.",ex:"It was labelled Drink me in large letters."},
+    {w:"cake",exp:"A sweet baked food; here labelled Eat me.",ex:"She found a little cake with the words Eat me."},
+    {w:"card",exp:"A flat piece of thick paper; the soldiers are playing-cards.",ex:"The soldiers were flat playing-cards."},
+    {w:"Caterpillar",exp:"A larva; here a philosophical creature smoking a hookah.",ex:"The Caterpillar and Alice looked at each other in silence."},
+    {w:"corridor",exp:"A long narrow passage in a building.",ex:"She found herself in a long low corridor."},
+    {w:"creature",exp:"A living being, animal or fantastical being.",ex:"All sorts of little birds and beasts gathered round her."},
+    {w:"curious",exp:"Eager to know; also strange and unusual.",ex:"Curiouser and curiouser! cried Alice."},
+    {w:"Dodo",exp:"An extinct flightless bird; a character in the pool of tears.",ex:"The Dodo solemnly rose to its feet."},
+    {w:"door",exp:"A movable barrier; Alice finds a little door fifteen inches high.",ex:"She came upon a little door about fifteen inches high."},
+    {w:"dream",exp:"A series of images during sleep; a wishful fantasy.",ex:"Was it really a dream after all?"},
+    {w:"duchess",exp:"A noblewoman; here a bad-tempered character with a baby.",ex:"The Duchess was sitting on a three-legged stool."},
+    {w:"enormous",exp:"Very large in size.",ex:"An enormous puppy was looking down at her."},
+    {w:"fall",exp:"To drop downward; Alice falls down the rabbit hole.",ex:"Down, down, down. Would the fall never come to an end?"},
+    {w:"fan",exp:"A flat folding device for creating a cool breeze.",ex:"She took up the fan and gloves."},
+    {w:"flamingo",exp:"A pink wading bird; used as a croquet mallet.",ex:"The chief difficulty Alice found was managing her flamingo."},
+    {w:"foolish",exp:"Lacking good sense; unwise.",ex:"It was foolish to cry so much."},
+    {w:"frightened",exp:"Filled with fear or alarm.",ex:"Alice was rather frightened by this."},
+    {w:"garden",exp:"An outdoor space with plants; Alice longs to reach it.",ex:"She could see a beautiful garden beyond the door."},
+    {w:"gloves",exp:"Hand coverings; the White Rabbit is always looking for his.",ex:"The White Rabbit dropped its white gloves and fan."},
+    {w:"grow",exp:"To increase in size; Alice grows and shrinks throughout.",ex:"One side will make you grow taller."},
+    {w:"hall",exp:"A large entrance room; the hall of many doors.",ex:"She found herself in a long hall lined with doors."},
+    {w:"hare",exp:"A wild animal like a large rabbit; the March Hare hosts the tea party.",ex:"The March Hare had a large teapot in front of him."},
+    {w:"hedgehog",exp:"A small spiny mammal; used as a croquet ball.",ex:"The hedgehog had unrolled itself and was creeping away."},
+    {w:"hole",exp:"An opening; Alice falls down the rabbit hole.",ex:"In another moment Alice had followed the rabbit down the hole."},
+    {w:"jury",exp:"A group of people who decide the verdict in a trial.",ex:"Write that down, the King said to the jury."},
+    {w:"key",exp:"A device for opening a lock; Alice finds a tiny golden key.",ex:"She found a little golden key on the glass table."},
+    {w:"kitten",exp:"A young cat; triggers the dream of Wonderland.",ex:"It was a black kitten and a white kitten."},
+    {w:"knight",exp:"An armored warrior; the White Knight appears later.",ex:"The White Knight was sliding down the poker."},
+    {w:"lock",exp:"A fastening device; the small door is locked.",ex:"She tried the little door, but it was locked."},
+    {w:"mad",exp:"Crazy; also the state of all Wonderland inhabitants.",ex:"We are all mad here, said the Cheshire Cat."},
+    {w:"mock",exp:"To make fun of; also the Mock Turtle character.",ex:"The Mock Turtle sighed deeply."},
+    {w:"mushroom",exp:"A type of fungus with magical properties.",ex:"One side will make you grow taller and the other shorter."},
+    {w:"nonsense",exp:"Words or ideas that have no meaning.",ex:"It is no use going back to yesterday."},
+    {w:"pepper",exp:"A spice; the Duchess uses too much of it.",ex:"There was certainly too much pepper in the soup."},
+    {w:"pool",exp:"A small area of still water; Alice cries a pool of tears.",ex:"Alice was swimming in her pool of tears."},
+    {w:"puppy",exp:"A young dog; Alice encounters a gigantic one.",ex:"An enormous puppy was looking down at her."},
+    {w:"queen",exp:"A female ruler; the violent Queen of Hearts.",ex:"Off with their heads! shouted the Queen."},
+    {w:"rabbit",exp:"A small furry animal; the White Rabbit leads Alice into Wonderland.",ex:"The White Rabbit took a watch out of its waistcoat-pocket."},
+    {w:"riddle",exp:"A puzzling question or statement.",ex:"Why is a raven like a writing-desk?"},
+    {w:"rose",exp:"A flower; the cards are painting the white roses red.",ex:"They were painting a rosebush white to make it look red."},
+    {w:"size",exp:"The dimensions of something; Alice constantly changes size.",ex:"She had never before seen a rabbit with a waistcoat-pocket."},
+    {w:"tea",exp:"A hot drink; the subject of the mad tea party.",ex:"Have some wine, the March Hare said encouragingly."},
+    {w:"thimble",exp:"A cap worn to protect the finger when sewing.",ex:"Alice humbly accepted the thimble."},
+    {w:"trial",exp:"A formal legal hearing; Alice is called as a witness.",ex:"Who stole the tarts? said the King."},
+    {w:"waistcoat",exp:"A sleeveless garment worn over a shirt; the Rabbit wears one.",ex:"The rabbit took a watch out of its waistcoat-pocket."},
+    {w:"wise",exp:"Having good judgement and knowledge.",ex:"The wise little Alice was not going to do that."},
+    {w:"wonder",exp:"A feeling of amazement; also the place wonderland.",ex:"Alice opened the door and found that it led into a small passage."},
+    {w:"wretched",exp:"In a very unhappy or unfortunate state.",ex:"She felt a little irritated at the Caterpillar making such short remarks."},
+  ]},
+  dracula:{words:[
+    {w:"asylum",exp:"A hospital for people with mental illness; Renfield is confined there.",ex:"The Count had access to the asylum."},
+    {w:"bat",exp:"A flying mammal; Dracula can transform into one.",ex:"A bat flew close to her face."},
+    {w:"bite",exp:"To cut with the teeth; the vampire method of infection.",ex:"There were two puncture marks on her throat."},
+    {w:"blood",exp:"The red liquid in the body; what vampires feed on.",ex:"The lips were redder than ever, with gouts of fresh blood."},
+    {w:"castle",exp:"A large fortified medieval building; Dracula home.",ex:"The castle is on the very edge of a terrible precipice."},
+    {w:"coffin",exp:"A box in which a corpse is buried; vampires sleep in them.",ex:"Jonathan found the Count lying in his box upon the earth."},
+    {w:"Count",exp:"A European nobleman; Dracula title.",ex:"The Count smiled and his lips drew back over long sharp teeth."},
+    {w:"crucifix",exp:"A cross with a figure of Christ; repels vampires.",ex:"The old woman pressed a crucifix into his hand."},
+    {w:"curse",exp:"A supernatural invocation causing harm.",ex:"The nosferatu do not die like the bee when he stings once."},
+    {w:"daylight",exp:"The light of the sun; fatal to vampires.",ex:"Before the dawn had come he must return to his native earth."},
+    {w:"demon",exp:"An evil supernatural being.",ex:"He was at once man and demon."},
+    {w:"diary",exp:"A personal journal; the novel is told through diaries and letters.",ex:"I must keep writing in my diary."},
+    {w:"dust",exp:"Fine dry particles; what Dracula crumbles to after death.",ex:"He crumbled into dust and vanished."},
+    {w:"earth",exp:"Soil from his homeland; Dracula must sleep in his native earth.",ex:"The Count rested in a box filled with earth."},
+    {w:"evil",exp:"Profoundly immoral; Dracula embodies evil.",ex:"I shall cut off the head and fill the mouth with garlic."},
+    {w:"fangs",exp:"Long sharp pointed teeth; a vampire weapon.",ex:"His lips drew back over his long sharp fangs."},
+    {w:"fear",exp:"An unpleasant emotion caused by danger or threat.",ex:"There was something about him that made me uneasy."},
+    {w:"fog",exp:"A thick mist; Dracula often arrives in foggy weather.",ex:"A heavy sea-fog rolled in from the sea."},
+    {w:"garlic",exp:"A plant whose smell repels vampires.",ex:"The old woman hung garlic over the door."},
+    {w:"grave",exp:"A place of burial; vampires rise from their graves.",ex:"We opened the grave and found her there."},
+    {w:"horror",exp:"Intense fear or shock.",ex:"I was filled with horror and loathing."},
+    {w:"hunt",exp:"To pursue and kill; Van Helsing hunts Dracula.",ex:"We must hunt the monster down."},
+    {w:"hypnosis",exp:"A state of focused attention; Dracula uses it to control victims.",ex:"She was under some terrible influence."},
+    {w:"immortal",exp:"Living forever; not subject to death.",ex:"The nosferatu do not die like the bee."},
+    {w:"journal",exp:"A personal diary; the novel is narrated through journals.",ex:"I keep a journal in shorthand."},
+    {w:"knife",exp:"A sharp cutting blade; used to kill Dracula.",ex:"The knife plunged into the throat."},
+    {w:"Mina",exp:"The heroine of the novel, Jonathan Harker fiancee.",ex:"Mina was white and speechless with terror."},
+    {w:"mirror",exp:"A reflective surface; vampires cast no reflection.",ex:"There was no reflection of him in the mirror."},
+    {w:"mist",exp:"A thin fog; Dracula can transform into mist.",ex:"The mist crept under the door."},
+    {w:"moon",exp:"The natural satellite of Earth; wolves howl at it.",ex:"The full moon shone on the white snow."},
+    {w:"night",exp:"The period of darkness; when vampires are active.",ex:"Do you not think that there are things which you cannot understand?"},
+    {w:"nosferatu",exp:"An old word for vampire, used by Van Helsing.",ex:"The nosferatu do not die like the bee."},
+    {w:"pale",exp:"Light in colour; often used to describe those drained of blood.",ex:"Her face was pale as death."},
+    {w:"professor",exp:"Van Helsing title; the expert vampire hunter.",ex:"Professor Van Helsing was a man of iron nerve."},
+    {w:"Renfield",exp:"A patient in the asylum who eats flies and worships Dracula.",ex:"Renfield was sitting quietly in the corner."},
+    {w:"shadow",exp:"A dark shape; Dracula casts none.",ex:"No shadow fell upon the moonlit ground where he walked."},
+    {w:"silver",exp:"A precious metal; a silver bullet kills supernatural creatures.",ex:"A stake through the heart and a silver bullet."},
+    {w:"soul",exp:"The spiritual or immaterial part of a person.",ex:"His soul was not his own."},
+    {w:"stake",exp:"A pointed wooden post driven through a vampire heart.",ex:"The hammer drove the stake through the heart."},
+    {w:"sun",exp:"The star at the centre of our system; fatal to vampires.",ex:"The vampire has not power to live in the sunlight."},
+    {w:"superstition",exp:"A belief not based on reason or knowledge.",ex:"The peasants believe strange things."},
+    {w:"throat",exp:"The front part of the neck; where vampires bite.",ex:"There were two small punctures on her throat."},
+    {w:"Transylvania",exp:"A historical region of Romania; Dracula homeland.",ex:"I am Dracula and I bid you welcome."},
+    {w:"undead",exp:"Existing between life and death.",ex:"Un-Dead, as they call it in Eastern Europe."},
+    {w:"vampire",exp:"An undead creature that feeds on human blood.",ex:"The mouth was redder than ever for on the lips were gouts of blood."},
+    {w:"victim",exp:"A person harmed by another; Dracula prey.",ex:"The poor girl was white and thin."},
+    {w:"wolf",exp:"A wild canine; Dracula can transform into one.",ex:"The wolves began to howl as though the moonlight had some peculiar effect."},
+  ]},
+  frankenstein:{words:[
+    {w:"abhor",exp:"To regard with disgust and hatred.",ex:"I abhorred myself."},
+    {w:"abandoned",exp:"Deserted; left alone without support.",ex:"I, the miserable and the abandoned."},
+    {w:"agony",exp:"Extreme physical or mental pain.",ex:"I was seized by agony."},
+    {w:"ambition",exp:"A strong desire to achieve something.",ex:"My father looked upon my studies with contempt."},
+    {w:"anatomy",exp:"The scientific study of the structure of the human body.",ex:"I pursued my investigations with unrelenting ardour."},
+    {w:"creature",exp:"A living being; the monster created by Frankenstein.",ex:"The creature had abandoned the companions of his travels."},
+    {w:"creation",exp:"The act of bringing something into existence.",ex:"Learn from me by my example how dangerous is the acquirement of knowledge."},
+    {w:"daemon",exp:"An evil spirit or devil; Frankenstein calls his creature a daemon.",ex:"I called myself the murderer of William, of Justine, and of Clerval."},
+    {w:"death",exp:"The end of life; a central theme of the novel.",ex:"I was seized by a cold horror and clammy sweat."},
+    {w:"desolate",exp:"Bleak and empty; how the creature feels without companionship.",ex:"I am alone and miserable; man will not associate with me."},
+    {w:"destroy",exp:"To put an end to; Frankenstein seeks to destroy his creation.",ex:"I will not destroy the creature if it promises to leave Europe."},
+    {w:"disgust",exp:"A strong feeling of revulsion.",ex:"The form of the monster on whom I had bestowed existence was forever before my eyes."},
+    {w:"electricity",exp:"The force that animated the creature on the stormy night.",ex:"The rain poured down in torrents, and the thunder deafened and blinded me."},
+    {w:"exile",exp:"The state of being barred from one place.",ex:"I was banished from my home."},
+    {w:"experiment",exp:"A scientific procedure to test a hypothesis.",ex:"I paused, examining and analysing all the minutiae of causation."},
+    {w:"fate",exp:"The development of events outside a person control.",ex:"Destiny was too potent and her immutable laws had decreed my destruction."},
+    {w:"fiend",exp:"An evil person or spirit.",ex:"Devil! Do you dare approach me?"},
+    {w:"forest",exp:"A large area of trees; where the creature lives.",ex:"I lived in the forest, and fed on berries."},
+    {w:"god",exp:"A supreme being; Frankenstein plays god by creating life.",ex:"I had worked hard for nearly two years for the sole purpose of infusing life."},
+    {w:"guilt",exp:"A feeling of responsibility for wrongdoing.",ex:"I called myself the murderer of William."},
+    {w:"horror",exp:"Intense fear and shock.",ex:"With an anxiety that almost amounted to agony, I collected the instruments of life."},
+    {w:"humanity",exp:"Human beings collectively; compassion.",ex:"The creature sought warmth and companionship from humanity."},
+    {w:"ice",exp:"Frozen water; the Arctic setting of the novel frame.",ex:"I followed the monster to the icy regions of the north."},
+    {w:"justice",exp:"Fair treatment; Justine is unjustly executed.",ex:"Justine Moritz, poor, poor girl, is the victim."},
+    {w:"knowledge",exp:"Facts and information; Frankenstein dangerous quest.",ex:"Seek happiness in tranquillity and avoid ambition."},
+    {w:"laboratory",exp:"A room for scientific experiments.",ex:"In a solitary chamber I kept my workshop of filthy creation."},
+    {w:"life",exp:"The condition that distinguishes living organisms from dead matter.",ex:"I collected the instruments of life around me."},
+    {w:"loneliness",exp:"Sadness from being alone; the creature main suffering.",ex:"I, the miserable and the abandoned, am an abortion."},
+    {w:"misery",exp:"Great suffering or unhappiness.",ex:"No one can conceive the variety of feelings which bore me onwards."},
+    {w:"monster",exp:"A frightening creature; Frankenstein unnamed creation.",ex:"You are my creator but I am your master, obey!"},
+    {w:"murder",exp:"The unlawful killing of a person.",ex:"I was the true murderer."},
+    {w:"obsession",exp:"An idea that continually preoccupies the mind.",ex:"I pursued my undertaking with unremitting ardour."},
+    {w:"passion",exp:"Strong and barely controllable emotion.",ex:"My passion for science consumed all other pursuits."},
+    {w:"pity",exp:"The feeling of sorrow for someone else misfortune.",ex:"Did I request thee, Maker, from my clay to mould me Man?"},
+    {w:"pursuit",exp:"The action of following or chasing something.",ex:"I pursued my enemy across the frozen sea."},
+    {w:"ruin",exp:"Physical destruction or catastrophic fall.",ex:"My creation brought ruin upon all I loved."},
+    {w:"science",exp:"Systematic study; Frankenstein obsession.",ex:"Learn from me how dangerous is the acquirement of knowledge."},
+    {w:"sorrow",exp:"Deep distress caused by loss or disappointment.",ex:"I am full of sorrow and despair."},
+    {w:"storm",exp:"A violent weather event; lightning animates the creature.",ex:"It was on a dreary night of November that I beheld the accomplishment."},
+    {w:"vengeance",exp:"Punishment inflicted in return for an injury; revenge.",ex:"Cursed, cursed creator! Why did I live?"},
+    {w:"wretch",exp:"A very unfortunate or unhappy person.",ex:"Cursed, cursed creator! Why did I live?"},
+  ]},
+  quijote:{words:[
+    {w:"andante",exp:"Que anda errante; caballero andante busca aventuras.",ex:"Quiero que se me llame don Quijote de la Mancha."},
+    {w:"armas",exp:"Instrumentos de guerra; don Quijote lleva anticuadas armas.",ex:"Limpió sus armas, que sin haber salido a ningún servicio estaban llenas de orín."},
+    {w:"aventura",exp:"Empresa peligrosa o imprevista que se acomete.",ex:"Y así, del poco dormir y del mucho leer, se le secó el celebro."},
+    {w:"bachiller",exp:"Persona que ha obtenido el grado académico más básico.",ex:"Tenía en su casa una ama que pasaba de los cuarenta."},
+    {w:"batalla",exp:"Combate o enfrentamiento entre fuerzas opuestas.",ex:"Don Quijote acometió con su lanza en ristre."},
+    {w:"caballero",exp:"Hombre de clase noble que combate montado.",ex:"Yo sé quién soy, respondió don Quijote."},
+    {w:"caballo",exp:"Animal de montar; Rocinante es el caballo flaco de don Quijote.",ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+    {w:"calidad",exp:"Conjunto de propiedades que caracterizan a algo.",ex:"La de su calidad no podía ser sino princesa."},
+    {w:"camino",exp:"Vía o sendero por el que se transita.",ex:"Siguieron su camino por la venta adelante."},
+    {w:"cordura",exp:"Sensatez, juicio sano; lo opuesto a la locura.",ex:"Al cabo se le secó el celebro y vino a perder el juicio."},
+    {w:"cueva",exp:"Cavidad natural en la tierra; don Quijote baja a la Cueva de Montesinos.",ex:"Don Quijote se descolgó a la cueva con una soga."},
+    {w:"dama",exp:"Mujer noble; los caballeros luchan por su dama.",ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+    {w:"derrota",exp:"Acción de ser vencido en un combate.",ex:"Quedó don Quijote muy malparado en el suelo."},
+    {w:"disfraz",exp:"Vestimenta con que alguien se disfraza para no ser reconocido.",ex:"Dorotea se disfrazó de princesa Micomicona."},
+    {w:"don",exp:"Tratamiento de respeto que precede al nombre de pila.",ex:"Don Quijote de la Mancha."},
+    {w:"Dulcinea",exp:"Nombre idealizado que don Quijote da a Aldonza Lorenzo.",ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+    {w:"encantamiento",exp:"Acción mágica que transforma la realidad.",ex:"Sin duda los encantadores me persiguen."},
+    {w:"escudero",exp:"Sirviente que acompaña al caballero y lleva sus armas.",ex:"Sancho Panza se llamaba un labrador vecino suyo."},
+    {w:"fama",exp:"Renombre y gloria que se adquieren por las buenas acciones.",ex:"Quiso parecer a los que él había leído en sus libros."},
+    {w:"gigante",exp:"Ser de estatura y fuerza extraordinarias; los molinos de viento.",ex:"¿Qué gigantes? dijo Sancho Panza. Aquellos que allí ves, respondió su amo."},
+    {w:"gloria",exp:"Fama y honor conquistados por las grandes acciones.",ex:"Felice edad y siglos dichosos aquellos a quien los antiguos pusieron nombre de dorados."},
+    {w:"hidalgo",exp:"Noble de sangre de rango inferior que no tiene título.",ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme, vivía un hidalgo."},
+    {w:"honor",exp:"Cualidad moral que obliga a actuar con rectitud y nobleza.",ex:"Más vale morir en pie que vivir de rodillas."},
+    {w:"ilusión",exp:"Percepción equivocada de la realidad.",ex:"Todo lo que veo y toco es encantamiento."},
+    {w:"ínsula",exp:"Isla; Sancho sueña con gobernar una ínsula.",ex:"¿Cómo te fue con tu gobierno, Sancho?"},
+    {w:"justicia",exp:"Principio moral de dar a cada uno lo que le corresponde.",ex:"Deshacer agravios y socorrer a los menesterosos."},
+    {w:"labrador",exp:"Persona que labra la tierra; Sancho es un labrador.",ex:"Sancho Panza, que así se llamaba el labrador."},
+    {w:"lanza",exp:"Arma de asta larga con punta de acero.",ex:"Con estas razones perdía el pobre caballero el juicio."},
+    {w:"locura",exp:"Estado mental alterado; pérdida del juicio.",ex:"Viéndole don Quijote de aquella manera, con muestras de tanta tristeza."},
+    {w:"Mancha",exp:"Región de España donde vivía don Quijote.",ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme."},
+    {w:"molino",exp:"Edificio con aspas para moler cereal.",ex:"Acometió con su lanza al primero molino que estaba delante."},
+    {w:"mundo",exp:"La Tierra y todo lo que existe en ella.",ex:"Recorrió el mundo en busca de aventuras."},
+    {w:"pastora",exp:"Mujer que cuida ovejas; don Quijote quiere hacerse pastor.",ex:"Hagámonos pastores."},
+    {w:"refrán",exp:"Dicho popular que expresa una verdad general; Sancho los usa constantemente.",ex:"Sancho Panza tenía la memoria llena de refranes."},
+    {w:"reino",exp:"Estado gobernado por un rey o una reina.",ex:"Prometió hacerle gobernador de una ínsula."},
+    {w:"Rocinante",exp:"El caballo flaco y viejo de don Quijote.",ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+    {w:"Sancho",exp:"Sancho Panza, el escudero fiel de don Quijote.",ex:"Sancho Panza no dijo nada."},
+    {w:"señor",exp:"Título de respeto; Sancho llama siempre señor a don Quijote.",ex:"Señor, respondió Sancho Panza."},
+    {w:"venta",exp:"Posada o mesón en un camino.",ex:"Llegaron a una venta que don Quijote tuvo por castillo."},
+    {w:"ventura",exp:"Suerte o fortuna.",ex:"¡Felice edad y siglos dichosos!"},
+    {w:"verdad",exp:"Conformidad de las cosas con lo que se dice de ellas.",ex:"En esto de la verdad, señor cura, digo que tiene razón."},
+    {w:"viejo",exp:"De avanzada edad; don Quijote es un hidalgo ya mayor.",ex:"Frisaba la edad de nuestro hidalgo con los cincuenta años."},
+    {w:"yelmo",exp:"Pieza de armadura que cubre y protege la cabeza.",ex:"Limpió su adarga, adobó su lanza y puso nombre a su rocín."},
+  ]},
+  mousq:{words:[
+    {w:"ami",exp:"Personne avec qui on a des liens d affection et de confiance.",ex:"Mon ami, dit Athos, tu es brave."},
+    {w:"amour",exp:"Sentiment affectif intense envers une personne.",ex:"Madame Bonacieux était jolie."},
+    {w:"arme",exp:"Instrument servant à attaquer ou à se défendre.",ex:"Il posa son arme sur la table."},
+    {w:"arrestation",exp:"Action d arrêter quelqu un au nom de la loi.",ex:"Les gardes du cardinal firent l arrestation."},
+    {w:"Athos",exp:"L un des trois mousquetaires, mystérieux et noble.",ex:"Athos avait un calme parfait."},
+    {w:"Aramis",exp:"L un des trois mousquetaires, à moitié abbé.",ex:"Aramis rougit comme une jeune fille."},
+    {w:"auberge",exp:"Établissement où l on peut manger et dormir.",ex:"Ils s arrêtèrent dans une auberge."},
+    {w:"blessure",exp:"Lésion corporelle causée par un coup ou une arme.",ex:"Sa blessure n était pas mortelle."},
+    {w:"cardinal",exp:"Haut dignitaire de l Église catholique; ici Richelieu.",ex:"Son Éminence le cardinal de Richelieu."},
+    {w:"complot",exp:"Plan secret pour nuire à quelqu un.",ex:"Il y a un complot contre la reine."},
+    {w:"courage",exp:"Capacité de faire face au danger sans se laisser abattre.",ex:"Tous pour un, un pour tous."},
+    {w:"danger",exp:"Situation pouvant causer un dommage ou un risque.",ex:"Nous étions tous en grand danger."},
+    {w:"duel",exp:"Combat singulier entre deux personnes pour défendre leur honneur.",ex:"Il se mit en garde pour le duel."},
+    {w:"épée",exp:"Arme blanche longue et fine.",ex:"Il tira son épée et se mit en garde."},
+    {w:"espion",exp:"Personne qui recueille des informations secrètes.",ex:"Milady était un véritable espion."},
+    {w:"fidèle",exp:"Constant dans ses engagements et ses affections.",ex:"Porthos était fidèle à ses amis."},
+    {w:"fortune",exp:"Sort favorable ou ensemble des richesses.",ex:"Il avait la fortune d être gascon."},
+    {w:"honneur",exp:"Qualité morale qui pousse à agir avec intégrité.",ex:"Un gentilhomme ne recule jamais devant l honneur."},
+    {w:"liberté",exp:"État de quelqu un qui n est pas sous la contrainte.",ex:"Il méritait sa liberté."},
+    {w:"Milady",exp:"La mystérieuse et dangereuse adversaire des mousquetaires.",ex:"Milady sourit, mais ce sourire était glacial."},
+    {w:"mission",exp:"Tâche confiée à quelqu un.",ex:"Ils avaient une mission secrète à accomplir."},
+    {w:"mousquetaire",exp:"Soldat d élite de la garde royale française.",ex:"Tous pour un, un pour tous!"},
+    {w:"nuit",exp:"Période d obscurité entre le coucher et le lever du soleil.",ex:"Ils partirent la nuit pour n être pas vus."},
+    {w:"Porthos",exp:"L un des trois mousquetaires, grand et vaniteux.",ex:"Porthos tordait sa moustache avec orgueil."},
+    {w:"prisonnier",exp:"Personne détenue contre sa volonté.",ex:"Il était prisonnier dans la Bastille."},
+    {w:"reine",exp:"Souveraine; ici Anne d Autriche.",ex:"Sa Majesté la reine est en danger."},
+    {w:"roi",exp:"Souverain masculin d un royaume.",ex:"Le roi Louis XIII était à la chasse."},
+    {w:"ruse",exp:"Moyen détourné pour tromper ou atteindre un but.",ex:"Milady usait de ruse pour parvenir à ses fins."},
+    {w:"secret",exp:"Ce qui est caché et ne doit pas être divulgué.",ex:"Ce secret devait rester entre eux."},
+    {w:"soldat",exp:"Homme servant dans une armée.",ex:"Les soldats du cardinal patrouillaient."},
+    {w:"trahison",exp:"Acte de trahir la confiance de quelqu un.",ex:"C était une trahison impardonnable."},
+    {w:"valeur",exp:"Courage et bravoure au combat.",ex:"Il avait fait preuve d une grande valeur."},
+    {w:"vengeance",exp:"Acte de punir quelqu un en retour d un tort subi.",ex:"La vengeance est un plat qui se mange froid."},
+    {w:"victoire",exp:"Succès dans un combat ou une compétition.",ex:"La victoire était enfin à eux."},
+  ]},
+  werther:{words:[
+    {w:"Abschied",exp:"Trennung, das Verlassen eines Menschen oder Ortes.",ex:"Der Abschied war mir unmöglich."},
+    {w:"allein",exp:"Ohne andere Personen; isoliert.",ex:"Ich bin so allein und freue mich so meines Lebens."},
+    {w:"Augen",exp:"Die Organe des Sehens; Lottes Augen sind für Werther entscheidend.",ex:"Ich sah Lotten an."},
+    {w:"Blick",exp:"Das kurze Hinsehen; ein Blick kann tiefe Bedeutung haben.",ex:"Welch ein Blick!"},
+    {w:"Brief",exp:"Schriftliche Mitteilung an eine Person; der Roman ist ein Briefroman.",ex:"Am 10. Mai. Ich habe eine wunderbare Heiterkeit meine ganze Seele eingenommen."},
+    {w:"Einsamkeit",exp:"Der Zustand, allein zu sein; Isolierung.",ex:"Ich bin so allein und freue mich so meines Lebens."},
+    {w:"Empfindung",exp:"Wahrnehmung durch die Sinne; subjektives Gefühl.",ex:"Meine Empfindungen sind so verworren."},
+    {w:"ewig",exp:"Ohne Ende; für immer.",ex:"Du bist ewig in meinen Gedanken."},
+    {w:"Freude",exp:"Positives Gefühl der Befriedigung und des Glücks.",ex:"Welche Freude war das!"},
+    {w:"Freund",exp:"Person, mit der man eine enge freundschaftliche Bindung hat.",ex:"Ich schreibe dir, lieber Freund."},
+    {w:"Gott",exp:"Das höchste Wesen; Werther wendet sich in Verzweiflung an Gott.",ex:"Gott! Was ist der Mensch?"},
+    {w:"Herz",exp:"Das Organ des Blutkreislaufs; auch Sitz der Gefühle.",ex:"Mein Herz ist so schwer."},
+    {w:"Hoffnung",exp:"Erwartung, dass etwas Gewünschtes eintreten wird.",ex:"Die Hoffnung war nun begraben."},
+    {w:"Kleid",exp:"Ein Kleidungsstück; Lotte trägt ein einfaches weißes Kleid.",ex:"Sie trug ein einfaches weißes Kleid."},
+    {w:"Leiden",exp:"Schmerzen, körperliches oder seelisches Leid.",ex:"Die Leiden des jungen Werthers."},
+    {w:"Liebe",exp:"Tiefes Gefühl der Zuneigung und Leidenschaft.",ex:"Ich liebe sie, Wilhelm, und ich bin dem Wahnsinn nahe."},
+    {w:"Lotte",exp:"Die geliebte, aber unerreichbare Frau im Roman.",ex:"Ich sah Lotten an."},
+    {w:"Mond",exp:"Der natürliche Satellit der Erde; Symbol für Sehnsucht.",ex:"Der Mond schien durch die Bäume."},
+    {w:"Musik",exp:"Die Kunst der Töne; Lotte und Werther spielen Klavier.",ex:"Wenn Lotte am Klavier spielte."},
+    {w:"Natur",exp:"Die natürliche Welt; Werthers Naturbetrachtungen spiegeln seine Seelenlage.",ex:"Wenn das liebe Tal um mich dampft."},
+    {w:"Regen",exp:"Niederschlag in Form von Wassertropfen.",ex:"Es regnete in Strömen."},
+    {w:"Ruhe",exp:"Stille; auch: innerer Frieden.",ex:"Ich finde keine Ruhe mehr."},
+    {w:"Schmerz",exp:"Körperlicher oder seelischer Schmerz.",ex:"Ich leide viel, denn ich habe verloren."},
+    {w:"Seele",exp:"Das innere Wesen eines Menschen; Geist und Gefühle.",ex:"Meine Seele glänzt mit ganzem Feuer."},
+    {w:"Sehnsucht",exp:"Tiefe Sehnsucht nach etwas Unerreichbarem.",ex:"Eine unaussprechliche Sehnsucht ergriff mich."},
+    {w:"Stille",exp:"Abwesenheit von Lärm; Ruhe.",ex:"In der tiefen Stille der Nacht."},
+    {w:"Tanz",exp:"Rhythmische Körperbewegungen; Tanz verbindet Lotte und Werther.",ex:"Ich tanzte mit ihr den ersten Contretanz."},
+    {w:"Tod",exp:"Das Ende des Lebens; Werthers Selbstmord am Ende.",ex:"Ich gehe voran. Gehe zu meinem Vater."},
+    {w:"Tränen",exp:"Flüssigkeit aus den Augen beim Weinen.",ex:"Meine Tränen floßen."},
+    {w:"Traum",exp:"Bilder und Gedanken während des Schlafs; auch Wunschbild.",ex:"Es war wie ein Traum."},
+    {w:"Trost",exp:"Linderung von Schmerz oder Kummer.",ex:"Es gibt keinen Trost für mich."},
+    {w:"Unglück",exp:"Unheil; schlechtes Schicksal.",ex:"Welch ein Unglück ist das meinige!"},
+    {w:"Vernunft",exp:"Die Fähigkeit, klar zu denken; im Gegensatz zu Gefühl.",ex:"Was hilft mir die Vernunft?"},
+    {w:"Verzweiflung",exp:"Totaler Verlust der Hoffnung.",ex:"Es ist alles so leer, so öde."},
+    {w:"Wilhelm",exp:"Werthers Briefpartner und bester Freund.",ex:"Lieber Wilhelm, ich schreibe dir."},
+    {w:"Wonne",exp:"Höchste Freude und Glückseligkeit.",ex:"Was meines Lebens einzige Wonne war."},
+  ]},
+  pinocchio:{words:[
+    {w:"asino",exp:"Animale da soma; i ragazzi cattivi diventano asini.",ex:"Tutti i ragazzi che non studiano diventano asini."},
+    {w:"avaro",exp:"Chi non vuole spendere o condividere i propri beni.",ex:"Il Gatto e la Volpe erano avari e bugiardi."},
+    {w:"avventura",exp:"Esperienza eccitante e fuori dall ordinario.",ex:"Le avventure di Pinocchio."},
+    {w:"balena",exp:"Grande mammifero marino; Pinocchio viene inghiottito da una.",ex:"Pinocchio fu inghiottito dal pescecane."},
+    {w:"bambino",exp:"Essere umano in età infantile.",ex:"Pinocchio voleva diventare un bambino vero."},
+    {w:"bugiardo",exp:"Chi dice bugie abitualmente.",ex:"Le bugie si riconoscono subito."},
+    {w:"burattino",exp:"Bambola di legno mossa da fili.",ex:"C era una volta un pezzo di legno."},
+    {w:"cattivo",exp:"Che fa del male; moralmente negativo.",ex:"I ragazzi cattivi non vanno a scuola."},
+    {w:"ciuchino",exp:"Asinello; forma diminutiva di asino.",ex:"Tutti i ragazzi che non studiano diventano ciuchini."},
+    {w:"coscienza",exp:"La consapevolezza interiore del giusto e dello sbagliato.",ex:"Il Grillo-parlante era la sua coscienza."},
+    {w:"coraggio",exp:"Capacità di affrontare pericoli o difficoltà.",ex:"Pinocchio aveva paura ma andò avanti."},
+    {w:"fata",exp:"Essere magico femminile che aiuta i buoni.",ex:"La Fata dai capelli turchini gli sorrise."},
+    {w:"falegname",exp:"Artigiano che lavora il legno.",ex:"Geppetto era un vecchio falegname."},
+    {w:"fame",exp:"Il bisogno di mangiare.",ex:"Pinocchio aveva fame e nulla da mangiare."},
+    {w:"fuggire",exp:"Allontanarsi velocemente da qualcosa.",ex:"Pinocchio fuggì via di corsa."},
+    {w:"Gatto",exp:"Il Gatto e la Volpe, i due impostori del romanzo.",ex:"Il Gatto era cieco e la Volpe zoppa."},
+    {w:"Geppetto",exp:"Il falegname che intagliò Pinocchio e diventò il suo padre.",ex:"Geppetto lo chiamò Pinocchio."},
+    {w:"grillo",exp:"Insetto saltatore; il Grillo-parlante è la coscienza di Pinocchio.",ex:"Cri-cri-cri! disse il Grillo-parlante."},
+    {w:"inghiottire",exp:"Mandare giù attraverso la gola.",ex:"Il pescecane lo inghiottì d un sol boccone."},
+    {w:"lavoro",exp:"Attività fisica o mentale per guadagnare.",ex:"Chi non lavora non mangia."},
+    {w:"legno",exp:"Materiale ricavato dagli alberi; di cui è fatto Pinocchio.",ex:"C era una volta un pezzo di legno."},
+    {w:"libertà",exp:"La condizione di chi non è sotto la costrizione.",ex:"Pinocchio era libero di fare ciò che voleva."},
+    {w:"marachella",exp:"Birichinata; azione monellesca.",ex:"Aveva fatto un altra delle sue marachelle."},
+    {w:"mentire",exp:"Dire cose false.",ex:"Non mentire, Pinocchio, le bugie hanno le gambe corte."},
+    {w:"monello",exp:"Bambino birichino che fa dispetti.",ex:"Era un vero monello di strada."},
+    {w:"naso",exp:"Parte del viso; nel romanzo cresce quando Pinocchio mente.",ex:"Il naso gli crebbe subito di quattro dita."},
+    {w:"obbedire",exp:"Fare ciò che viene ordinato o richiesto.",ex:"Devi obbedire e andare a scuola."},
+    {w:"Paese dei Balocchi",exp:"Il luogo dove i bambini non fanno nulla; rappresenta il vizio.",ex:"Il Paese dei Balocchi era il paradiso dei bambini pigri."},
+    {w:"pericolo",exp:"Situazione che può causare danno.",ex:"Era in grande pericolo."},
+    {w:"pescecane",exp:"Grande squalo; il mostro che inghiotte Pinocchio e Geppetto.",ex:"Un enorme pescecane aprì la bocca."},
+    {w:"piangere",exp:"Versare lacrime per dolore o commozione.",ex:"Pinocchio piangeva a dirotto."},
+    {w:"pigro",exp:"Chi non vuole lavorare o fare sforzi.",ex:"I ragazzi pigri vanno al Paese dei Balocchi."},
+    {w:"promessa",exp:"Dichiarazione con cui ci si impegna a fare qualcosa.",ex:"Pinocchio promise di essere buono."},
+    {w:"scuola",exp:"Luogo dove si va ad imparare.",ex:"Domani andrò a scuola senz altro."},
+    {w:"uomo",exp:"Essere umano adulto di sesso maschile.",ex:"Pinocchio voleva diventare un bambino e poi un uomo."},
+    {w:"Volpe",exp:"Animale furbo; la Volpe è uno dei personaggi ingannatori.",ex:"La Volpe disse: Vieni con noi."},
+  ]},
+  casmurro:{words:[
+    {w:"adulto",exp:"Que chegou à maturidade; pessoa crescida.",ex:"Já era adulto quando voltou ao Rio."},
+    {w:"amor",exp:"Sentimento afetivo intenso; paixão.",ex:"O amor de Bentinho por Capitu era imenso."},
+    {w:"amigo",exp:"Pessoa com quem se tem laços de amizade.",ex:"Escobar era o melhor amigo de Bentinho."},
+    {w:"angústia",exp:"Estado de sofrimento moral intenso.",ex:"A angústia não me deixava dormir."},
+    {w:"Bentinho",exp:"O narrador e protagonista do romance.",ex:"Bentinho era o nome que a minha mãe me dava."},
+    {w:"boca",exp:"Abertura do rosto usada para comer e falar.",ex:"A boca de Capitu tinha um sorriso enigmático."},
+    {w:"Capitu",exp:"A protagonista feminina, personagem central e enigmática.",ex:"Capitu olhava para mim, sem falar."},
+    {w:"casa",exp:"Edifício destinado à habitação.",ex:"A casa da rua de Matacavalos."},
+    {w:"casamento",exp:"União formal entre duas pessoas.",ex:"Casamos depois de alguns anos."},
+    {w:"ciúme",exp:"Sentimento de desconfiança em relação à fidelidade.",ex:"Era o ciúme que me devorava."},
+    {w:"coração",exp:"Órgão central do sistema circulatório; sede dos sentimentos.",ex:"O coração batia mais rápido ao vê-la."},
+    {w:"criança",exp:"Ser humano na infância.",ex:"Fomos criados juntos desde crianças."},
+    {w:"dúvida",exp:"Estado de incerteza ou hesitação.",ex:"A dúvida me consumia."},
+    {w:"Escobar",exp:"O melhor amigo de Bentinho, cuja proximidade com Capitu é questionada.",ex:"Escobar era um rapaz inteligente e sociável."},
+    {w:"filho",exp:"Descendente direto de alguém.",ex:"O filho parecia-se com Escobar."},
+    {w:"infância",exp:"Período da vida entre o nascimento e a adolescência.",ex:"A saudade da infância voltou-me ao coração."},
+    {w:"janela",exp:"Abertura na parede para dar luz e ar.",ex:"Capitu estava na janela quando a vi."},
+    {w:"lágrimas",exp:"Líquido que sai dos olhos ao chorar.",ex:"Os olhos de Capitu tinham lágrimas."},
+    {w:"memória",exp:"Faculdade de reter e evocar o passado.",ex:"Que me contes a tua vida, disse ela."},
+    {w:"mentira",exp:"Afirmação contrária à verdade.",ex:"Será que era mentira tudo aquilo?"},
+    {w:"morte",exp:"Fim da vida.",ex:"A morte de Escobar foi um choque."},
+    {w:"noite",exp:"Período de escuridão entre o pôr do sol e o nascer do dia.",ex:"Era uma noite de verão."},
+    {w:"olhos",exp:"Órgãos da visão; os olhos de Capitu são centrais no romance.",ex:"Olhos de ressaca, disse-me uma vez um poeta."},
+    {w:"passado",exp:"Tempo já decorrido; o narrador vive de recordações.",ex:"O passado não me abandona."},
+    {w:"paixão",exp:"Sentimento amoroso intenso e avassalador.",ex:"A paixão de Bentinho por Capitu era irresistível."},
+    {w:"saudade",exp:"Sentimento de falta e nostalgia, tipicamente lusófono.",ex:"A saudade da infância voltou-me ao coração."},
+    {w:"segredo",exp:"Algo que se mantém oculto.",ex:"Capitu tinha os seus segredos."},
+    {w:"seminário",exp:"Escola de formação de sacerdotes.",ex:"Minha mãe resolveu que eu fosse para o seminário."},
+    {w:"silêncio",exp:"Ausência de som; estado de quem não fala.",ex:"Capitu ficou em silêncio."},
+    {w:"sorriso",exp:"Expressão facial de alegria.",ex:"O sorriso de Capitu era enigmático."},
+    {w:"tempo",exp:"A sucessão de momentos; o passar dos anos.",ex:"O tempo passou rápido."},
+    {w:"traição",exp:"Ato de trair a confiança de alguém.",ex:"Capitu, dissera eu a mim mesmo, Capitu é que me traiu."},
+    {w:"tristeza",exp:"Estado de quem está triste; melancolia.",ex:"A tristeza tomou conta de mim."},
+    {w:"verdade",exp:"Conformidade com a realidade.",ex:"Qual era a verdade afinal?"},
+    {w:"vizinho",exp:"Pessoa que mora próxima.",ex:"Capitu era a filha do nosso vizinho."},
+    {w:"voz",exp:"Som produzido pela fala.",ex:"A voz de Capitu era suave."},
+  ]},
 };
 
 // ── STATE ──
@@ -1846,20 +1776,8 @@ function ctxTranslate(){
 }
 function ctxReadFrom(){
   hideCtxMenu();
-  readFromSentence(_ctxSi);
-}
-
-// Read from a specific sentence index
-function readFromSentence(si){
-  if(S.mode !== 'audio'){
-    // Switch to audio mode on the fly
-    S.mode = 'audio';
-    document.getElementById('actl').style.display = 'flex';
-  }
-  stopAudio();
-  S.playing = true;
-  speakS(si);
-  toast('▶ Leyendo desde la frase '+(si+1));
+  // ctxReadFrom is called from a button click = user gesture
+  readFromSentenceGesture(_ctxSi);
 }
 function updProg(){
   const p = document.getElementById('tpn');
@@ -1951,48 +1869,184 @@ function renderHist(){
       </div>`).join('') + '</div>';
 }
 
-// ── TTS — claude.use('tts') ──
-let _ttsApi = null;
+// ── TTS — using artifact tts capability correctly ──
+// Key rules from the API spec:
+// - speak() / add() MUST come from a direct user gesture (click/keypress)
+// - add() queues lines after the current reading — no extra gesture needed
+// - pause() / resume() for pause, NOT stop()
+// - onState() tracks "idle"|"starting"|"speaking"|"paused"
+// - speak() rejects "no_gesture" if called outside a gesture context
+
+let _ttsApi   = null;   // resolved once after first user gesture
+let _ttsState = 'idle'; // tracked via onState
+let _ttsUnsub = null;   // cleanup for onState listener
+
 async function getTts(){
   if(_ttsApi) return _ttsApi;
   _ttsApi = await claude.use('tts');
+  if(_ttsApi && !_ttsUnsub){
+    _ttsUnsub = _ttsApi.onState(({state, reason})=>{
+      _ttsState = state;
+      if(state === 'idle'){
+        clrHl();
+        if(reason === 'completed'){
+          // A batch of sentences finished — advance to next batch
+          _advanceBatch();
+        } else if(reason === 'viewer_stopped' || reason === 'not_granted'){
+          S.playing = false; updBtn();
+        } else if(reason === 'stopped'){
+          // We called stop() deliberately — do nothing
+        }
+      }
+      if(state === 'speaking' || state === 'starting'){
+        updBtn();
+      }
+    });
+  }
   return _ttsApi;
 }
-async function startAudio(){
-  // getTts() must be called from a user gesture for consent to work.
-  // If called from startRead (non-gesture), tts may be null.
-  // We set a flag and let the play button trigger the actual start.
-  if(!_ttsApi){
-    // Not yet consented - mark as wanting to play, show prompt on button
-    S.playing = false;
-    _wantAudio = true;
-    updBtn();
-    toast('▶ Pulsa el botón de reproducción para iniciar el audio', 4000);
-    return;
+
+// We send sentences in batches of 5 to tts.speak() — avoids too many
+// individual calls and stays well under the 100-line limit.
+// After each batch completes ('completed'), _advanceBatch() sends the next.
+const TTS_BATCH = 5;
+
+async function _sendBatch(fromGesture){
+  const tts = _ttsApi;
+  if(!tts || !S.playing) return;
+  const end = Math.min(S.si + TTS_BATCH, S.sents.length);
+  if(S.si >= S.sents.length){ S.playing=false; updBtn(); toast('Fin del texto'); return; }
+
+  const langCode = LMETA[S.lang]?.tts?.split('-')[0] || 'en';
+  const lines = [];
+  for(let i=S.si; i<end; i++){
+    const text = S.sents[i].trim();
+    if(text.length > 0 && text.length <= 2000)
+      lines.push({text, language: langCode});
   }
-  S.playing=true; speakS(S.si);
+  if(!lines.length){ S.playing=false; updBtn(); return; }
+
+  // Highlight first sentence of batch
+  hlSent(S.si);
+
+  // Track which sentence is speaking via onLine
+  const batchStart = S.si;
+  if(_ttsUnsub2){ _ttsUnsub2(); _ttsUnsub2=null; }
+  _ttsUnsub2 = tts.onLine(({line})=>{
+    const si = batchStart + line;
+    if(si !== S.si){ S.si=si; hlSent(si); }
+  });
+
+  try{
+    // speak() on first gesture; add() would need an active reading
+    await tts.speak(lines, {rate: S.rate});
+    // onState 'completed' fires after this resolves — handled there
+  } catch(e){
+    if(e?.code === 'no_gesture'){
+      // Should not happen since we only call from togPlay/prevS/nextS
+      // but handle gracefully
+      S.playing=false; updBtn();
+      toast('Pulsa ▶ para iniciar la narración');
+    } else if(e?.code === 'stopped' || e?.code === 'replaced'){
+      // Deliberate stop — ignore
+    } else if(e?.code === 'not_granted'){
+      S.playing=false; updBtn();
+      toast('Narración desactivada. Actívala en Permisos del artefacto.');
+    } else {
+      console.warn('TTS error:', e?.code, e?.message);
+      S.playing=false; updBtn();
+    }
+  }
+}
+let _ttsUnsub2 = null;
+
+function _advanceBatch(){
+  if(!S.playing) return;
+  S.si = Math.min(S.si + TTS_BATCH, S.sents.length);
+  if(S.si >= S.sents.length){ S.playing=false; updBtn(); toast('Fin del texto'); return; }
+  // add() doesn't need a gesture since there's no active reading at this point
+  // but speak() is safer — we schedule it via setTimeout to let the stack clear
+  setTimeout(()=>{ if(S.playing) _sendBatch(false); }, 50);
 }
 
-let _wantAudio = false;
-async function speakS(i){
-  i=Math.max(0,Math.min(i,S.sents.length-1));
-  if(i>=S.sents.length){S.playing=false;updBtn();return;}
-  S.si=i; hlSent(i); updBtn();
-  const tts=await getTts(); if(!tts)return;
-  const langCode=LMETA[S.lang].tts.split('-')[0];
-  try{
-    await tts.speak(S.sents[i],{language:langCode,rate:S.rate});
-    clrHl();
-    if(S.playing){
-      const next=S.si+1;
-      if(next<S.sents.length) speakS(next);
-      else{S.playing=false;updBtn();toast('Fin del texto cargado');}
+// Called from mode select (not a gesture) — just sets state, play button starts it
+function startAudio(){
+  S.playing = false; // will start on first ▶ press
+  updBtn();
+  toast('Pulsa ▶ para iniciar la narración', 3000);
+}
+
+// MUST be called from a direct user gesture (button click)
+async function togPlay(){
+  const tts = await getTts();
+  if(!tts){ toast('Narración no disponible en este navegador.'); return; }
+
+  if(S.playing){
+    if(_ttsState === 'speaking' || _ttsState === 'starting'){
+      await tts.pause().catch(()=>{});
+      _ttsState = 'paused';
+      S.playing = false; updBtn();
+    } else if(_ttsState === 'paused'){
+      await tts.resume().catch(()=>{});
+      S.playing = true; updBtn();
+    } else {
+      // idle — just stop
+      S.playing = false; updBtn();
     }
-  }catch(e){
-    if(e?.code==='viewer_stopped'||e?.code==='interrupted')return;
-    S.playing=false;updBtn();
+  } else {
+    if(_ttsState === 'paused'){
+      await tts.resume().catch(()=>{});
+      S.playing = true; updBtn();
+    } else {
+      // Start fresh — this IS a user gesture
+      S.playing = true; updBtn();
+      await _sendBatch(true);
+    }
   }
 }
+
+// prevS / nextS also called from buttons = user gestures
+async function prevS(){
+  if(!_ttsApi) return;
+  const wasPlaying = S.playing;
+  await _ttsApi.stop().catch(()=>{});
+  S.si = Math.max(0, S.si - 1);
+  clrHl();
+  if(wasPlaying){ S.playing=true; await _sendBatch(true); }
+}
+async function nextS(){
+  if(!_ttsApi) return;
+  const wasPlaying = S.playing;
+  await _ttsApi.stop().catch(()=>{});
+  S.si = Math.min(S.sents.length-1, S.si + 1);
+  clrHl();
+  if(wasPlaying){ S.playing=true; await _sendBatch(true); }
+}
+
+async function stopAudio(){
+  if(_ttsApi) await _ttsApi.stop().catch(()=>{});
+  if(_ttsUnsub2){ _ttsUnsub2(); _ttsUnsub2=null; }
+  S.playing=false; clrHl(); updBtn();
+}
+
+async function chRate(v){
+  S.rate = parseFloat(v);
+  if(_ttsApi) await _ttsApi.setRate?.(S.rate).catch(()=>{});
+}
+
+// readFromSentence — called from button = user gesture
+async function readFromSentenceGesture(si){
+  const tts = await getTts();
+  if(!tts){ toast('Narración no disponible.'); return; }
+  if(_ttsApi) await _ttsApi.stop().catch(()=>{});
+  S.si = si;
+  S.mode = 'audio';
+  document.getElementById('actl').style.display = 'flex';
+  S.playing = true; updBtn();
+  await _sendBatch(true);
+  toast('▶ Leyendo desde la frase '+(si+1));
+}
+
 function hlSent(i){
   clrHl();
   const spans=document.querySelectorAll(`.rw[data-si="${i}"]`);
@@ -2003,28 +2057,11 @@ function hlSent(i){
 function clrHl(){document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk'));}
 function updBtn(){
   const b=document.getElementById('bplay');if(!b)return;
-  b.textContent=S.playing?'⏸':'▶';b.classList.toggle('pon',S.playing);
+  const paused = _ttsState==='paused' && !S.playing;
+  b.textContent = (S.playing && (_ttsState==='speaking'||_ttsState==='starting')) ? '⏸'
+                : paused ? '▶' : S.playing ? '⏳' : '▶';
+  b.classList.toggle('pon', S.playing || paused);
 }
-async function stopAudio(){
-  const tts=await getTts();
-  if(tts)try{await tts.stop();}catch{}
-  S.playing=false;clrHl();updBtn();
-}
-async function togPlay(){
-  if(S.playing){
-    await stopAudio();
-  } else {
-    // This IS a user gesture - safe to get TTS consent here
-    const tts = await getTts();
-    if(!tts){ toast('Audio no disponible en este navegador.'); return; }
-    _wantAudio = false;
-    S.playing = true;
-    speakS(S.si);
-  }
-}
-function prevS(){if(S.si<=0)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si-1);});}
-function nextS(){if(S.si>=S.sents.length-1)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si+1);});}
-function chRate(v){S.rate=parseFloat(v);if(S.playing){stopAudio().then(()=>{S.playing=true;speakS(S.si);});}}
 
 
 // ── KEYBOARD ──
