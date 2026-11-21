@@ -2425,62 +2425,47 @@ async function startRead(){
     const total    = parseInt(res.headers.get('content-length')||'0');
     const reader   = res.body.getReader();
     const isLatin1 = S.book.enc === 'latin1';
-    const dec      = new TextDecoder(isLatin1 ? 'iso-8859-1' : 'utf-8');
 
-    let chunks = [];        // Uint8Array chunks received so far
+    // Collect ALL bytes first, then decode once.
+    // Streaming UTF-8 decode with {stream:true} is fragile when the same
+    // TextDecoder instance is reused — it corrupts multi-byte sequences.
+    let chunks = [];
     let received = 0;
-    let openedReader = false;
-
-    // ── Read until we have enough for the first screen ──
-    while(received < FIRST_CHUNK_BYTES){
-      const {done, value} = await reader.read();
-      if(done) break;
-      chunks.push(value);
-      received += value.length;
-      bar.style.width = Math.min(5 + (received / FIRST_CHUNK_BYTES) * 40, 45) + '%';
-    }
-
-    // Decode and clean what we have so far
-    const firstBuf  = mergeChunks(chunks);
-    const firstText = cleanGutenberg(dec.decode(firstBuf, {stream: true}));
-    const firstWords = firstText.split(/\s+/).slice(0, 1500).join(' ');
-
-    // Open the reader NOW with the first ~1500 words
-    S.raw   = firstWords;
-    S.paras = firstWords.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-    S.sents = splitSents(firstWords);
-    renderReader();
-    goTo('sr');
-    appendLoadingFooter(true);  // show "Cargando más…" at bottom
-    bar.style.width = '50%';
-
-    // ── Continue reading the rest in the background ──
-    let raw = dec.decode(firstBuf, {stream: true});
-    let sinceLastAppend = received;
 
     while(true){
       const {done, value} = await reader.read();
       if(done) break;
       chunks.push(value);
       received += value.length;
-      raw += dec.decode(value, {stream: true});
-
       if(total > 0)
-        bar.style.width = Math.min(50 + (received/total)*48, 98) + '%';
-
-      // Every APPEND_EVERY_BYTES, update the reader content
-      if(received - sinceLastAppend >= APPEND_EVERY_BYTES){
-        sinceLastAppend = received;
-        const partial = cleanGutenberg(raw);
-        backgroundAppend(partial);
-      }
+        bar.style.width = Math.min(5 + (received/total)*90, 95) + '%';
+      else
+        bar.style.width = Math.min((parseFloat(bar.style.width)||5) + 3, 90) + '%';
     }
 
-    // Final decode flush and render
-    raw += dec.decode(); // flush
-    const fullText = cleanGutenberg(raw);
+    bar.style.width = '98%';
+
+    // Decode the full buffer in one shot
+    const fullBuf = mergeChunks(chunks);
+    let rawText;
+    if(isLatin1){
+      rawText = new TextDecoder('iso-8859-1').decode(fullBuf);
+    } else {
+      // Strip UTF-8 BOM (EF BB BF) if present
+      const slice = fullBuf[0]===0xEF && fullBuf[1]===0xBB && fullBuf[2]===0xBF
+        ? fullBuf.slice(3) : fullBuf;
+      rawText = new TextDecoder('utf-8').decode(slice);
+    }
+
+    const fullText = cleanGutenberg(rawText);
     bar.style.width = '100%';
-    backgroundAppend(fullText, /*final*/ true);
+
+    // Show reader immediately with full text
+    S.raw   = fullText;
+    S.paras = fullText.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
+    S.sents = splitSents(fullText);
+    renderReader();
+    goTo('sr');
     showResumeBar();
 
   } catch(e){
