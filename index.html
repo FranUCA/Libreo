@@ -2797,159 +2797,103 @@ function renderHist(){
       </div>`).join('') + '</div>';
 }
 
-// ── TTS — speak() first line (gesture), add() each next line ──
-// Key insight: onLine fires with line=0 for every single-line speak/add.
-// So we track S.si manually: increment BEFORE each add(), not via onLine.
-let _ttsApi        = null;
-let _ttsUnsubState = null;
-let _ttsUnsubLine  = null;
-let _ttsAdding     = false;
+// ── WEB SPEECH TTS ──────────────────────────────────────────────────
+// Uses window.speechSynthesis (built into Chrome/Android/Safari)
+// No gesture restriction, no API key, works on GitHub Pages
+const syn = window.speechSynthesis || null;
 
-async function getTts(){
-  if(_ttsApi) return _ttsApi;
-  _ttsApi = await claude.use('tts');
-  return _ttsApi;
+function bestVoice(lang){
+  if(!syn) return null;
+  const vs = syn.getVoices(), code = LMETA[lang].tts, base = code.split('-')[0];
+  return vs.find(v=>v.lang===code)
+      || vs.find(v=>v.lang.startsWith(base+'-'))
+      || vs.find(v=>v.lang.startsWith(base))
+      || null;
 }
 
-// MUST be called from a direct user gesture (button click)
-async function _startReading(){
-  const tts = _ttsApi;
-  if(!tts || !S.playing) return;
-  const lang = LMETA[S.lang]?.tts?.split('-')[0] || 'en';
-
-  if(_ttsUnsubState){ _ttsUnsubState(); _ttsUnsubState = null; }
-  if(_ttsUnsubLine) { _ttsUnsubLine();  _ttsUnsubLine  = null; }
-  _ttsAdding = false;
-
-  // Highlight current sentence when it starts playing
-  _ttsUnsubLine = tts.onLine(()=>{ hlSent(S.si); });
-
-  // When a sentence finishes: advance index and add the next one
-  _ttsUnsubState = tts.onState(async ({state, reason})=>{
-    if(state === 'idle'){
-      clrHl();
-      if(reason === 'completed' && S.playing){
-        S.si++;                          // advance AFTER completion
-        if(S.si >= S.sents.length){
-          S.playing = false; updBtn(); toast('Fin del texto'); return;
-        }
-        await _addNext(tts, lang);
-      } else if(reason === 'viewer_stopped' || reason === 'not_granted'){
-        S.playing = false; updBtn();
-      }
-    }
-    updBtn();
-  });
-
-  // speak() the first sentence — this MUST be in a gesture call stack
-  const first = _getLine(S.si, lang);
-  if(!first){ S.playing = false; updBtn(); return; }
-
-  try{
-    // speak() returns a Promise that resolves when the line finishes.
-    // We don't await it here — onState 'completed' handles the continuation.
-    tts.speak(first, {rate: S.rate}).catch(e=>{
-      if(e?.code !== 'stopped' && e?.code !== 'replaced'){
-        console.warn('TTS speak error:', e?.code, e?.message);
-        S.playing = false; updBtn();
-      }
-    });
-    updBtn();
-  } catch(e){
-    if(e?.code === 'no_gesture')      toast('Pulsa ▶ para iniciar la narración');
-    else if(e?.code === 'not_granted') toast('Narración desactivada en Permisos.');
-    S.playing = false; updBtn();
-  }
-}
-
-async function _addNext(tts, lang){
-  if(_ttsAdding || !S.playing) return;
-  _ttsAdding = true;
-  const line = _getLine(S.si, lang);
-  if(!line){
-    // Skip empty/too-long sentences
-    if(S.si < S.sents.length){ S.si++; _ttsAdding=false; await _addNext(tts,lang); return; }
-    S.playing=false; updBtn(); _ttsAdding=false; return;
-  }
-  try{
-    await tts.add(line, {rate: S.rate});
-  } catch(e){
-    if(e?.code !== 'stopped' && e?.code !== 'replaced'){
-      S.playing = false; updBtn();
-    }
-  } finally { _ttsAdding = false; }
-}
-
-function _getLine(si, lang){
-  if(si < 0 || si >= S.sents.length) return null;
-  const text = S.sents[si]?.trim();
-  if(!text || text.length < 2 || text.length > 2000) return null;
-  return {text, language: lang};
-}
-
-function startAudio(){ S.playing = false; updBtn(); }
-
-// ▶/⏸ — DIRECT USER GESTURE
-async function togPlay(){
-  const tts = await getTts();
-  if(!tts){ toast('Narración no disponible en este navegador.'); return; }
-
-  if(S.playing){
-    // Pause
-    S.playing = false;
-    await tts.pause().catch(()=>{});
-    updBtn();
-  } else {
-    // Resume or start fresh
-    S.playing = true;
-    if(tts.active()){
-      await tts.resume().catch(()=>{});
-      updBtn();
-    } else {
-      await _startReading();
-    }
-  }
-}
-
-// ⏮ ⏭ — DIRECT USER GESTURE
-async function prevS(){
-  const tts = await getTts(); if(!tts) return;
-  const was = S.playing;
-  S.playing = false;
-  await tts.stop().catch(()=>{});
-  S.si = Math.max(0, S.si - 1); clrHl();
-  if(was){ S.playing = true; await _startReading(); }
-}
-async function nextS(){
-  const tts = await getTts(); if(!tts) return;
-  const was = S.playing;
-  S.playing = false;
-  await tts.stop().catch(()=>{});
-  S.si = Math.min(S.sents.length - 1, S.si + 1); clrHl();
-  if(was){ S.playing = true; await _startReading(); }
-}
-
-async function stopAudio(){
-  if(_ttsApi) await _ttsApi.stop().catch(()=>{});
-  S.playing = false; clrHl(); updBtn();
-}
-
-async function chRate(v){
-  S.rate = parseFloat(v);
-  if(_ttsApi) _ttsApi.setRate?.(S.rate).catch(()=>{});
-}
-
-// Called from a click = user gesture
-async function readFromSentenceGesture(si){
-  const tts = await getTts();
-  if(!tts){ toast('Narración no disponible.'); return; }
-  await tts.stop().catch(()=>{});
-  S.si = si; S.mode = 'audio';
-  document.getElementById('actl').style.display = 'flex';
+function startAudio(){
+  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
   S.playing = true;
-  await _startReading();
+  speakS(S.si);
+}
+
+function speakS(i){
+  if(!syn) return;
+  i = Math.max(0, Math.min(i, S.sents.length - 1));
+  if(i >= S.sents.length){ S.playing=false; updBtn(); return; }
+  S.si = i;
+  hlSent(i);
+  const u = new SpeechSynthesisUtterance(S.sents[i]);
+  u.lang = LMETA[S.lang].tts;
+  u.rate = S.rate;
+  const v = bestVoice(S.lang); if(v) u.voice = v;
+  u.onend = ()=>{
+    clrHl();
+    if(S.playing){
+      const next = S.si + 1;
+      if(next < S.sents.length) speakS(next);
+      else { S.playing=false; updBtn(); toast('Fin del texto'); }
+    }
+  };
+  u.onerror = e=>{
+    if(e.error === 'interrupted') return;
+    S.playing=false; updBtn();
+  };
+  syn.cancel();
+  syn.speak(u);
+  updBtn();
+}
+
+function hlSent(i){
+  clrHl();
+  const spans = document.querySelectorAll(`.rw[data-si="${i}"]`);
+  if(!spans.length) return;
+  spans.forEach(s=>s.classList.add('sk'));
+  spans[0].scrollIntoView({behavior:'smooth', block:'center'});
+}
+function clrHl(){ document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk')); }
+function updBtn(){
+  const b = document.getElementById('bplay'); if(!b) return;
+  b.textContent = S.playing ? '⏸' : '▶';
+  b.classList.toggle('pon', S.playing);
+}
+function stopAudio(){
+  if(syn) syn.cancel();
+  S.playing=false; clrHl(); updBtn();
+}
+function togPlay(){
+  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
+  if(S.playing){ stopAudio(); }
+  else { S.playing=true; speakS(S.si); }
+}
+function prevS(){
+  if(S.si <= 0) return;
+  const was = S.playing;
+  syn.cancel(); S.playing = was;
+  speakS(S.si - 1);
+}
+function nextS(){
+  if(S.si >= S.sents.length - 1) return;
+  const was = S.playing;
+  syn.cancel(); S.playing = was;
+  speakS(S.si + 1);
+}
+function chRate(v){
+  S.rate = parseFloat(v);
+  if(S.playing){ syn.cancel(); speakS(S.si); }
+}
+// Called from word-tap context menu (also activates audio if not in that mode)
+function readFromSentenceGesture(si){
+  if(S.mode !== 'audio'){
+    S.mode = 'audio';
+    document.getElementById('actl').style.display = 'flex';
+  }
+  stopAudio();
+  S.playing = true;
+  speakS(si);
   toast('▶ Leyendo desde la frase ' + (si + 1));
 }
+if(syn) syn.addEventListener('voiceschanged', ()=>{});
 
 
 // ── KEYBOARD ──
