@@ -1220,9 +1220,9 @@ function openVocab(){
   document.getElementById('vocab-search').value = '';
 
   if(!data || !data.words || data.words.length === 0){
-    document.getElementById('vocab-body').innerHTML =
-      '<p style="color:var(--dm);font-size:.88rem;padding:1rem 0">No hay vocabulario predefinido para este libro todavía.</p>';
+    // No preset vocab - generate it via Claude
     goTo('sv');
+    generateVocab();
     return;
   }
 
@@ -1244,13 +1244,20 @@ function renderVocab(){
     return;
   }
   body.innerHTML = `<div class="alpha-list">
-    ${_vocabFiltered.map(v=>`
-      <div class="vw-row" onclick="openWordSheet('${esc(v.w)}','${esc(v.exp)}','${esc(v.ex)}')">
+    ${_vocabFiltered.map((v,i)=>`
+      <div class="vw-row" data-vi="${i}" onclick="vocabRowClick(this)">
         <span class="vw-word">${esc(v.w)}</span>
         <span class="vw-hint">${esc(v.exp)}</span>
         <span class="vw-arr">›</span>
       </div>`).join('')}
   </div>`;
+}
+
+function vocabRowClick(el){
+  const i = parseInt(el.dataset.vi);
+  const v = _vocabFiltered[i];
+  if(!v) return;
+  openWordSheet(v.w, v.exp, v.ex);
 }
 
 function filterVocab(q){
@@ -1259,6 +1266,66 @@ function filterVocab(q){
     ? _vocabAll.filter(v=>v.w.toLowerCase().includes(q) || v.exp.toLowerCase().includes(q))
     : _vocabAll;
   renderVocab();
+}
+
+async function generateVocab(){
+  const body = document.getElementById('vocab-body');
+  body.innerHTML = `<div style="display:flex;align-items:center;gap:.8rem;padding:1.2rem 0;color:var(--dm);font-size:.88rem">
+    <div class="sp2"></div> Generando vocabulario con Claude…</div>`;
+
+  const api = await getSample();
+  if(!api){
+    body.innerHTML = '<p style="color:var(--dm);font-size:.88rem;padding:1rem 0">Vocabulario no disponible sin conexión.</p>';
+    return;
+  }
+
+  const langNames = {en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const srcLang = langNames[S.lang] || S.lang;
+  const tgtLang = TRANS_LABEL[S.lang] || 'español';
+
+  // If book text is loaded, extract real words from it
+  let contextNote = '';
+  if(S.sents.length > 20){
+    // Pick a sample of sentences for context
+    const sample = S.sents.slice(0, 40).join(' ').slice(0, 1500);
+    contextNote = `\nTexto de muestra del libro:\n"${sample}"`;
+  }
+
+  const prompt = `Eres un profesor de idiomas. Genera vocabulario esencial del libro "${S.book.title}" de ${S.book.author} en ${srcLang}.
+Devuelve exactamente 40 palabras importantes del libro. Para cada palabra:
+- w: la palabra en ${srcLang}
+- exp: breve explicación en ${srcLang} (máximo 15 palabras)
+- ex: frase corta del libro que CONTENGA la palabra (máximo 20 palabras)
+${contextNote}
+Responde SOLO con JSON válido (sin markdown), formato exacto:
+{"words":[{"w":"palabra","exp":"explicación","ex":"frase con la palabra"},...]}"`;
+
+  try{
+    const res = await api(prompt, {modelTier:'default'});
+    const clean = res.text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    if(!parsed.words || !Array.isArray(parsed.words)) throw new Error('bad format');
+
+    // Deduplicate and sort
+    const seen = new Set();
+    _vocabAll = parsed.words
+      .filter(v => v.w && v.exp && v.ex)
+      .filter(v => { const k=v.w.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; })
+      .sort((a,b) => a.w.localeCompare(b.w));
+    _vocabFiltered = _vocabAll;
+
+    // Cache in VOCAB so we don't regenerate
+    if(!VOCAB[S.book.id]) VOCAB[S.book.id] = {};
+    VOCAB[S.book.id].words = _vocabAll;
+
+    renderVocab();
+  } catch(e){
+    console.error('generateVocab error:', e);
+    body.innerHTML = `<p style="color:var(--dm);font-size:.88rem;padding:1rem 0">
+      No se pudo generar el vocabulario.<br>
+      <span style="font-size:.78rem;opacity:.7">Abre el libro primero para obtener mejores resultados.</span>
+    </p>`;
+  }
 }
 
 // ── WORD DETAIL SHEET ──
@@ -1724,7 +1791,7 @@ function renderReader(){
 }
 
 
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
 
 function onSel(){
   setTimeout(()=>{
@@ -1892,10 +1959,21 @@ async function getTts(){
   return _ttsApi;
 }
 async function startAudio(){
-  const tts = await getTts();
-  if(!tts){ toast('Audio no disponible.'); return; }
+  // getTts() must be called from a user gesture for consent to work.
+  // If called from startRead (non-gesture), tts may be null.
+  // We set a flag and let the play button trigger the actual start.
+  if(!_ttsApi){
+    // Not yet consented - mark as wanting to play, show prompt on button
+    S.playing = false;
+    _wantAudio = true;
+    updBtn();
+    toast('▶ Pulsa el botón de reproducción para iniciar el audio', 4000);
+    return;
+  }
   S.playing=true; speakS(S.si);
 }
+
+let _wantAudio = false;
 async function speakS(i){
   i=Math.max(0,Math.min(i,S.sents.length-1));
   if(i>=S.sents.length){S.playing=false;updBtn();return;}
@@ -1933,8 +2011,16 @@ async function stopAudio(){
   S.playing=false;clrHl();updBtn();
 }
 async function togPlay(){
-  if(S.playing)await stopAudio();
-  else{S.playing=true;speakS(S.si);}
+  if(S.playing){
+    await stopAudio();
+  } else {
+    // This IS a user gesture - safe to get TTS consent here
+    const tts = await getTts();
+    if(!tts){ toast('Audio no disponible en este navegador.'); return; }
+    _wantAudio = false;
+    S.playing = true;
+    speakS(S.si);
+  }
 }
 function prevS(){if(S.si<=0)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si-1);});}
 function nextS(){if(S.si>=S.sents.length-1)return;const w=S.playing;stopAudio().then(()=>{S.playing=w;speakS(S.si+1);});}
