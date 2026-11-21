@@ -2510,8 +2510,9 @@ function backgroundAppend(text, isFinal=false){
   S.sents = splitSents(text);
 
   // While audio is playing, skip DOM rebuild entirely — data-si would
-  // become stale and cause jumps. Rebuild will happen when audio stops.
+  // become stale and cause jumps. Set flag so stopAudio() rebuilds when done.
   if(S.playing){
+    _needsRebuild = true;
     if(isFinal) appendLoadingFooter(false);
     return;
   }
@@ -2892,11 +2893,14 @@ function updBtn(){
   b.textContent = S.playing ? '⏸' : '▶';
   b.classList.toggle('pon', S.playing);
 }
+let _needsRebuild = false;  // set by backgroundAppend when it skips DOM update
+
 function stopAudio(){
+  ++_ttsGen;        // invalidate any pending onend BEFORE cancel
   if(syn) syn.cancel();
   S.playing=false; clrHl(); updBtn();
-  // If backgroundAppend skipped a DOM rebuild, do it now
-  if(S.raw) renderReaderContent();
+  // Only rebuild DOM if backgroundAppend queued an update while we were playing
+  if(_needsRebuild){ _needsRebuild=false; renderReaderContent(); }
 }
 function togPlay(){
   if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
@@ -2923,10 +2927,8 @@ function chRate(v){
 function readFromSentenceGesture(si){
   // Show audio controls
   document.getElementById('actl').style.display = 'flex';
-  // Stop current audio cleanly (this also rebuilds DOM if needed)
-  if(syn) syn.cancel();
-  ++_ttsGen;  // invalidate any pending onend
-  clrHl(); updBtn();
+  // stopAudio increments _ttsGen and cancels — speakS will then do its own increment
+  stopAudio();
   // Now start from the requested sentence
   S.playing = true;
   speakS(si);
