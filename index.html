@@ -2560,20 +2560,65 @@ function cleanGutenberg(t){
 let _bmSaveTimer = null;
 
 // Build paragraph HTML with data-si word spans.
-// Simple approach: render each sentence as its own block, tagged with its index.
-// This guarantees data-si is always exactly correct.
+// Renders natural paragraphs (not one-per-sentence).
+// Each word span gets data-si = index of the sentence it belongs to,
+// computed by walking sentences through the paragraph text in order.
 function buildParaHtml(){
-  if(!S.sents.length) return '';
+  if(!S.paras.length) return '';
+
+  // Build a flat list of [word, sentenceIndex] pairs by walking
+  // through S.sents in document order and matching words greedily.
+  // We work on a normalised (lowercase, punctuation-stripped) version
+  // so abbreviations and punctuation don't break the matching.
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]/g,'');
+
+  // Flatten all paragraph words
+  const paraWords = [];
+  for(const para of S.paras){
+    const toks = para.split(/(\s+)/);
+    for(const t of toks){
+      if(/\S/.test(t)) paraWords.push(norm(t));
+    }
+  }
+
+  // For each paragraph word, find which sentence it belongs to
+  const wordSi = new Array(paraWords.length).fill(0);
+  let pIdx = 0; // current position in paraWords
+
+  for(let si = 0; si < S.sents.length && pIdx < paraWords.length; si++){
+    const sentToks = S.sents[si].split(/\s+/).map(norm).filter(w => w.length > 0);
+    // Try to find the start of this sentence in paraWords starting at pIdx
+    let matchStart = -1;
+    for(let p = pIdx; p < Math.min(pIdx + 30, paraWords.length); p++){
+      if(paraWords[p] === sentToks[0]){
+        matchStart = p; break;
+      }
+    }
+    if(matchStart < 0) matchStart = pIdx; // fallback
+    // Mark words from matchStart onwards as belonging to sentence si
+    for(let w = matchStart; w < Math.min(matchStart + sentToks.length + 3, paraWords.length); w++){
+      wordSi[w] = si;
+    }
+    pIdx = matchStart + sentToks.length;
+  }
+
+  // Render paragraphs, tagging each word span with its sentence index
   let html = '';
-  S.sents.forEach((sent, si) => {
-    const tokens = sent.split(/(\s+)/);
+  let globalIdx = 0;
+  for(const para of S.paras){
+    if(!para) continue;
+    const isH = para.length < 70 && !/[.,:;!?]/.test(para);
+    if(isH){ html += '<h3>' + esc(para) + '</h3>'; continue; }
+    const toks = para.split(/(\s+)/);
     html += '<p>';
-    tokens.forEach(tok => {
-      if(!/\S/.test(tok)){ html += tok; return; }
+    for(const tok of toks){
+      if(!/\S/.test(tok)){ html += tok; continue; }
+      const si = wordSi[globalIdx] ?? 0;
       html += `<span class="rw" data-si="${si}" onclick="clickW(this)">${esc(tok)}</span>`;
-    });
+      globalIdx++;
+    }
     html += '</p>';
-  });
+  }
   return html;
 }
 
