@@ -2448,7 +2448,7 @@ async function startRead(){
     // Open the reader NOW with the first ~1500 words
     S.raw   = firstWords;
     S.paras = firstWords.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-    S.sents = firstWords.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+    S.sents = splitSents(firstWords);
     renderReader();
     goTo('sr');
     appendLoadingFooter(true);  // show "Cargando más…" at bottom
@@ -2520,10 +2520,13 @@ function backgroundAppend(text, isFinal=false){
   const rc = document.getElementById('rc');
   if(!rc) return;
 
-  // Update state
+  // Update paras and raw, but only update sents if NOT currently playing
+  // (replacing S.sents mid-playback causes index corruption and jumps)
   S.raw   = text;
   S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-  S.sents = text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+  if(!S.playing){
+    S.sents = splitSents(text);
+  }
 
   // Save scroll position
   const pane      = document.getElementById('tpn');
@@ -2553,7 +2556,7 @@ function backgroundAppend(text, isFinal=false){
 async function finishLoad(text, mode, alreadyInReader=false){
   S.raw   = text;
   S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
-  S.sents = text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+  S.sents = splitSents(text);
   if(!alreadyInReader){ renderReader(); goTo('sr'); }
   else { renderReaderContent(); }
   showResumeBar();
@@ -2797,6 +2800,28 @@ function renderHist(){
       </div>`).join('') + '</div>';
 }
 
+// ── SENTENCE SPLITTER ──────────────────────────────────────────────
+// Split text into sentences suitable for TTS.
+// Rules:
+//  - Split on . ! ? followed by whitespace+capital OR end of string
+//  - Don't split on common abbreviations (Mr. Mrs. Dr. St. etc.)
+//  - Don't split if the char before . is a single uppercase letter (initials)
+//  - Minimum 15 chars per sentence to skip headers and stray fragments
+function splitSents(text){
+  if(!text) return [];
+  // Replace common abbreviations with a placeholder to avoid false splits
+  const abbrevs = ['Mr','Mrs','Dr','St','Prof','Jr','Sr','vs','etc','i.e','e.g','Fig','No','Vol'];
+  let t = text;
+  abbrevs.forEach(a => { t = t.replace(new RegExp(a+'\.','g'), a+'⊙'); });
+  // Also protect single uppercase initials (A. B. etc.)
+  t = t.replace(/\b([A-Z])\.\s/g, '$1⊙ ');
+  // Split on sentence-ending punctuation followed by space+capital or end
+  const raw = t.split(/(?<=[.!?]["\'»]?)\s+(?=[A-ZÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÑ"'])/);
+  return raw
+    .map(s => s.replace(/⊙/g, '.').trim())
+    .filter(s => s.length >= 15);
+}
+
 // ── WEB SPEECH TTS ──────────────────────────────────────────────────
 // Uses window.speechSynthesis (built into Chrome/Android/Safari)
 // No gesture restriction, no API key, works on GitHub Pages
@@ -2817,17 +2842,21 @@ function startAudio(){
   speakS(S.si);
 }
 
+let _ttsGen = 0; // incremented on every cancel — stale onend checks this
+
 function speakS(i){
   if(!syn) return;
   i = Math.max(0, Math.min(i, S.sents.length - 1));
   if(i >= S.sents.length){ S.playing=false; updBtn(); return; }
   S.si = i;
   hlSent(i);
+  const myGen = ++_ttsGen;   // this utterance's generation token
   const u = new SpeechSynthesisUtterance(S.sents[i]);
   u.lang = LMETA[S.lang].tts;
   u.rate = S.rate;
   const v = bestVoice(S.lang); if(v) u.voice = v;
   u.onend = ()=>{
+    if(myGen !== _ttsGen) return;   // stale — a newer speakS() already took over
     clrHl();
     if(S.playing){
       const next = S.si + 1;
@@ -2836,7 +2865,8 @@ function speakS(i){
     }
   };
   u.onerror = e=>{
-    if(e.error === 'interrupted') return;
+    if(myGen !== _ttsGen) return;
+    if(e.error === 'interrupted' || e.error === 'canceled') return;
     S.playing=false; updBtn();
   };
   syn.cancel();
