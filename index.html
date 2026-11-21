@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Libreo">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Aprende idiomas leyendo grandes obras en su idioma original">
+<title>Libreo</title>
+<link rel="manifest" id="manifest-link">
+<link rel="apple-touch-icon" id="apple-icon">
+<style>
+:root{
+  --bg:#0e1117;--sf:#161b25;--sf2:#1e2534;--bd:#2a3347;
+  --en:#4a9eff;--fr:#ff6b6b;--de:#f5a623;--pt:#4ade80;--it:#c084fc;--es:#fbbf24;
+  --ac:#4a9eff;--soft:rgba(74,158,255,.13);
+  --tx:#e8edf5;--dm:#8892a4;--dmr:#4a5568;
+  --gd:#f5c842;--gr:#4ade80;--r:14px;--rs:10px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:light){:root{
+  --bg:#f0f4fc;--sf:#fff;--sf2:#e8edf8;--bd:#d0d8ea;
+  --tx:#1a2035;--dm:#5a6882;--dmr:#9baabb;
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;background:var(--bg);}
+body{display:flex;flex-direction:column;min-height:100%;height:100%;
+  background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
+  overflow-x:hidden;
+  padding-top:var(--safe-t);padding-bottom:var(--safe-b);
+  -webkit-font-smoothing:antialiased;}
+.sc{display:none;flex-direction:column;flex:1;}
+.sc.on{display:flex;}
+
+/* ── INSTALL BANNER ── */
+#install-banner{display:none;align-items:center;gap:.75rem;padding:.75rem 1rem;
+  background:linear-gradient(135deg,rgba(74,158,255,.15),rgba(255,107,107,.1));
+  border-bottom:1px solid var(--bd);font-size:.82rem;}
+#install-banner.show{display:flex;}
+#install-banner p{flex:1;color:var(--tx);line-height:1.4;}
+#install-banner .ibtn{background:var(--ac);color:#fff;border:none;padding:.4rem .9rem;
+  border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+#install-banner .dismiss{background:none;color:var(--dm);border:none;
+  padding:.4rem .5rem;font-size:1rem;cursor:pointer;}
+
+/* ── LANG SELECT ── */
+#sl{align-items:center;justify-content:center;gap:1.6rem;
+  padding:1.5rem;min-height:0;flex:1;flex-wrap:wrap;overflow-y:auto;}
+.logo{text-align:center;width:100%;}
+.logo-icon{margin-bottom:.6rem;}
+.logo h1{font-family:Georgia,'Playfair Display',serif;
+  font-size:clamp(2.2rem,6vw,3.4rem);letter-spacing:-.03em;
+  background:linear-gradient(135deg,var(--en) 0%,var(--fr) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;}
+.logo p{color:var(--dm);margin-top:.4rem;font-size:.88rem;font-weight:300;
+  -webkit-text-fill-color:var(--dm);}
+.lcds{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;max-width:560px;}
+.lc{background:var(--sf);border:2px solid var(--bd);border-radius:var(--r);
+  padding:1.2rem 1.4rem;text-align:center;cursor:pointer;
+  transition:border-color .2s,transform .15s,box-shadow .2s;
+  min-width:110px;flex:1;max-width:150px;
+  -webkit-user-select:none;user-select:none;}
+.lc:active{transform:scale(.95);}
+.lc.en:hover,.lc.en:focus{border-color:var(--en);box-shadow:0 6px 24px rgba(74,158,255,.25);}
+.lc.fr:hover,.lc.fr:focus{border-color:var(--fr);box-shadow:0 6px 24px rgba(255,107,107,.25);}
+.lc.de:hover,.lc.de:focus{border-color:var(--de);box-shadow:0 6px 24px rgba(245,166,35,.25);}
+.lc.pt:hover,.lc.pt:focus{border-color:var(--pt);box-shadow:0 6px 24px rgba(74,222,128,.25);}
+.lc.it:hover,.lc.it:focus{border-color:var(--it);box-shadow:0 6px 24px rgba(192,132,252,.25);}
+.lc.es:hover,.lc.es:focus{border-color:var(--es);box-shadow:0 6px 24px rgba(251,191,36,.25);}
+.lf{font-size:2.2rem;margin-bottom:.4rem;}
+.ln{font-family:Georgia,serif;font-size:1.1rem;font-weight:700;}
+.ld{color:var(--dm);font-size:.72rem;margin-top:.12rem;}
+
+/* ── LIBRARY ── */
+#sb{flex-direction:column;}
+.topbar{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);
+  position:sticky;top:0;z-index:10;flex-shrink:0;}
+.bbtn{background:none;border:1px solid var(--bd);color:var(--dm);
+  padding:.4rem .8rem;border-radius:var(--rs);cursor:pointer;font-size:.82rem;
+  transition:all .15s;min-height:36px;-webkit-user-select:none;user-select:none;}
+.bbtn:active{background:var(--sf2);}
+.tt{font-family:Georgia,serif;font-size:1.1rem;flex:1;}
+.bdg{padding:.28rem .65rem;border-radius:20px;font-size:.78rem;font-weight:600;}
+.bdg.en{background:rgba(74,158,255,.13);color:var(--en);}
+.bdg.fr{background:rgba(255,107,107,.13);color:var(--fr);}
+.bdg.de{background:rgba(245,166,35,.13);color:var(--de);}
+.bdg.pt{background:rgba(74,222,128,.13);color:var(--pt);}
+.bdg.it{background:rgba(192,132,252,.13);color:var(--it);}
+.bdg.es{background:rgba(251,191,36,.13);color:var(--es);}
+.lby{padding:1.2rem;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.cs{margin-bottom:2rem;}
+.ch{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;}
+.ct{font-family:Georgia,serif;font-size:1.05rem;}
+.cd{color:var(--dm);font-size:.74rem;margin-left:auto;}
+.bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.8rem;}
+@media(max-width:380px){.bg{grid-template-columns:1fr 1fr;}}
+.bc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);
+  padding:1rem;cursor:pointer;
+  transition:border-color .2s,transform .1s,box-shadow .15s;
+  position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;}
+.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.bc.a1::before,.bc.a2::before{background:var(--gr);}
+.bc.b1::before,.bc.b2::before{background:var(--gd);}
+.bc.c1::before,.bc.c2::before{background:var(--fr);}
+.bc:active{transform:scale(.97);background:var(--sf2);}
+.btt{font-family:Georgia,serif;font-size:.88rem;line-height:1.35;margin-bottom:.3rem;}
+.ba{color:var(--dm);font-size:.74rem;margin-bottom:.6rem;}
+.bm{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+.lp{font-size:.67rem;font-weight:600;padding:.14rem .38rem;border-radius:4px;}
+.a1,.a2{background:rgba(74,222,128,.15);color:#4ade80;}
+.b1,.b2{background:rgba(245,200,66,.15);color:#f5c842;}
+.c1,.c2{background:rgba(255,107,107,.15);color:#ff6b6b;}
+.sp{font-size:.65rem;padding:.14rem .38rem;border-radius:4px;
+  background:rgba(74,158,255,.12);color:var(--en);}
+.bdsc{color:var(--dm);font-size:.73rem;margin-top:.42rem;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+/* ── MODE SELECT ── */
+#sm{align-items:center;justify-content:center;gap:1.5rem;
+  padding:2rem;flex:1;overflow-y:auto;}
+.mbt{font-family:Georgia,serif;font-size:1.3rem;text-align:center;
+  max-width:340px;line-height:1.4;}
+.mba{color:var(--dm);text-align:center;margin-top:.3rem;font-size:.88rem;}
+.mcs{display:flex;gap:1.2rem;flex-wrap:wrap;justify-content:center;}
+.mc{background:var(--sf);border:2px solid var(--bd);border-radius:var(--r);
+  padding:1.6rem;text-align:center;cursor:pointer;
+  transition:border-color .2s,transform .1s;
+  min-width:140px;flex:1;max-width:180px;
+  -webkit-user-select:none;user-select:none;}
+.mc:active{transform:scale(.95);background:var(--sf2);}
+.mi{font-size:2.2rem;margin-bottom:.6rem;}
+.ml{font-weight:600;font-size:.95rem;}
+.ms{color:var(--dm);font-size:.76rem;margin-top:.25rem;line-height:1.4;}
+
+/* ── READER ── */
+#sr{flex-direction:column;height:100%;overflow:hidden;}
+.rtb{display:flex;align-items:center;gap:.6rem;padding:.6rem .9rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);
+  flex-shrink:0;min-height:50px;}
+.rtl{font-family:Georgia,serif;font-size:.86rem;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.actl{display:flex;align-items:center;gap:.35rem;flex-shrink:0;}
+.cb{background:none;border:1px solid var(--bd);color:var(--dm);
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.88rem;
+  transition:all .15s;-webkit-user-select:none;user-select:none;flex-shrink:0;}
+.cb:active{background:var(--sf2);}
+.cb.pon{border-color:var(--ac);color:var(--ac);background:var(--soft);}
+.rsel{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  padding:.3rem .35rem;border-radius:var(--rs);font-size:.74rem;
+  cursor:pointer;height:36px;}
+.rm{flex:1;overflow:hidden;display:flex;}
+.tpn{flex:1;overflow-y:auto;
+  padding:1.5rem clamp(.8rem,4vw,3rem);
+  -webkit-overflow-scrolling:touch;}
+.rc{max-width:65ch;margin:0 auto;}
+.rc p{font-family:Georgia,'Playfair Display',serif;
+  font-size:clamp(1rem,2.5vw,1.12rem);line-height:1.95;margin-bottom:1.2em;}
+.rc h2,.rc h3{font-family:Georgia,serif;font-weight:700;
+  margin:1.5em 0 .5em;font-size:1.05rem;}
+.rw{cursor:pointer;border-radius:3px;padding:2px 1px;
+  transition:background .1s,color .1s;
+  -webkit-user-select:none;user-select:none;}
+.rw:hover,.rw:focus{background:var(--soft);color:var(--ac);}
+.rw.hl{background:var(--soft);color:var(--ac);}
+.rw.sk{background:rgba(245,200,66,.3);color:var(--gd);}
+.font-sm .rc p{font-size:.93rem;}
+.font-lg .rc p{font-size:1.26rem;}
+
+/* ── TRANS PANEL ── */
+.tp2{width:280px;background:var(--sf);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;flex-shrink:0;
+  transition:width .25s;overflow:hidden;}
+.tp2.clo{width:0;}
+.th{padding:.8rem .9rem;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:.5rem;}
+.th h3{font-size:.84rem;font-weight:600;flex:1;}
+.tcl{background:none;border:none;color:var(--dm);cursor:pointer;
+  font-size:1rem;padding:.2rem;min-width:28px;min-height:28px;}
+.tb{flex:1;overflow-y:auto;padding:.8rem .9rem;-webkit-overflow-scrolling:touch;}
+.tw{font-family:Georgia,serif;font-size:1.2rem;font-weight:700;
+  color:var(--ac);margin-bottom:.4rem;}
+.tld{color:var(--dm);font-size:.8rem;display:flex;align-items:center;gap:.5rem;}
+.sp2{width:13px;height:13px;border:2px solid var(--bd);
+  border-top-color:var(--ac);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.hs{margin-top:1.2rem;}
+.hs h4{font-size:.7rem;color:var(--dmr);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:.6rem;}
+.hi{padding:.5rem;border-radius:var(--rs);background:var(--sf2);
+  margin-bottom:.4rem;cursor:pointer;-webkit-user-select:none;user-select:none;}
+.hi:active{background:var(--bd);}
+.ho{font-size:.8rem;font-weight:600;color:var(--ac);}
+.ht{font-size:.75rem;color:var(--dm);margin-top:.05rem;}
+
+.pb{height:3px;background:var(--bd);flex-shrink:0;}
+.pf{height:100%;background:var(--ac);width:0%;transition:width .3s;}
+
+/* ── LOADING ── */
+#sld{align-items:center;justify-content:center;gap:1rem;flex:1;}
+.lsp{width:40px;height:40px;border:3px solid var(--bd);
+  border-top-color:var(--ac);border-radius:50%;
+  animation:spin .9s linear infinite;}
+.ltx{color:var(--dm);font-size:.9rem;text-align:center;padding:0 2rem;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(1.5rem + var(--safe-b));left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  padding:.6rem 1.2rem;border-radius:20px;font-size:.82rem;z-index:300;
+  transition:transform .3s;pointer-events:none;
+  max-width:88vw;text-align:center;line-height:1.4;}
+.toast.on{transform:translateX(-50%) translateY(0);}
+
+/* ── FAB ── */
+.fab{display:none;position:fixed;right:1rem;
+  bottom:calc(1.2rem + var(--safe-b));
+  background:var(--ac);color:#fff;border:none;width:44px;height:44px;
+  border-radius:50%;cursor:pointer;font-size:1.1rem;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:30;
+  align-items:center;justify-content:center;transition:transform .15s;}
+.fab:active{transform:scale(.9);}
+
+@media(max-width:620px){
+  .tp2{position:fixed;bottom:0;left:0;right:0;width:100%!important;
+    height:min(60vh,400px);border-left:none;border-top:1px solid var(--bd);
+    border-radius:16px 16px 0 0;z-index:40;
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);}
+  .tp2.mob{transform:translateY(0);}
+  .tp2.clo{width:100%!important;transform:translateY(100%);}
+  .fab{display:flex;}
+  .rsel{font-size:.7rem;}
+}
+
+/* ── FONT SIZE LEVELS ── */
+.rc p{transition:font-size .15s;}
+.fs0 .rc p{font-size:.85rem;}
+.fs1 .rc p{font-size:.95rem;}
+.fs2 .rc p{font-size:1.05rem;}
+.fs3 .rc p{font-size:1.18rem;}
+.fs4 .rc p{font-size:1.35rem;}
+
+/* ── LOAD PROGRESS BAR ── */
+#load-bar-wrap{position:fixed;top:0;left:0;right:0;height:3px;z-index:200;display:none;}
+#load-bar-wrap.show{display:block;}
+#load-bar{height:100%;width:0%;background:var(--ac);transition:width .4s ease;}
+
+/* ── RESUME BADGE on book cards ── */
+.resume-badge{position:absolute;top:6px;right:6px;
+  background:var(--ac);color:#fff;font-size:.6rem;font-weight:700;
+  padding:.15rem .4rem;border-radius:6px;letter-spacing:.03em;}
+
+/* ── RESUME TOAST ── */
+#resume-bar{display:none;align-items:center;gap:.7rem;padding:.6rem 1rem;
+  background:var(--sf2);border-bottom:1px solid var(--bd);font-size:.82rem;flex-shrink:0;}
+#resume-bar.show{display:flex;}
+#resume-bar span{flex:1;color:var(--tx);}
+#resume-bar button{background:var(--ac);color:#fff;border:none;
+  padding:.35rem .8rem;border-radius:14px;font-size:.78rem;font-weight:600;cursor:pointer;}
+#resume-bar .skip{background:none;color:var(--dm);font-size:.8rem;cursor:pointer;border:none;}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <p>📱 Instala <strong>Libreo</strong> como app en tu móvil</p>
+  <button class="ibtn" onclick="installApp()">Instalar</button>
+  <button class="dismiss" onclick="document.getElementById('install-banner').classList.remove('show')" aria-label="Cerrar">✕</button>
+</div>
+
+<!-- LANG SELECT -->
+<div id="sl" class="sc on">
+  <div class="logo">
+    <div class="logo-icon" id="logo-svg"></div>
+    <h1>Libreo</h1>
+    <p>Aprende idiomas leyendo obras en su idioma original</p>
+  </div>
+  <div class="lcds">
+    <div class="lc en" onclick="selLang('en')" tabindex="0"><div class="lf">🇬🇧</div><div class="ln">English</div><div class="ld">Inglés · A2–C1</div></div>
+    <div class="lc es" onclick="selLang('es')" tabindex="0"><div class="lf">🇪🇸</div><div class="ln">Español</div><div class="ld">Español · A2–C2</div></div>
+    <div class="lc fr" onclick="selLang('fr')" tabindex="0"><div class="lf">🇫🇷</div><div class="ln">Français</div><div class="ld">Francés · B1–C2</div></div>
+    <div class="lc de" onclick="selLang('de')" tabindex="0"><div class="lf">🇩🇪</div><div class="ln">Deutsch</div><div class="ld">Alemán · B1–C2</div></div>
+    <div class="lc pt" onclick="selLang('pt')" tabindex="0"><div class="lf">🇵🇹</div><div class="ln">Português</div><div class="ld">Portugués · B1–C1</div></div>
+    <div class="lc it" onclick="selLang('it')" tabindex="0"><div class="lf">🇮🇹</div><div class="ln">Italiano</div><div class="ld">Italiano · A2–C2</div></div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div id="sb" class="sc">
+  <div class="topbar">
+    <button class="bbtn" onclick="goTo('sl')">← Idiomas</button>
+    <span class="tt">Biblioteca</span>
+    <span id="bdg" class="bdg"></span>
+  </div>
+  <div class="lby" id="lby"></div>
+</div>
+
+<!-- MODE SELECT -->
+<div id="sm" class="sc">
+  <button class="bbtn" style="align-self:flex-start;margin:1rem 1.2rem;" onclick="goTo('sb')">← Biblioteca</button>
+  <div class="mbt" id="mtitle"></div>
+  <div class="mba" id="mauth"></div>
+  <div class="mcs">
+    <div class="mc" onclick="startRead('read')">
+      <div class="mi">📖</div><div class="ml">Leer</div>
+      <div class="ms">Texto interactivo.<br>Toca una palabra<br>para traducirla</div>
+    </div>
+    <div class="mc" onclick="startRead('audio')">
+      <div class="mi">🎧</div><div class="ml">Audiolibro</div>
+      <div class="ms">Narración en el<br>idioma original<br>con texto sincronizado</div>
+    </div>
+  </div>
+</div>
+
+<!-- Global loading progress bar -->
+<div id="load-bar-wrap"><div id="load-bar"></div></div>
+
+<!-- READER -->
+<div id="sr" class="sc">
+  <div id="resume-bar">
+    <span id="resume-msg"></span>
+    <button onclick="jumpToBookmark()">Continuar</button>
+    <button class="skip" onclick="dismissResume()">Desde el principio</button>
+  </div>
+  <div class="rtb">
+    <button class="bbtn" onclick="exitR()">←</button>
+    <span class="rtl" id="rtl"></span>
+    <div class="actl" id="actl" style="display:none">
+      <button class="cb" onclick="prevS()" title="Anterior">⏮</button>
+      <button class="cb" id="bplay" onclick="togPlay()">▶</button>
+      <button class="cb" onclick="nextS()" title="Siguiente">⏭</button>
+      <select class="rsel" id="rsel" onchange="chRate(this.value)">
+        <option value="0.7">0.7×</option>
+        <option value="0.85">0.85×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.2">1.2×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </div>
+    <button class="cb" onclick="cycleFont()" title="Tamaño texto">Aa</button>
+    <button class="cb" onclick="togPanel()" title="Traducción">📝</button>
+  </div>
+  <div class="pb"><div class="pf" id="pf"></div></div>
+  <div class="rm">
+    <div class="tpn" id="tpn"><div class="rc" id="rc"></div></div>
+    <div class="tp2" id="tpanel">
+      <div class="th">
+        <h3>🌐 Traducción</h3>
+        <button class="tcl" onclick="togPanel()">✕</button>
+      </div>
+      <div class="tb" id="tbody">
+        <p style="color:var(--dm);font-size:.82rem;line-height:1.65">
+          Toca una palabra o selecciona una frase para ver su traducción.
+        </p>
+      </div>
+    </div>
+  </div>
+  <button class="fab" onclick="togMob()">📝</button>
+</div>
+
+<!-- LOADING -->
+<div id="sld" class="sc">
+  <div class="lsp"></div>
+  <div class="ltx" id="ltx">Cargando…</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// ICONO: libro + candado abierto
+// ═══════════════════════════════════════════════
+const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo redondeado -->
+  <rect width="512" height="512" rx="96" fill="#161b25"/>
+
+  <!-- Libro (páginas izquierda) -->
+  <rect x="80" y="140" width="156" height="240" rx="12" fill="#1e2a3d"/>
+  <rect x="80" y="140" width="156" height="240" rx="12" fill="none" stroke="#4a9eff" stroke-width="6"/>
+  <!-- Lomo izquierdo -->
+  <rect x="224" y="140" width="14" height="240" rx="4" fill="#2a3a55"/>
+  <!-- Líneas de páginas izquierda -->
+  <line x1="104" y1="195" x2="210" y2="195" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="104" y1="225" x2="210" y2="225" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="104" y1="255" x2="210" y2="255" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="104" y1="285" x2="210" y2="285" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="104" y1="315" x2="210" y2="315" stroke="#4a9eff" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+
+  <!-- Libro (páginas derecha) -->
+  <rect x="238" y="140" width="156" height="240" rx="12" fill="#1e2a3d"/>
+  <rect x="238" y="140" width="156" height="240" rx="12" fill="none" stroke="#ff6b6b" stroke-width="6"/>
+  <!-- Lomo derecho -->
+  <rect x="238" y="140" width="14" height="240" rx="4" fill="#2a3a55"/>
+  <!-- Líneas de páginas derecha -->
+  <line x1="268" y1="195" x2="374" y2="195" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="268" y1="225" x2="374" y2="225" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="268" y1="255" x2="374" y2="255" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="268" y1="285" x2="374" y2="285" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+  <line x1="268" y1="315" x2="374" y2="315" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+
+  <!-- Candado abierto (esquina superior derecha del libro) -->
+  <!-- Cuerpo del candado -->
+  <rect x="330" y="290" width="110" height="88" rx="14" fill="#f5c842"/>
+  <!-- Agujero del candado -->
+  <circle cx="385" cy="326" r="14" fill="#161b25"/>
+  <rect x="378" y="326" width="14" height="22" rx="4" fill="#161b25"/>
+  <!-- Arco del candado ABIERTO (desplazado hacia arriba-derecha) -->
+  <path d="M355 290 L355 248 Q355 210 393 210 Q431 210 431 248 L431 275"
+        fill="none" stroke="#f5c842" stroke-width="20" stroke-linecap="round"/>
+</svg>`;
+
+// ════════════════════════════════════════════
+// PWA SETUP
+// ════════════════════════════════════════════
+function setupPWA(){
+  // Render logo in page
+  document.getElementById('logo-svg').innerHTML = ICON_SVG.replace(
+    'viewBox="0 0 512 512"','viewBox="0 0 512 512" width="80" height="80"');
+
+  // Icon blob
+  const iconBlob = new Blob([ICON_SVG],{type:'image/svg+xml'});
+  const iconUrl  = URL.createObjectURL(iconBlob);
+  document.getElementById('apple-icon').href = iconUrl;
+
+  // Manifest
+  const manifest = {
+    name:"Libreo",
+    short_name:"Libreo",
+    description:"Aprende idiomas leyendo grandes obras en su idioma original",
+    start_url:"./",
+    display:"standalone",
+    background_color:"#0e1117",
+    theme_color:"#0e1117",
+    orientation:"any",
+    lang:"es",
+    icons:[
+      {src:iconUrl,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"},
+      {src:iconUrl,sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},
+    ]
+  };
+  const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  document.getElementById('manifest-link').href = URL.createObjectURL(mBlob);
+
+  // Service Worker — cache libros y traducciones
+  if('serviceWorker' in navigator){
+    const swCode = `
+const CACHE = 'libreo-v1';
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks =>
+    Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  const cacheable = url.hostname === 'raw.githubusercontent.com'
+                 || url.hostname.includes('mymemory');
+  if(!cacheable) return;
+  e.respondWith(
+    caches.open(CACHE).then(cache =>
+      cache.match(e.request).then(hit => {
+        if(hit) return hit;
+        return fetch(e.request).then(res => {
+          if(res.ok) cache.put(e.request, res.clone());
+          return res;
+        }).catch(() => hit || new Response('Offline',{status:503}));
+      })
+    )
+  );
+});`;
+    const swBlob = new Blob([swCode],{type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob),{scope:'./'})
+      .catch(()=>{});
+  }
+}
+
+// Install prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('show');
+});
+function installApp(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(()=>{ deferredPrompt = null; });
+}
+
+// ════════════════════════════════════════════
+// CATÁLOGO — todos verificados en idioma original
+// ════════════════════════════════════════════
+const G = "https://raw.githubusercontent.com/GITenberg/";
+
+const BOOKS = {
+  en:[
+    {cat:"Clásicos para comenzar 🌱",desc:"A2–B1",books:[
+      {id:"alice",   title:"Alice's Adventures in Wonderland",author:"Lewis Carroll",   lv:"a2",desc:"Un mundo fantástico de lógica absurda.",
+       url:G+"Alice-s-Adventures-in-Wonderland_11/master/11.txt"},
+      {id:"wizard",  title:"The Wonderful Wizard of Oz",      author:"L. Frank Baum",  lv:"a2",desc:"Dorothy y sus amigos rumbo a Oz.",
+       url:G+"The-Wonderful-Wizard-of-Oz_55/master/55.txt"},
+      {id:"secret",  title:"The Secret Garden",               author:"F. H. Burnett",  lv:"b1",desc:"Una niña descubre un jardín mágico.",
+       url:G+"The-Secret-Garden_17396/master/17396.txt"},
+    ]},
+    {cat:"Aventura y acción ⚔️",desc:"B1–C1",books:[
+      {id:"treasure",title:"Treasure Island",                 author:"R. L. Stevenson",lv:"b1",desc:"Piratas, tesoros y aventura en alta mar.",
+       url:G+"Treasure-Island_120/master/120.txt"},
+      {id:"wild",    title:"The Call of the Wild",            author:"Jack London",    lv:"b1",desc:"Un perro en la fiebre del oro de Alaska.",
+       url:G+"The-Call-of-the-Wild_215/master/215.txt"},
+      {id:"moby",    title:"Moby-Dick",                       author:"Herman Melville",lv:"c1",desc:"La obsesiva caza de la ballena blanca.",
+       url:G+"Moby-Dick--Or-The-Whale_2701/master/2701.txt"},
+    ]},
+    {cat:"Gótico y misterio 🕯️",desc:"B2",books:[
+      {id:"frank",   title:"Frankenstein",                    author:"Mary Shelley",   lv:"b2",desc:"El científico y su criatura: génesis del horror.",
+       url:G+"Frankenstein_84/master/84.txt"},
+      {id:"dracula", title:"Dracula",                         author:"Bram Stoker",    lv:"b2",desc:"El conde vampiro de Transilvania.",
+       url:G+"Dracula_345/master/345.txt"},
+      {id:"jekyll",  title:"Dr Jekyll and Mr Hyde",           author:"R. L. Stevenson",lv:"b2",desc:"La dualidad entre el bien y el mal.",
+       url:G+"The-Strange-Case-of-Dr.-Jekyll-and-Mr.-Hyde_42/master/42.txt"},
+    ]},
+    {cat:"Ciencia ficción 🚀",desc:"B1–B2",books:[
+      {id:"time",    title:"The Time Machine",                author:"H. G. Wells",    lv:"b2",desc:"Un viaje a los confines del futuro.",
+       url:G+"The-Time-Machine_35/master/35.txt"},
+      {id:"war",     title:"The War of the Worlds",           author:"H. G. Wells",    lv:"b2",desc:"La invasión marciana de la Tierra.",
+       url:G+"The-War-of-the-Worlds_36/master/36.txt"},
+      {id:"journey", title:"Journey to the Centre of the Earth",author:"Jules Verne", lv:"b1",desc:"Exploración al interior del planeta.",
+       url:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857.txt"},
+    ]},
+  ],
+
+  es:[
+    {cat:"Clásicos del Siglo de Oro 🌹",desc:"B2–C2",books:[
+      {id:"quijote",  title:"Don Quijote de la Mancha",       author:"Miguel de Cervantes",  lv:"c1",desc:"El ingenioso hidalgo que confundía los molinos con gigantes.",
+       url:G+"Don-Quijote_2000/master/2000-8.txt",enc:"latin1"},
+      {id:"lazarillo",title:"Lazarillo de Tormes",            author:"Anónimo",              lv:"b2",desc:"El primer pícaro de la literatura española.",
+       url:G+"Vida-De-Lazarillo-De-Tormes-Y-De-Sus-Fortunas-Y-Adversidades_320/master/320-8.txt",enc:"latin1"},
+      {id:"quevedo",  title:"Los Sueños",                     author:"Francisco de Quevedo", lv:"c1",desc:"Visiones satíricas del infierno y la sociedad.",
+       url:G+"Los-suenos-Vol-1_65999/master/65999-0.txt"},
+      {id:"calderon", title:"Teatro selecto",                 author:"Calderón de la Barca", lv:"c1",desc:"La vida es sueño y otras obras cumbre del barroco.",
+       url:G+"Teatro-selecto-tomo-1-de-4_54436/master/54436-0.txt"},
+      {id:"lope",     title:"Comedias escogidas",             author:"Lope de Vega",         lv:"c1",desc:"El Fénix de los ingenios: comedia nueva.",
+       url:G+"Comedias--El-remedio-en-la-desdicha--El-mejor-alcalde-el-rey_28408/master/28408-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Realismo y Romanticismo 🏛️",desc:"B2–C1",books:[
+      {id:"becquer",  title:"Obras escogidas",                author:"Gustavo A. Bécquer",   lv:"b2",desc:"Rimas y Leyendas: la poesía romántica más pura.",
+       url:G+"Obras-escogidas_53552/master/53552-8.txt",enc:"latin1"},
+      {id:"regenta",  title:"La Regenta",                     author:"Leopoldo Alas «Clarín»",lv:"c1",desc:"La novela realista española más ambiciosa.",
+       url:G+"La-Regenta_17073/master/17073-8.txt",enc:"latin1"},
+      {id:"fortunata",title:"Fortunata y Jacinta",            author:"Benito Pérez Galdós",  lv:"c1",desc:"Dos historias de casadas en el Madrid del XIX.",
+       url:G+"Fortunata-y-Jacintados-historias-de-casadas_17013/master/17013-8.txt",enc:"latin1"},
+      {id:"marianela",title:"Marianela",                      author:"Benito Pérez Galdós",  lv:"b2",desc:"El amor y la belleza en el realismo de Galdós.",
+       url:G+"Marianela_17340/master/17340-8.txt",enc:"latin1"},
+      {id:"pepita",   title:"Pepita Jiménez",                 author:"Juan Valera",          lv:"b2",desc:"El amor de un seminarista en la Andalucía romántica.",
+       url:G+"Pepita-Jim-nez_17223/master/17223-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Pardo Bazán y naturalismo 🌊",desc:"B2–C1",books:[
+      {id:"cuentos",  title:"Cuentos de amor",                author:"Emilia Pardo Bazán",   lv:"b2",desc:"El naturalismo con mirada femenina.",
+       url:G+"Cuentos-de-amor_55514/master/55514-0.txt"},
+      {id:"dueno",    title:"Dulce Dueño",                    author:"Emilia Pardo Bazán",   lv:"c1",desc:"Mística y modernismo en la mejor Pardo Bazán.",
+       url:G+"Dulce-Dueno_56044/master/56044-0.txt"},
+    ]},
+  ],
+
+  fr:[
+    {cat:"Romans d'aventure ⚔️",desc:"B1–B2",books:[
+      {id:"mousq",    title:"Les Trois Mousquetaires",         author:"Alexandre Dumas",  lv:"b1",desc:"D'Artagnan y los mosqueteros del rey.",
+       url:G+"Les-trois-mousquetaires_13951/master/13951-8.txt",enc:"latin1"},
+      {id:"notredame",title:"Notre-Dame de Paris",             author:"Victor Hugo",      lv:"b2",desc:"El jorobado y la catedral en el París medieval.",
+       url:G+"Notre-Dame-de-Paris_19657/master/19657-8.txt",enc:"latin1"},
+      {id:"verne_fr", title:"Vingt mille lieues sous les mers",author:"Jules Verne",      lv:"b2",desc:"El capitán Nemo bajo el océano.",
+       url:G+"Vingt-mille-Lieues-Sous-Les-Mers---Complete_5097/master/5097-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Grands classiques 🏛️",desc:"C1–C2",books:[
+      {id:"miser",    title:"Les Misérables",                  author:"Victor Hugo",      lv:"c1",desc:"Jean Valjean y la Francia del siglo XIX.",
+       url:G+"Les-mis-rables-Tome-I--13-Fantine_17489/master/17489-8.txt",enc:"latin1"},
+      {id:"germ",     title:"Germinal",                        author:"Émile Zola",      lv:"c1",desc:"Los mineros y la lucha de clases.",
+       url:G+"Germinal_5711/master/5711-8.txt",enc:"latin1"},
+      {id:"bovary",   title:"Madame Bovary",                   author:"Gustave Flaubert",lv:"c1",desc:"Romanticismo y desilusión provincial.",
+       url:G+"Madame-Bovary_14155/master/14155-8.txt",enc:"latin1"},
+      {id:"rouge",    title:"Le Rouge et le Noir",             author:"Stendhal",        lv:"c1",desc:"Ambición, amor e hipocresía en la Restauración.",
+       url:G+"Le-Rouge-et-le-noir--chronique-du-XIXe-si-cle_798/master/798-8.txt",enc:"latin1"},
+      {id:"educ",     title:"L'Éducation sentimentale",        author:"Gustave Flaubert",lv:"c1",desc:"El desengaño de un joven en el París del XIX.",
+       url:G+"OEuvres-completes-de-Gustave-Flaubert-tome-4-L-education-sentimentale-v-2_52893/master/52893-0.txt"},
+    ]},
+    {cat:"Théâtre 🎭",desc:"B2",books:[
+      {id:"cyrano",   title:"Cyrano de Bergerac",              author:"Edmond Rostand",  lv:"b2",desc:"Amor, honor y el arte de la palabra.",
+       url:G+"Cyrano-de-Bergerac_1256/master/1256-8.txt",enc:"latin1"},
+    ]},
+  ],
+
+  de:[
+    {cat:"Klassische Literatur 🏛️",desc:"B2–C1",books:[
+      {id:"werther",   title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"El amor imposible que conmocionó Europa.",
+       url:G+"Die-Leiden-des-jungen-Werther---Band-1_2407/master/2407-8.txt",enc:"latin1"},
+      {id:"siddh",     title:"Siddhartha — eine indische Dichtung",author:"Hermann Hesse",lv:"b2",desc:"La búsqueda espiritual del joven Siddhartha.",
+       url:G+"Siddhartha--eine-indische-Dichtung_2499/master/2499-8.txt",enc:"latin1"},
+      {id:"faust",     title:"Faust — Der Tragödie erster Teil",author:"J. W. von Goethe",lv:"c1",desc:"El pacto de Fausto con Mefistófeles.",
+       url:G+"Faust--Der-Trag-die-erster-Teil_2229/master/2229-8.txt",enc:"latin1"},
+      {id:"zara",      title:"Also sprach Zarathustra",         author:"F. Nietzsche",    lv:"c2",desc:"La obra filosófica más influyente de Nietzsche.",
+       url:G+"Also-sprach-Zarathustra--Ein-Buch-f-r-Alle-und-Keinen_7205/master/7205-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Franz Kafka 🪲",desc:"B2–C1",books:[
+      {id:"verwandlung",title:"Die Verwandlung",               author:"Franz Kafka",     lv:"b2",desc:"Gregor Samsa amanece convertido en un insecto.",
+       url:G+"Die-Verwandlung_22367/master/22367-8.txt",enc:"latin1"},
+      {id:"strafk",    title:"In der Strafkolonie",             author:"Franz Kafka",    lv:"c1",desc:"Una máquina de tortura en una colonia penal.",
+       url:G+"In-der-Strafkolonie_25791/master/25791-0.txt"},
+    ]},
+  ],
+
+  pt:[
+    {cat:"Machado de Assis 🏛️",desc:"B1–B2",books:[
+      {id:"casmurro",title:"Dom Casmurro",                    author:"Machado de Assis", lv:"b1",desc:"¿Fue Capitu realmente infiel?",
+       url:G+"Dom-Casmurro_55752/master/55752-8.txt",enc:"latin1"},
+      {id:"quincas", title:"Quincas Borba",                   author:"Machado de Assis", lv:"b2",desc:"El humanitismo y la locura según Machado.",
+       url:G+"Quincas-Borba_55682/master/55682-8.txt",enc:"latin1"},
+      {id:"helena",  title:"Helena",                          author:"Machado de Assis", lv:"b1",desc:"Amor y secretos en la corte de Pedro II.",
+       url:G+"Helena_67162/master/67162-0.txt"},
+    ]},
+    {cat:"Eça de Queirós 📚",desc:"B2–C1",books:[
+      {id:"amaro",   title:"O Crime do Padre Amaro",           author:"Eça de Queirós",  lv:"b2",desc:"Crítica a la hipocresía clerical en Portugal.",
+       url:G+"O-crime-do-padre-Amaro-scenas-da-vida-devota_31971/master/31971-8.txt",enc:"latin1"},
+      {id:"mandarin",title:"O Mandarim",                      author:"Eça de Queirós",  lv:"b2",desc:"Un empleado vende su alma por una herencia.",
+       url:G+"O-Mandarim_16384/master/16384-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Poesia épica 🎭",desc:"C2",books:[
+      {id:"lusiadas",title:"Os Lusíadas",                     author:"Luís de Camões",  lv:"c2",desc:"La epopeya del descubrimiento de Portugal.",
+       url:G+"Os-Lus-adas_3333/master/3333-8.txt",enc:"latin1"},
+    ]},
+  ],
+
+  it:[
+    {cat:"Prime letture 🌱",desc:"A2–B1",books:[
+      {id:"pinocchio",title:"Le avventure di Pinocchio",       author:"Carlo Collodi",    lv:"a2",desc:"Il burattino di legno che voleva diventare bambino.",
+       url:G+"Le-avventure-di-Pinocchio-Storia-di-un-burattino_52484/master/52484-0.txt"},
+    ]},
+    {cat:"Grandi classici 🏛️",desc:"B2–C1",books:[
+      {id:"promessi",title:"I Promessi Sposi",                 author:"Alessandro Manzoni",lv:"b2",desc:"El amor de Renzo y Lucia en el Milán del XVII.",
+       url:G+"I-promessi-sposiOpere-di-Alessando-Manzoni-vol.-1_45334/master/45334-8.txt",enc:"latin1"},
+      {id:"mistero", title:"Il mistero del poeta",             author:"Antonio Fogazzaro", lv:"b2",desc:"Amor y arte en la Italia decimonónica.",
+       url:G+"Il-mistero-del-poeta_22504/master/22504-8.txt",enc:"latin1"},
+    ]},
+    {cat:"Poesia italiana 🎭",desc:"C1–C2",books:[
+      {id:"canti",   title:"I Canti",                          author:"Giacomo Leopardi", lv:"c1",desc:"La poesía más pura del Romanticismo italiano.",
+       url:G+"I-Canti_55236/master/55236-0.txt"},
+      {id:"inferno", title:"Divina Commedia — Inferno",        author:"Dante Alighieri",  lv:"c2",desc:"Nel mezzo del cammin di nostra vita…",
+       url:G+"Divina-Commedia-di-Dante-Inferno_997/master/997.txt",enc:"latin1"},
+    ]},
+  ],
+};
+
+const TRANS_TARGET = {en:'es',es:'en',fr:'es',de:'es',pt:'es',it:'es'};
+const TRANS_LABEL  = {en:'español',es:'inglés',fr:'español',de:'español',pt:'español',it:'español'};
+
+const LMETA = {
+  en:{flag:"🇬🇧",badge:"🇬🇧 English",   rgb:"74,158,255",  tts:"en-GB"},
+  es:{flag:"🇪🇸",badge:"🇪🇸 Español",   rgb:"251,191,36",  tts:"es-ES"},
+  fr:{flag:"🇫🇷",badge:"🇫🇷 Français",  rgb:"255,107,107", tts:"fr-FR"},
+  de:{flag:"🇩🇪",badge:"🇩🇪 Deutsch",   rgb:"245,166,35",  tts:"de-DE"},
+  pt:{flag:"🇵🇹",badge:"🇵🇹 Português", rgb:"74,222,128",  tts:"pt-PT"},
+  it:{flag:"🇮🇹",badge:"🇮🇹 Italiano",  rgb:"192,132,252", tts:"it-IT"},
+};
+
+// ── STATE ──
+const S = {
+  lang:null, book:null, mode:'read',
+  raw:'', paras:[], sents:[], si:0,
+  playing:false, rate:1,
+  cache:{}, hist:[], panelOpen:true, fontSize:1
+};
+
+// ── NAVIGATION ──
+function goTo(id){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function selLang(lang){
+  S.lang=lang; S.cache={}; S.hist=[];
+  const m=LMETA[lang], r=document.documentElement;
+  r.style.setProperty('--ac',`rgb(${m.rgb})`);
+  r.style.setProperty('--soft',`rgba(${m.rgb},.13)`);
+  const b=document.getElementById('bdg');
+  b.className='bdg '+lang; b.textContent=m.badge;
+  renderLib(lang); goTo('sb');
+}
+
+
+
+function selBook(id){
+  const b = (BOOKS[S.lang]||[]).flatMap(c=>c.books).find(x=>x.id===id);
+  if(!b) return;
+  S.book = b;
+  document.getElementById('mtitle').textContent = b.title;
+  document.getElementById('mauth').textContent  = b.author;
+  goTo('sm');
+}
+function exitR(){ stopAudio(); goTo('sm'); }
+
+// ── FONT SIZE — 5 levels, persistent ──
+const FONT_LEVELS = ['fs0','fs1','fs2','fs3','fs4'];
+const FONT_LABELS = ['A−−','A−','A','A+','A++'];
+
+function applyFont(level){
+  S.fontSize = level;
+  const body = document.body;
+  FONT_LEVELS.forEach(c => body.classList.remove(c));
+  body.classList.add(FONT_LEVELS[level]);
+  document.getElementById('font-btn').textContent = FONT_LABELS[level];
+  try { localStorage.setItem('libreo_font', level); } catch{}
+}
+
+function cycleFont(){
+  applyFont((S.fontSize + 1) % FONT_LEVELS.length);
+}
+
+function loadFont(){
+  try {
+    const saved = localStorage.getItem('libreo_font');
+    applyFont(saved !== null ? parseInt(saved) : 2); // default = middle (A)
+  } catch { applyFont(2); }
+}
+
+// ── BOOKMARK helpers ──
+function bmKey(){ return 'libreo_bm_' + S.lang + '_' + S.book.id; }
+
+function saveBookmark(){
+  const pane = document.getElementById('tpn');
+  if(!pane || !S.book) return;
+  const pct = pane.scrollHeight > pane.clientHeight
+    ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight)
+    : 0;
+  if(pct < 0.01) return; // don't save if still at the very top
+  try { localStorage.setItem(bmKey(), JSON.stringify({pct, ts: Date.now()})); } catch{}
+}
+
+function loadBookmark(){
+  try {
+    const raw = localStorage.getItem(bmKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function jumpToBookmark(){
+  const bm = loadBookmark();
+  if(!bm) return;
+  dismissResume();
+  const pane = document.getElementById('tpn');
+  setTimeout(()=>{
+    pane.scrollTop = bm.pct * (pane.scrollHeight - pane.clientHeight);
+    updProg();
+  }, 80);
+}
+
+function dismissResume(){
+  document.getElementById('resume-bar').classList.remove('show');
+}
+
+function showResumeBar(){
+  const bm = loadBookmark();
+  if(!bm || bm.pct < 0.02) return;
+  const pct = Math.round(bm.pct * 100);
+  const ago = relTime(bm.ts);
+  document.getElementById('resume-msg').textContent =
+    `Ibas por el ${pct}% — ${ago}`;
+  document.getElementById('resume-bar').classList.add('show');
+}
+
+function relTime(ts){
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff/60000);
+  if(mins < 2)   return 'hace un momento';
+  if(mins < 60)  return `hace ${mins} min`;
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24)   return `hace ${hrs}h`;
+  return `hace ${Math.floor(hrs/24)} día${Math.floor(hrs/24)>1?'s':''}`;
+}
+
+// ── LOAD BOOK — progressive streaming ──
+async function startRead(mode){
+  S.mode=mode; S.cache={}; S.hist=[]; S.si=0; stopAudio();
+  dismissResume();
+
+  // Show loading screen with animated bar
+  goTo('sld');
+  document.getElementById('ltx').textContent = 'Descargando "'+S.book.title+'"…';
+  const bar = document.getElementById('load-bar');
+  const wrap = document.getElementById('load-bar-wrap');
+  wrap.classList.add('show');
+  bar.style.width = '8%';
+
+  try{
+    // ── Latin-1 books: must load as ArrayBuffer (no streaming decode possible)
+    if(S.book.enc === 'latin1'){
+      bar.style.width = '40%';
+      const res = await fetch(S.book.url);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      bar.style.width = '80%';
+      const buf = await res.arrayBuffer();
+      const text = cleanGutenberg(new TextDecoder('iso-8859-1').decode(buf));
+      bar.style.width = '100%';
+      await finishLoad(text, mode);
+
+    } else {
+      // ── UTF-8 books: stream chunk by chunk, show text as it arrives ──
+      const res = await fetch(S.book.url);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+
+      const total = parseInt(res.headers.get('content-length')||'0');
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let received = 0, raw = '';
+
+      // Show reader immediately with a spinner paragraph
+      S.raw=''; S.paras=[]; S.sents=[];
+      renderReader();     // renders empty skeleton
+      goTo('sr');         // switch to reader NOW
+      wrap.classList.add('show'); // keep bar visible
+
+      // Inject a live loading indicator at the bottom of content
+      const liveEl = document.createElement('p');
+      liveEl.id = 'live-loading';
+      liveEl.style.cssText = 'color:var(--dm);font-size:.82rem;text-align:center;padding:1rem 0;';
+      liveEl.textContent = 'Cargando texto…';
+      document.getElementById('rc').appendChild(liveEl);
+
+      let chunksDone = false;
+      while(!chunksDone){
+        const {done, value} = await reader.read();
+        if(done){ chunksDone = true; break; }
+        received += value.length;
+        raw += decoder.decode(value, {stream:true});
+
+        // Update progress bar
+        if(total > 0){
+          bar.style.width = Math.min(10 + (received/total)*85, 95)+'%';
+        } else {
+          bar.style.width = Math.min((bar.style.width?parseFloat(bar.style.width):10)+5, 90)+'%';
+        }
+
+        // Every ~15 KB, re-render what we have so far
+        if(received % 15000 < 4096 || done){
+          const partial = cleanGutenberg(raw);
+          updateReaderContent(partial);
+        }
+      }
+
+      // Final full render
+      bar.style.width = '100%';
+      const fullText = cleanGutenberg(raw);
+      await finishLoad(fullText, mode, /*alreadyInReader*/ true);
+    }
+
+  } catch(e){
+    console.error(e);
+    bar.style.width = '0%';
+    wrap.classList.remove('show');
+    toast('Error al cargar el libro. Comprueba tu conexión a Internet.');
+    goTo('sm');
+  } finally {
+    setTimeout(()=>{ bar.style.width='0%'; wrap.classList.remove('show'); }, 600);
+  }
+}
+
+// Called each time we have more data during streaming
+function updateReaderContent(text){
+  const paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(p=>p.length>0);
+  const content = document.getElementById('rc');
+  if(!content) return;
+  const liveEl = document.getElementById('live-loading');
+
+  // Replace all paragraphs except the live spinner
+  let html = '';
+  for(const para of paras){
+    if(!para) continue;
+    const isH = para.length<70 && !/[.,:;!?]/.test(para);
+    if(isH){ html += '<h3>'+esc(para)+'</h3>'; continue; }
+    html += '<p>'+para.split(/(\s+)/).map(tok=>{
+      if(!/\S/.test(tok)) return tok;
+      return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
+    }).join('')+'</p>';
+  }
+  content.innerHTML = html;
+  // Re-append spinner at the end
+  const newLive = document.createElement('p');
+  newLive.id = 'live-loading';
+  newLive.style.cssText = 'color:var(--dm);font-size:.82rem;text-align:center;padding:1rem 0;';
+  newLive.textContent = 'Cargando más texto…';
+  content.appendChild(newLive);
+}
+
+// Finalise after all data is received
+async function finishLoad(text, mode, alreadyInReader=false){
+  S.raw   = text;
+  S.paras = text.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(p=>p.length>0);
+  S.sents = text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(s=>s.trim()).filter(s=>s.length>8);
+
+  if(!alreadyInReader){
+    renderReader();
+    goTo('sr');
+  } else {
+    // Final full render (remove spinner, add all words)
+    const content = document.getElementById('rc');
+    let html = '';
+    for(const para of S.paras){
+      if(!para) continue;
+      const isH = para.length<70 && !/[.,:;!?]/.test(para);
+      if(isH){ html += '<h3>'+esc(para)+'</h3>'; continue; }
+      html += '<p>'+para.split(/(\s+)/).map(tok=>{
+        if(!/\S/.test(tok)) return tok;
+        return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
+      }).join('')+'</p>';
+    }
+    content.innerHTML = html;
+  }
+
+  // Show resume bar if we have a bookmark for this book
+  showResumeBar();
+
+  if(mode==='audio') startAudio();
+}
+
+function cleanGutenberg(t){
+  const sm=['*** START OF','***START OF','* START OF'];
+  const em=['*** END OF','***END OF','* END OF'];
+  let s=0, e=t.length;
+  for(const m of sm){ const i=t.indexOf(m); if(i!==-1){s=t.indexOf('\n',i)+1; break;} }
+  for(const m of em){ const i=t.indexOf(m); if(i!==-1){e=i; break;} }
+  return t.slice(s,e).trim()
+    .replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n');
+}
+
+// ── RENDER READER ──
+let _bmSaveTimer = null;
+
+function renderReader(){
+  document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
+  document.getElementById('actl').style.display = S.mode==='audio' ? 'flex' : 'none';
+  const content = document.getElementById('rc');
+  content.innerHTML = S.paras.map(para=>{
+    if(!para) return '';
+    const isH = para.length<70 && !/[.,:;!?]/.test(para);
+    if(isH) return '<h3>'+esc(para)+'</h3>';
+    return '<p>'+para.split(/(\s+)/).map(tok=>{
+      if(!/\S/.test(tok)) return tok;
+      return '<span class="rw" onclick="clickW(this)">'+esc(tok)+'</span>';
+    }).join('')+'</p>';
+  }).join('');
+
+  const pane = document.getElementById('tpn');
+  // Remove old listeners by cloning (avoids duplicate handlers on re-render)
+  const newPane = pane.cloneNode(false);
+  newPane.appendChild(content);
+  pane.parentNode.replaceChild(newPane, pane);
+  newPane.id = 'tpn';
+  newPane.appendChild(content);
+
+  newPane.addEventListener('mouseup', onSel);
+  newPane.addEventListener('touchend', onSel, {passive:true});
+  newPane.addEventListener('scroll', ()=>{
+    updProg();
+    // Debounced bookmark save — 2 seconds after scroll stops
+    clearTimeout(_bmSaveTimer);
+    _bmSaveTimer = setTimeout(saveBookmark, 2000);
+  }, {passive:true});
+  updProg();
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function onSel(){
+  setTimeout(()=>{
+    const sel = window.getSelection();
+    if(!sel||sel.isCollapsed) return;
+    const txt = sel.toString().trim();
+    if(txt.length<2||txt.length>250) return;
+    sel.removeAllRanges();
+    translate(txt);
+  },50);
+}
+function clickW(el){
+  document.querySelectorAll('.rw.hl').forEach(e=>e.classList.remove('hl'));
+  el.classList.add('hl');
+  translate(el.textContent.trim());
+}
+function updProg(){
+  const p = document.getElementById('tpn');
+  document.getElementById('pf').style.width =
+    (p.scrollHeight>p.clientHeight
+      ? Math.min(p.scrollTop/(p.scrollHeight-p.clientHeight)*100,100)
+      : 0)+'%';
+}
+
+// ── TRANSLATION — MyMemory API (gratuita) ──
+async function translate(word){
+  if(!word) return;
+  openPanel();
+  const tbody = document.getElementById('tbody');
+  const target = TRANS_TARGET[S.lang]||'es';
+  const label  = TRANS_LABEL[S.lang]||'español';
+  tbody.innerHTML = `<div class="tw">${esc(word)}</div>
+    <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
+  const key = word.toLowerCase().trim()+'|'+target;
+  if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${S.lang}|${target}`;
+  try{
+    const r  = await fetch(url, {signal:AbortSignal.timeout(8000)});
+    const js = await r.json();
+    const t  = js?.responseData?.translatedText||'';
+    if(!t || js.responseStatus===403 || t.toLowerCase()===word.toLowerCase())
+      throw new Error('no trans');
+    const alts = (js.matches||[]).map(m=>m.translation)
+      .filter(x=>x&&x.toLowerCase()!==t.toLowerCase())
+      .filter((x,i,a)=>a.indexOf(x)===i).slice(0,3);
+    const res = {t, alts};
+    S.cache[key] = res;
+    showTrans(word, res, label);
+    addHist(word, t);
+  } catch{
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div>
+      <div style="color:var(--dm);font-size:.82rem;line-height:1.6;margin-top:.4rem">
+        No se encontró traducción.<br>
+        <span style="font-size:.74rem;opacity:.7">Límite diario de MyMemory (~500 palabras/IP).</span>
+      </div>`;
+  }
+}
+
+function showTrans(word, res, label){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = `
+    <div class="tw">${esc(word)}</div>
+    <div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:.4rem">${esc(res.t)}</div>
+      ${res.alts&&res.alts.length ? `
+        <div style="margin-bottom:.6rem">
+          <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;
+            letter-spacing:.07em;margin-bottom:.3rem">Alternativas</div>
+          ${res.alts.map(a=>`<span style="display:inline-block;background:var(--sf2);
+            border:1px solid var(--bd);border-radius:6px;
+            padding:.12rem .4rem;font-size:.76rem;margin:.12rem .12rem .12rem 0">${esc(a)}</span>`).join('')}
+        </div>` : ''}
+      <div style="font-size:.7rem;color:var(--dmr);margin-top:.4rem">
+        <a href="https://mymemory.translated.net" target="_blank"
+          style="color:var(--ac);text-decoration:none">MyMemory API</a>
+      </div>
+    </div>
+    <div id="hlist"></div>`;
+  renderHist();
+}
+
+function addHist(word, trad){
+  S.hist = [{w:word,t:trad}, ...S.hist.filter(h=>h.w!==word)].slice(0,20);
+  renderHist();
+}
+function renderHist(){
+  const el = document.getElementById('hlist');
+  if(!el||S.hist.length<2) return;
+  el.innerHTML = '<div class="hs"><h4>Historial</h4>' +
+    S.hist.slice(1,8).map(h=>`
+      <div class="hi" onclick="translate('${h.w.replace(/'/g,"\\'")}')">
+        <div class="ho">${esc(h.w)}</div>
+        <div class="ht">${esc(h.t)}</div>
+      </div>`).join('') + '</div>';
+}
+
+// ── TRANS PANEL ──
+function openPanel(){
+  S.panelOpen = true;
+  const p = document.getElementById('tpanel');
+  p.classList.remove('clo');
+  if(window.innerWidth<=620) p.classList.add('mob');
+}
+function togPanel(){
+  S.panelOpen = !S.panelOpen;
+  const p = document.getElementById('tpanel');
+  p.classList.toggle('clo', !S.panelOpen);
+  if(window.innerWidth<=620) p.classList.toggle('mob', S.panelOpen);
+}
+function togMob(){ document.getElementById('tpanel').classList.toggle('mob'); }
+
+// ── WEB SPEECH TTS ──
+const syn = window.speechSynthesis||null;
+function bestVoice(lang){
+  if(!syn) return null;
+  const vs=syn.getVoices(), code=LMETA[lang].tts, base=code.split('-')[0];
+  return vs.find(v=>v.lang===code)
+      || vs.find(v=>v.lang.startsWith(base+'-'))
+      || vs.find(v=>v.lang.startsWith(base))
+      || null;
+}
+function startAudio(){
+  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
+  S.playing=true; speakS(S.si);
+}
+function speakS(i){
+  if(!syn||i>=S.sents.length) return;
+  S.si=i; hlSent(i);
+  const u = new SpeechSynthesisUtterance(S.sents[i]);
+  u.lang = LMETA[S.lang].tts; u.rate = S.rate;
+  const v = bestVoice(S.lang); if(v) u.voice=v;
+  u.onend  = ()=>{ clrHl(); if(S.playing&&S.si+1<S.sents.length) speakS(S.si+1); else{S.playing=false;updBtn();} };
+  u.onerror= ()=>{ S.playing=false; updBtn(); };
+  syn.cancel(); syn.speak(u); updBtn();
+}
+function hlSent(i){
+  clrHl();
+  const sent = S.sents[i]; if(!sent) return;
+  const first = sent.trim().split(/\s+/)[0].toLowerCase();
+  const spans = document.querySelectorAll('.rw');
+  for(let j=0; j<spans.length; j++){
+    if(spans[j].textContent.trim().toLowerCase()===first){
+      const count = Math.min(sent.split(/\s+/).length, spans.length-j);
+      for(let k=0;k<count;k++) spans[j+k].classList.add('sk');
+      spans[j].scrollIntoView({behavior:'smooth', block:'center'});
+      break;
+    }
+  }
+}
+function clrHl(){ document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk')); }
+function updBtn(){
+  const b = document.getElementById('bplay'); if(!b) return;
+  b.textContent = S.playing ? '⏸' : '▶';
+  b.classList.toggle('pon', S.playing);
+}
+function stopAudio(){ if(syn) syn.cancel(); S.playing=false; clrHl(); updBtn(); }
+function togPlay(){ if(!syn) return; S.playing ? stopAudio() : (S.playing=true, speakS(S.si)); }
+function prevS(){ stopAudio(); if(S.si>0){S.playing=true; speakS(S.si-1);} }
+function nextS(){ stopAudio(); if(S.si<S.sents.length-1){S.playing=true; speakS(S.si+1);} }
+function chRate(v){ S.rate=parseFloat(v); if(S.playing){stopAudio();S.playing=true;speakS(S.si);} }
+if(syn) syn.addEventListener('voiceschanged',()=>{});
+
+// ── TOAST ──
+function toast(msg, dur=4000){
+  const el = document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'), dur);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('sr').classList.contains('on')) return;
+  if(e.key===' '&&S.mode==='audio'){ e.preventDefault(); togPlay(); }
+  if(e.key==='ArrowRight'&&S.mode==='audio') nextS();
+  if(e.key==='ArrowLeft' &&S.mode==='audio') prevS();
+});
+document.querySelectorAll('.lc').forEach(c=>{
+  c.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') c.click(); });
+});
+
+// ── BOOKMARK INDICATOR on library cards ──
+function renderLib(lang){
+  document.getElementById('lby').innerHTML = (BOOKS[lang]||[]).map(c=>`
+    <div class="cs">
+      <div class="ch"><span class="ct">${c.cat}</span><span class="cd">${c.desc}</span></div>
+      <div class="bg">
+        ${c.books.map(b=>{
+          let bm = null;
+          try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
+          const pct = bm ? Math.round(bm.pct*100) : 0;
+          const badge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
+          return `<div class="bc ${b.lv}" onclick="selBook('${b.id}')">
+            ${badge}
+            <div class="btt">${b.title}</div>
+            <div class="ba">${b.author}</div>
+            <div class="bm">
+              <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
+              <span class="sp">🎧</span>
+            </div>
+            <div class="bdsc">${b.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ── BOOT ──
+setupPWA();
+loadFont();
+</script>
+</body>
+</html>
