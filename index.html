@@ -205,7 +205,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   -webkit-user-select:none;user-select:none;}
 .rw:hover,.rw:focus{background:var(--soft);color:var(--ac);}
 .rw.hl{background:var(--soft);color:var(--ac);}
-.rw.sk{background:rgba(245,200,66,.3);color:var(--gd);}
+.rw.sk{background:var(--ac);color:#fff;border-radius:3px;}
 .font-sm .rc p{font-size:.93rem;}
 .font-lg .rc p{font-size:1.26rem;}
 
@@ -2561,64 +2561,63 @@ function cleanGutenberg(t){
 let _bmSaveTimer = null;
 
 // Build paragraph HTML with data-si word spans.
-// Renders natural paragraphs (not one-per-sentence).
-// Each word span gets data-si = index of the sentence it belongs to,
-// computed by walking sentences through the paragraph text in order.
+// Strategy: reconstruct the full text from S.paras, then find where each
+// sentence from S.sents starts using indexOf (exact substring search).
+// Each character position maps to a sentence index.
+// This is O(n) and exact — no fuzzy matching.
 function buildParaHtml(){
   if(!S.paras.length) return '';
 
-  // Build a flat list of [word, sentenceIndex] pairs by walking
-  // through S.sents in document order and matching words greedily.
-  // We work on a normalised (lowercase, punctuation-stripped) version
-  // so abbreviations and punctuation don't break the matching.
-  const norm = s => s.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]/g,'');
+  // Rebuild the full text exactly as it was before splitting into paras
+  const fullText = S.paras.join('\n\n');
 
-  // Flatten all paragraph words
-  const paraWords = [];
-  for(const para of S.paras){
-    const toks = para.split(/(\s+)/);
-    for(const t of toks){
-      if(/\S/.test(t)) paraWords.push(norm(t));
+  // Build a char→sentenceIndex map using exact substring search
+  // charSi[i] = sentence index for character at position i in fullText
+  const charSi = new Uint16Array(fullText.length); // default 0
+  let searchFrom = 0;
+  for(let si = 0; si < S.sents.length; si++){
+    const sent = S.sents[si];
+    // Search for this sentence starting from where the last one ended
+    const pos = fullText.indexOf(sent, searchFrom);
+    if(pos !== -1){
+      // Mark all chars of this sentence with si
+      const end = pos + sent.length;
+      charSi.fill(si, pos, end);
+      searchFrom = pos + Math.max(1, sent.length - 10); // allow slight overlap
     }
   }
 
-  // For each paragraph word, find which sentence it belongs to
-  const wordSi = new Array(paraWords.length).fill(0);
-  let pIdx = 0; // current position in paraWords
-
-  for(let si = 0; si < S.sents.length && pIdx < paraWords.length; si++){
-    const sentToks = S.sents[si].split(/\s+/).map(norm).filter(w => w.length > 0);
-    // Try to find the start of this sentence in paraWords starting at pIdx
-    let matchStart = -1;
-    for(let p = pIdx; p < Math.min(pIdx + 30, paraWords.length); p++){
-      if(paraWords[p] === sentToks[0]){
-        matchStart = p; break;
-      }
-    }
-    if(matchStart < 0) matchStart = pIdx; // fallback
-    // Mark words from matchStart onwards as belonging to sentence si
-    for(let w = matchStart; w < Math.min(matchStart + sentToks.length + 3, paraWords.length); w++){
-      wordSi[w] = si;
-    }
-    pIdx = matchStart + sentToks.length;
-  }
-
-  // Render paragraphs, tagging each word span with its sentence index
+  // Now render: walk paras, track char position in fullText, tag each word
   let html = '';
-  let globalIdx = 0;
-  for(const para of S.paras){
-    if(!para) continue;
+  let charPos = 0; // position in fullText
+
+  for(let pi = 0; pi < S.paras.length; pi++){
+    const para = S.paras[pi];
+    if(!para){ charPos += 2; continue; } // \n\n separator
+
     const isH = para.length < 70 && !/[.,:;!?]/.test(para);
-    if(isH){ html += '<h3>' + esc(para) + '</h3>'; continue; }
+    if(isH){
+      html += '<h3>' + esc(para) + '</h3>';
+      charPos += para.length + 2;
+      continue;
+    }
+
     const toks = para.split(/(\s+)/);
     html += '<p>';
     for(const tok of toks){
-      if(!/\S/.test(tok)){ html += tok; continue; }
-      const si = wordSi[globalIdx] ?? 0;
+      if(!/\S/.test(tok)){
+        html += tok;
+        charPos += tok.length;
+        continue;
+      }
+      // Use the sentence index of the MIDDLE character of this token
+      const mid = charPos + Math.floor(tok.length / 2);
+      const si = mid < charSi.length ? charSi[mid] : 0;
       html += `<span class="rw" data-si="${si}" onclick="clickW(this)">${esc(tok)}</span>`;
-      globalIdx++;
+      charPos += tok.length;
     }
     html += '</p>';
+    charPos += 2; // \n\n separator between paras
   }
   return html;
 }
@@ -2675,7 +2674,7 @@ function clickW(el){
   document.querySelectorAll('.rw.hl').forEach(e=>e.classList.remove('hl'));
   el.classList.add('hl');
   _ctxWord = el.textContent.trim();
-  _ctxSi   = parseInt(el.dataset.si ?? '0');
+  _ctxSi   = parseInt(el.getAttribute('data-si') || '0');
 
   const menu = document.getElementById('ctx-menu');
   const rect = el.getBoundingClientRect();
@@ -2852,8 +2851,8 @@ let _ttsGen = 0; // incremented on every cancel — stale onend checks this
 
 function speakS(i){
   if(!syn) return;
+  if(!S.sents.length){ S.playing=false; updBtn(); toast('Sin frases para leer.'); return; }
   i = Math.max(0, Math.min(i, S.sents.length - 1));
-  if(i >= S.sents.length){ S.playing=false; updBtn(); return; }
   S.si = i;
   hlSent(i);
   const myGen = ++_ttsGen;   // this utterance's generation token
@@ -3144,6 +3143,10 @@ loadTheme();
 // Wire context menu buttons
 document.getElementById('ctx-translate').addEventListener('click', ctxTranslate);
 document.getElementById('ctx-readfrom').addEventListener('click',  ctxReadFrom);
+// Also wire touchend for iOS where click can be delayed
+document.getElementById('ctx-readfrom').addEventListener('touchend', e=>{
+  e.preventDefault(); ctxReadFrom();
+});
 getSample().catch(()=>{});
 </script>
 </body>
