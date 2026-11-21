@@ -167,7 +167,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .mc{background:var(--sf);border:2px solid var(--bd);border-radius:var(--r);
   padding:1.6rem;text-align:center;cursor:pointer;
   transition:border-color .2s,transform .1s;
-  min-width:140px;flex:1;max-width:180px;
+  min-width:140px;flex:1;max-width:220px;
   -webkit-user-select:none;user-select:none;}
 .mc:active{transform:scale(.95);background:var(--sf2);}
 .mi{font-size:2.2rem;margin-bottom:.6rem;}
@@ -439,13 +439,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <div class="mbt" id="mtitle"></div>
   <div class="mba" id="mauth"></div>
   <div class="mcs">
-    <div class="mc" onclick="startRead('read')">
+    <div class="mc" onclick="startRead()">
       <div class="mi">📖</div><div class="ml">Leer</div>
       <div class="ms">Texto interactivo.<br>Toca una palabra<br>para traducirla</div>
-    </div>
-    <div class="mc" onclick="startRead('audio')">
-      <div class="mi">🎧</div><div class="ml">Audiolibro</div>
-      <div class="ms">Narración en el<br>idioma original<br>con texto sincronizado</div>
     </div>
     <div class="mc" onclick="openVocab()">
       <div class="mi">📚</div><div class="ml">Vocabulario</div>
@@ -503,7 +499,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <div class="rtb">
     <button class="bbtn" onclick="exitR()">←</button>
     <span class="rtl" id="rtl"></span>
-    <div class="actl" id="actl" style="display:none">
+    <div class="actl" id="actl">
       <button class="cb" onclick="prevS()" title="Anterior">⏮</button>
       <button class="cb" id="bplay" onclick="togPlay()">▶</button>
       <button class="cb" onclick="nextS()" title="Siguiente">⏭</button>
@@ -2409,8 +2405,8 @@ function relTime(ts){
 const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
 const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
 
-async function startRead(mode){
-  S.mode=mode; S.cache={}; S.hist=[]; S.si=0; stopAudio();
+async function startRead(){
+  S.mode='read'; S.cache={}; S.hist=[]; S.si=0; stopAudio();
   dismissResume();
 
   const bar  = document.getElementById('load-bar');
@@ -2456,7 +2452,6 @@ async function startRead(mode){
     renderReader();
     goTo('sr');
     appendLoadingFooter(true);  // show "Cargando más…" at bottom
-    if(mode==='audio') startAudio();
     bar.style.width = '50%';
 
     // ── Continue reading the rest in the background ──
@@ -2632,7 +2627,7 @@ function renderReaderContent(){
 
 function renderReader(){
   document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
-  document.getElementById('actl').style.display = S.mode==='audio' ? 'flex' : 'none';
+
 
   const content = document.getElementById('rc');
   content.innerHTML = buildParaHtml();
