@@ -2810,16 +2810,20 @@ function renderHist(){
 //  - Minimum 15 chars per sentence to skip headers and stray fragments
 function splitSents(text){
   if(!text) return [];
-  // Replace common abbreviations with a placeholder to avoid false splits
-  const abbrevs = ['Mr','Mrs','Dr','St','Prof','Jr','Sr','vs','etc','i.e','e.g','Fig','No','Vol'];
+  // Protect abbreviations: "Mr. " -> "Mr\u25ce " so the dot is not a sentence boundary.
+  // No lookbehind (crashes Safari < 16.4 and older Android WebView).
+  const abbrevs = ['Mr','Mrs','Dr','St','Prof','Jr','Sr','Vs','Etc','Fig','No','Vol','Inc','Ltd','vs','etc'];
   let t = text;
-  abbrevs.forEach(a => { t = t.replace(new RegExp(a+'\.','g'), a+'⊙'); });
-  // Also protect single uppercase initials (A. B. etc.)
-  t = t.replace(/\b([A-Z])\.\s/g, '$1⊙ ');
-  // Split on sentence-ending punctuation followed by space+capital or end
-  const raw = t.split(/(?<=[.!?]["\'»]?)\s+(?=[A-ZÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÑ"'])/);
-  return raw
-    .map(s => s.replace(/⊙/g, '.').trim())
+  abbrevs.forEach(a => {
+    t = t.replace(new RegExp(a + '\\.(?=\\s)', 'gi'), a + '\u25ce');
+  });
+  // Protect single uppercase initials: "A. " -> "A\u25ce "
+  t = t.replace(/\b([A-Z])\.(?=\s)/g, '$1\u25ce');
+  // Mark sentence boundaries: punctuation + spaces + uppercase -> insert \x01
+  // This avoids lookbehind entirely.
+  t = t.replace(/([.!?]["\u2019\xbb]?)([ \t\r\n]+)([A-Z\xc0-\xd6\xd8-\xde\u00c0-\u017e\"\u201c])/g, '$1\x01$3');
+  return t.split('\x01')
+    .map(s => s.replace(/\u25ce/g, '.').replace(/\s+/g, ' ').trim())
     .filter(s => s.length >= 15);
 }
 
