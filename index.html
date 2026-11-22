@@ -328,8 +328,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .gx-inp{flex:1;padding:.55rem .75rem;border-radius:10px;border:1px solid var(--bd);
   background:var(--sf);color:var(--tx);font-size:.88rem;min-width:0;}
 .gx-inp:focus{outline:none;border-color:var(--ac);}
-.gx-sel{padding:.5rem .3rem;border-radius:10px;border:1px solid var(--bd);
-  background:var(--sf);color:var(--tx);font-size:.8rem;cursor:pointer;}
+
 .gx-btn{padding:.5rem .8rem;border-radius:10px;border:none;
   background:var(--ac);color:#fff;font-size:.85rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .gx-res{margin-top:.5rem;max-height:55vh;overflow-y:auto;}
@@ -456,15 +455,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       <input id="gx-input" type="search" class="gx-inp" placeholder="🔍 Buscar en Gutenberg (título o autor)…"
         onkeydown="if(event.key==='Enter'){event.preventDefault();gxSearch();}"
         oninput="if(!this.value.trim())gxClear()">
-      <select id="gx-lang" class="gx-sel">
-        <option value="">Todos</option>
-        <option value="en">EN</option>
-        <option value="es">ES</option>
-        <option value="fr">FR</option>
-        <option value="de">DE</option>
-        <option value="pt">PT</option>
-        <option value="it">IT</option>
-      </select>
       <button class="gx-btn" onclick="gxSearch()">Buscar</button>
     </div>
     <div id="gx-results" class="gx-res" style="display:none"></div>
@@ -759,6 +749,28 @@ const BOOKS = {
   ],
 
   de:[
+    {cat:"Para empezar 🌱",desc:"A1–A2",books:[
+      {id:"struwwel",   title:"Der Struwwelpeter",             author:"Heinrich Hoffmann",lv:"a1",desc:"Cuentos morales rimados para niños. Ideal para A1.",
+       url:G+"Der-Struwwelpeteroder-lustige-Geschichten-und-drollige-Bilder_24571/master/24571-0.txt"},
+      {id:"marchen64",  title:"Märchen",                       author:"Anonym",           lv:"a1",desc:"Cuentos populares alemanes breves y sencillos.",
+       url:G+"Marchen_64522/master/64522-0.txt"},
+      {id:"fabeln9375", title:"Ausgewählte Fabeln",            author:"Äsop / La Fontaine",lv:"a2",desc:"Fábulas clásicas en alemán sencillo.",
+       url:G+"Ausgewahlte-Fabeln_9375/master/9375-8.txt",enc:"latin1"},
+      {id:"marchen6641",title:"Märchen und Sagen",             author:"Anonym",           lv:"a2",desc:"Cuentos y leyendas de la tradición alemana.",
+       url:G+"Marchen-und-Sagen_6641/master/6641-8.txt",enc:"latin1"},
+      {id:"mondnacht",  title:"In der Mondnacht",              author:"Anonym",           lv:"a2",desc:"Cuentos nocturnos de la tradición alemana.",
+       url:G+"In-der-Mondnacht-Marchen_48287/master/48287-0.txt"},
+    ]},
+    {cat:"Lectura fácil 📖",desc:"B1",books:[
+      {id:"fabeln9158", title:"Fabeln und Erzählungen",        author:"C. F. Gellert",    lv:"b1",desc:"Fábulas morales del siglo XVIII alemán.",
+       url:G+"Fabeln-und-Erzahlungen_9158/master/9158-8.txt",enc:"latin1"},
+      {id:"tomsawyer_de",title:"Die Abenteuer Tom Sawyers",   author:"Mark Twain",       lv:"b1",desc:"Las aventuras de Tom Sawyer en alemán.",
+       url:G+"Die-Abenteuer-Tom-Sawyers_30165/master/30165-8.txt",enc:"latin1"},
+      {id:"tomsawyer2_de",title:"Tom Sawyers neue Abenteuer", author:"Mark Twain",       lv:"b1",desc:"Nuevas aventuras de Tom Sawyer en alemán.",
+       url:G+"Tom-Sawyers-Neue-Abenteuer_65346/master/65346-0.txt"},
+      {id:"winterm",    title:"Deutschland: Ein Wintermärchen",author:"Heinrich Heine",   lv:"b1",desc:"Poema épico-satírico del viaje de Heine por Alemania.",
+       url:G+"Deutschland-Ein-Wintermarchen_6079/master/6079-8.txt",enc:"latin1"},
+    ]},
     {cat:"Klassische Literatur 🏛️",desc:"B2–C1",books:[
       {id:"werther",   title:"Die Leiden des jungen Werthers", author:"J. W. von Goethe", lv:"b2",desc:"El amor imposible que conmocionó Europa.",
        url:G+"Die-Leiden-des-jungen-Werther---Band-1_2407/master/2407-8.txt",enc:"latin1"},
@@ -1836,9 +1848,7 @@ function selLang(lang){
   r.style.setProperty('--soft',`rgba(${m.rgb},.13)`);
   const b=document.getElementById('bdg');
   b.className='bdg '+lang; b.textContent=m.badge;
-  // Pre-set search language filter to match selected language
-  const gxSel = document.getElementById('gx-lang');
-  if(gxSel) gxSel.value = lang;
+
   renderLib(lang); goTo('sb');
 }
 
@@ -2080,7 +2090,7 @@ function loadFont(){
 }
 
 // ── BOOKMARK helpers ──
-function bmKey(){ return 'libreo_bm_' + S.lang + '_' + S.book.id; }
+function bmKey(){ return 'libreo_bm_' + (S.book.lang || S.lang) + '_' + S.book.id; }
 
 function saveBookmark(){
   const pane = document.getElementById('tpn');
@@ -2449,27 +2459,43 @@ function renderReader(){
   newPane.addEventListener('mouseup', onSel);
   newPane.addEventListener('touchend', onSel, {passive:true});
 
-  // ── Long-press on a word (>1s) = set manual pin ──
-  let _lpTimer = null;
-  let _lpEl    = null;
+  // ── Long-press on a word (>900ms) = set manual pin ──
+  let _lpTimer   = null;
+  let _lpEl      = null;
+  let _lpFired   = false;
+  let _lpStartT  = 0;
 
   newPane.addEventListener('touchstart', e => {
     const el = e.target.closest('.rw');
     if(!el) return;
-    _lpEl = el;
-    _lpTimer = setTimeout(() => {
-      _lpTimer = null;
+    _lpEl     = el;
+    _lpFired  = false;
+    _lpStartT = Date.now();
+    _lpTimer  = setTimeout(() => {
+      _lpFired = true;
       pinWord(_lpEl);
     }, 900);
   }, {passive: true});
 
   newPane.addEventListener('touchend', () => {
-    clearTimeout(_lpTimer); _lpTimer = null;
+    if(!_lpFired) { clearTimeout(_lpTimer); _lpTimer = null; }
   }, {passive: true});
 
-  newPane.addEventListener('touchmove', () => {
-    clearTimeout(_lpTimer); _lpTimer = null;
+  // Only cancel on significant movement (>10px), not tiny jitter
+  let _lpStartX = 0, _lpStartY = 0;
+  newPane.addEventListener('touchstart', e => {
+    if(e.touches[0]){ _lpStartX = e.touches[0].clientX; _lpStartY = e.touches[0].clientY; }
   }, {passive: true});
+
+  newPane.addEventListener('touchmove', e => {
+    if(!_lpTimer) return;
+    const dx = e.touches[0].clientX - _lpStartX;
+    const dy = e.touches[0].clientY - _lpStartY;
+    if(Math.sqrt(dx*dx + dy*dy) > 10){ clearTimeout(_lpTimer); _lpTimer = null; }
+  }, {passive: true});
+
+  // Suppress browser long-press menu so it doesn't interfere
+  newPane.addEventListener('contextmenu', e => { e.preventDefault(); });
   newPane.addEventListener('scroll', ()=>{
     updProg();
   }, {passive:true});
@@ -3072,9 +3098,8 @@ async function gxSearch(url){
     // Fresh search
     const q = document.getElementById('gx-input').value.trim();
     if(!q){ gxClear(); return; }
-    const lang = document.getElementById('gx-lang').value;
     const params = new URLSearchParams({search: q});
-    if(lang) params.set('languages', lang);
+    if(S.lang) params.set('languages', S.lang);
     url = GX_API + '?' + params;
     res.style.display = 'block';
     res.innerHTML = '<div class="gx-status">Buscando…</div>';
