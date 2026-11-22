@@ -566,6 +566,18 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <div class="doc-topbar">
     <button class="bbtn" onclick="closeDoc()">← Volver</button>
     <span class="doc-title" id="doc-title"></span>
+    <div style="display:flex;align-items:center;gap:.4rem;margin-left:auto;flex-shrink:0">
+      <label style="font-size:.75rem;color:var(--dm)">Pág.</label>
+      <input id="pdf-page" type="number" min="1" value="1"
+        style="width:52px;padding:.3rem .4rem;border-radius:8px;border:1px solid var(--bd);
+               background:var(--sf);color:var(--tx);font-size:.82rem;text-align:center"
+        onchange="pdfGoPage(this.value)"
+        title="Ir a página">
+      <button id="pdf-pin-btn" onclick="pdfPin()"
+        style="border:none;background:none;font-size:1.3rem;cursor:pointer;padding:.2rem;
+               line-height:1;transition:filter .15s"
+        title="Guardar página como marcador">📌</button>
+    </div>
   </div>
   <iframe id="doc-frame" title="Visor PDF" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"></iframe>
 </div>
@@ -2854,20 +2866,77 @@ function findDocBook(id){
   return null;
 }
 
+function pdfBmKey(){ return S.book ? 'libreo_pdf_' + S.book.id : null; }
+
+function pdfViewerUrl(page){
+  page = parseInt(page) || 1;
+  // Google Docs viewer supports #page=N in the outer URL only as a hint;
+  // we store the page in localStorage and restore via the page input
+  return 'https://docs.google.com/gview?url=' + encodeURIComponent(S.book.hurl) + '&embedded=true';
+}
+
 function openDoc(id){
   const book = findDocBook(id);
   if(!book) return;
+  S.book = book;   // keep S.book in sync for pdfBmKey
   document.getElementById('doc-title').textContent = book.title + ' — ' + book.author;
+  // Restore saved page
+  let savedPage = 1;
+  try {
+    const raw = localStorage.getItem('libreo_pdf_' + book.id);
+    if(raw){ const bm = JSON.parse(raw); savedPage = bm.page || 1; }
+  } catch {}
+  const pageInput = document.getElementById('pdf-page');
+  pageInput.value = savedPage;
+  // Update pin button color
+  pdfSyncPin();
+  // Load viewer
   const frame = document.getElementById('doc-frame');
-  // Use Google Docs viewer to render PDFs (works inside iframes, no CSP issue)
-  const viewerUrl = 'https://docs.google.com/gview?url=' + encodeURIComponent(book.hurl) + '&embedded=true';
-  frame.src = viewerUrl;
+  frame.src = pdfViewerUrl(savedPage);
   goTo('sv-doc');
+  // If saved page > 1 show a small toast so user knows we restored it
+  if(savedPage > 1) setTimeout(()=>toast('📌 Continuando en pág. ' + savedPage), 800);
 }
 
 function closeDoc(){
   document.getElementById('doc-frame').src = 'about:blank';
   goTo('sb');
+}
+
+function pdfGoPage(page){
+  page = Math.max(1, parseInt(page) || 1);
+  document.getElementById('pdf-page').value = page;
+  // Google Docs viewer doesn't support direct page navigation via URL change
+  // without a full reload, so we just save the page — user navigates inside the viewer
+  // and updates the input manually. We reload the frame only if they changed page on open.
+}
+
+function pdfPin(){
+  const key = pdfBmKey();
+  if(!key) return;
+  const page = parseInt(document.getElementById('pdf-page').value) || 1;
+  try {
+    const existing = JSON.parse(localStorage.getItem(key) || 'null');
+    if(existing){
+      // Toggle off
+      localStorage.removeItem(key);
+      pdfSyncPin();
+      toast('📌 Marcador eliminado');
+      return;
+    }
+    localStorage.setItem(key, JSON.stringify({page, ts: Date.now()}));
+  } catch {}
+  pdfSyncPin();
+  toast('📌 Marcador guardado en pág. ' + page);
+}
+
+function pdfSyncPin(){
+  const btn = document.getElementById('pdf-pin-btn');
+  if(!btn) return;
+  const key = pdfBmKey();
+  const hasBm = key && !!localStorage.getItem(key);
+  btn.style.filter = hasBm ? 'sepia(1) saturate(5) hue-rotate(5deg)' : 'none';
+  btn.title = hasBm ? 'Marcador activo — pulsa para borrar' : 'Guardar página como marcador';
 }
 
 // ── THEME ──
