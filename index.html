@@ -2092,7 +2092,7 @@ function loadFont(){
 }
 
 // ── BOOKMARK helpers ──
-function bmKey(){ return 'libreo_bm_' + (S.book.lang || S.lang) + '_' + S.book.id; }
+function bmKey(){ return 'libreo_bm_' + S.book.id; }
 
 function saveBookmark(){
   const pane = document.getElementById('tpn');
@@ -2154,7 +2154,8 @@ function dismissResume(){
 
 function showResumeBar(){
   const bm = loadBookmark();
-  if(!bm || bm.pct < 0.02) return;
+  if(!bm) return;
+  if(!bm.manual && bm.pct < 0.02) return;
   const ago = relTime(bm.ts);
   const msg = bm.manual && bm.word
     ? `📌 Pin en «${bm.word}» — ${ago}`
@@ -2871,7 +2872,7 @@ function renderBookCard(b, lang){
   const isDoc = !!b.fmt;
   let bm = null;
   if(!isDoc){
-    try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
+    try { const r=localStorage.getItem('libreo_bm_'+b.id); bm=r?JSON.parse(r):null; } catch{}
   }
   const pct = bm ? Math.round(bm.pct*100) : 0;
   const resumeBadge = bm?.manual
