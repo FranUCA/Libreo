@@ -2101,12 +2101,20 @@ function jumpToBookmark(){
   const bm = loadBookmark();
   if(!bm) return;
   dismissResume();
-  if(bm.si) S.si = bm.si;  // restore TTS position
+  if(bm.si) S.si = bm.si;
   const pane = document.getElementById('tpn');
-  setTimeout(()=>{
-    pane.scrollTop = bm.pct * (pane.scrollHeight - pane.clientHeight);
-    updProg();
-  }, 80);
+  // Retry until the pane has real height (DOM may not be painted yet)
+  let attempts = 0;
+  function tryScroll(){
+    const max = pane.scrollHeight - pane.clientHeight;
+    if(max > 10){
+      pane.scrollTop = bm.pct * max;
+      updProg();
+    } else if(attempts++ < 20){
+      setTimeout(tryScroll, 80);
+    }
+  }
+  tryScroll();
 }
 
 function dismissResume(){
@@ -2121,6 +2129,8 @@ function showResumeBar(){
   document.getElementById('resume-msg').textContent =
     `Ibas por el ${pct}% — ${ago}`;
   document.getElementById('resume-bar').classList.add('show');
+  // Auto-jump after a brief moment so the user sees the bar first
+  setTimeout(jumpToBookmark, 800);
 }
 
 function relTime(ts){
@@ -2144,7 +2154,7 @@ const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
 const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
 
 async function startRead(generateVocab=false){
-  S.mode='read'; S.cache={}; S.hist=[]; S.si=0; stopAudio();
+  S.mode='read'; S.cache={}; S.hist=[]; stopAudio();
   dismissResume();
 
   const bar  = document.getElementById('load-bar');
