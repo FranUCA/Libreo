@@ -206,6 +206,8 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .rw:hover,.rw:focus{background:var(--soft);color:var(--ac);}
 .rw.hl{background:var(--soft);color:var(--ac);}
 .rw.sk{background:var(--ac);color:#fff;border-radius:3px;}
+.rw.pinned{background:#f59e0b;color:#fff;border-radius:3px;
+  transition:background .15s;box-shadow:0 0 0 3px rgba(245,158,11,.4);}
 .font-sm .rc p{font-size:.93rem;}
 .font-lg .rc p{font-size:1.26rem;}
 
@@ -2101,11 +2103,27 @@ function jumpToBookmark(){
   const bm = loadBookmark();
   if(!bm) return;
   dismissResume();
-  if(bm.si) S.si = bm.si;
+
+  // Restore sentence index IMMEDIATELY — togPlay uses S.si so this must
+  // happen before any user interaction, not after the DOM scroll retry.
+  if(bm.si != null) S.si = bm.si;
+
   const pane = document.getElementById('tpn');
-  // Retry until the pane has real height (DOM may not be painted yet)
   let attempts = 0;
+
   function tryScroll(){
+    if(bm.manual && bm.si != null){
+      // Scroll to the pinned sentence span
+      const span = pane.querySelector(`.rw[data-si="${bm.si}"]`);
+      if(span){
+        span.scrollIntoView({behavior:'smooth', block:'center'});
+        span.classList.add('pinned');
+        setTimeout(() => span.classList.remove('pinned'), 1500);
+        updProg();
+        return;
+      }
+    }
+    // Fallback: scroll by percentage
     const max = pane.scrollHeight - pane.clientHeight;
     if(max > 10){
       pane.scrollTop = bm.pct * max;
@@ -2124,13 +2142,16 @@ function dismissResume(){
 function showResumeBar(){
   const bm = loadBookmark();
   if(!bm || bm.pct < 0.02) return;
-  const pct = Math.round(bm.pct * 100);
   const ago = relTime(bm.ts);
-  document.getElementById('resume-msg').textContent =
-    `Ibas por el ${pct}% — ${ago}`;
+  const msg = bm.manual && bm.word
+    ? `📌 Pin en «${bm.word}» — ${ago}`
+    : `▶ Por el ${Math.round(bm.pct*100)}% — ${ago}`;
+  document.getElementById('resume-msg').textContent = msg;
   document.getElementById('resume-bar').classList.add('show');
-  // Auto-jump after a brief moment so the user sees the bar first
-  setTimeout(jumpToBookmark, 800);
+  // Restore S.si NOW so ▶ works immediately even before the scroll happens
+  if(bm.si != null) S.si = bm.si;
+  // Auto-scroll to pin position
+  setTimeout(jumpToBookmark, 600);
 }
 
 function relTime(ts){
@@ -2313,6 +2334,34 @@ function cleanGutenberg(t){
 // ── RENDER READER ──
 // Each word-span gets data-si (sentence index) so TTS can highlight
 // and "read from here" can find the right sentence instantly.
+
+// ── MANUAL PIN ───────────────────────────────────────────────────────────────
+// Long-press a word to drop a pin. Saved to localStorage. Shown on book card.
+// On next open, reader starts at the pinned sentence.
+
+function pinWord(el){
+  if(!el || !S.book) return;
+  const si  = parseInt(el.getAttribute('data-si') || '0');
+  const pane = document.getElementById('tpn');
+  const pct  = pane.scrollHeight > pane.clientHeight
+    ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight) : 0;
+  const word = el.textContent.trim();
+
+  try {
+    localStorage.setItem(bmKey(), JSON.stringify({pct, si, word, ts: Date.now(), manual: true}));
+  } catch {}
+
+  // Visual feedback: flash the word with pin colour
+  el.classList.add('pinned');
+  setTimeout(() => el.classList.remove('pinned'), 1200);
+
+  // Show toast
+  toast('📌 Marcador puesto en «' + word + '»');
+
+  // Update book card badge
+  updateCacheBadges(S.lang);
+}
+
 let _bmSaveTimer = null;
 
 // Build paragraph HTML with data-si word spans.
@@ -2399,10 +2448,30 @@ function renderReader(){
   pane.parentNode.replaceChild(newPane, pane);
   newPane.addEventListener('mouseup', onSel);
   newPane.addEventListener('touchend', onSel, {passive:true});
+
+  // ── Long-press on a word (>1s) = set manual pin ──
+  let _lpTimer = null;
+  let _lpEl    = null;
+
+  newPane.addEventListener('touchstart', e => {
+    const el = e.target.closest('.rw');
+    if(!el) return;
+    _lpEl = el;
+    _lpTimer = setTimeout(() => {
+      _lpTimer = null;
+      pinWord(_lpEl);
+    }, 900);
+  }, {passive: true});
+
+  newPane.addEventListener('touchend', () => {
+    clearTimeout(_lpTimer); _lpTimer = null;
+  }, {passive: true});
+
+  newPane.addEventListener('touchmove', () => {
+    clearTimeout(_lpTimer); _lpTimer = null;
+  }, {passive: true});
   newPane.addEventListener('scroll', ()=>{
     updProg();
-    clearTimeout(_bmSaveTimer);
-    _bmSaveTimer = setTimeout(saveBookmark, 2000);
   }, {passive:true});
   updProg();
 }
@@ -2725,7 +2794,9 @@ function renderBookCard(b, lang){
     try { const r=localStorage.getItem('libreo_bm_'+lang+'_'+b.id); bm=r?JSON.parse(r):null; } catch{}
   }
   const pct = bm ? Math.round(bm.pct*100) : 0;
-  const resumeBadge = pct>1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
+  const resumeBadge = bm?.manual
+    ? `<span class="resume-badge">📌</span>`
+    : pct > 1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
   const onclick = isDoc ? `openDoc('${b.id}')` : `selBook('${b.id}')`;
   const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
   const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
