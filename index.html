@@ -3260,8 +3260,16 @@ function gxOpen(key){
   if(!book){ toast('Error: libro no encontrado'); return; }
   gxClear();
   document.getElementById('gx-input').value = '';
+  // Apply language colors without navigating to library (selLang calls goTo('sb'))
   const supported = ['en','es','fr','de','pt','it'];
-  if(supported.includes(book.lang) && book.lang !== S.lang) selLang(book.lang);
+  if(supported.includes(book.lang) && book.lang !== S.lang){
+    S.lang = book.lang;
+    const m = LMETA[book.lang], r = document.documentElement;
+    r.style.setProperty('--ac', `rgb(${m.rgb})`);
+    r.style.setProperty('--soft', `rgba(${m.rgb},.13)`);
+    const bdg = document.getElementById('bdg');
+    if(bdg){ bdg.className = 'bdg ' + book.lang; bdg.textContent = m.badge; }
+  }
   S.book = book;
   startRead(/*generateVocab=*/true);
 }
