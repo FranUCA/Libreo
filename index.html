@@ -3148,23 +3148,33 @@ function gxClear(){
 
 // Fetch Gutendex JSON, trying direct then two CORS proxies
 async function gxFetch(url){
+  const log = document.getElementById('gx-results');
+  function dbg(msg){ if(log) log.innerHTML = '<div class="gx-status" style="color:var(--dm);font-size:.75rem">' + msg + '</div>'; }
+
   // 1. Direct
+  dbg('Probando conexión directa…');
   try {
     const r = await fetch(url, {signal: AbortSignal.timeout(6000)});
-    if(r.ok) return await r.json();
-  } catch {}
+    if(r.ok){ dbg(''); return await r.json(); }
+    dbg('Directo: HTTP ' + r.status);
+  } catch(e){ dbg('Directo falló: ' + e.message + '<br>Probando proxy 1…'); }
+
   // 2. allorigins proxy
   try {
     const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
                           {signal: AbortSignal.timeout(8000)});
-    if(r.ok) return await r.json();
-  } catch {}
+    if(r.ok){ dbg(''); return await r.json(); }
+    dbg('Proxy1: HTTP ' + r.status);
+  } catch(e){ dbg('Proxy 1 falló: ' + e.message + '<br>Probando proxy 2…'); }
+
   // 3. corsproxy.io
   try {
     const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url),
                           {signal: AbortSignal.timeout(8000)});
-    if(r.ok) return await r.json();
-  } catch {}
+    if(r.ok){ dbg(''); return await r.json(); }
+    dbg('Proxy2: HTTP ' + r.status);
+  } catch(e){ dbg('Proxy 2 falló: ' + e.message); }
+
   throw new Error('unreachable');
 }
 
