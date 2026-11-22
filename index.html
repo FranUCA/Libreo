@@ -321,6 +321,10 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .resume-badge{position:absolute;top:6px;right:6px;
   background:var(--ac);color:#fff;font-size:.6rem;font-weight:700;
   padding:.15rem .4rem;border-radius:6px;letter-spacing:.03em;}
+.gx-card{padding:.7rem .8rem;border-radius:10px;border:1px solid var(--bd);
+  background:var(--sf);margin-bottom:.5rem;cursor:pointer;transition:background .15s;}
+.gx-card:active{background:var(--sf2);}
+.cache-badge{position:absolute;top:.4rem;left:.4rem;font-size:.8rem;line-height:1;}
 
 /* ── VOCABULARY SCREEN ── */
 #sv{flex-direction:column;}
@@ -473,6 +477,38 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   </div>
   <div class="vocab-body" id="vocab-body"></div>
 </div>
+
+<!-- GUTENDEX SEARCH SCREEN -->
+<div id="sg" class="sc">
+  <div class="tb">
+    <button class="ib" onclick="goTo('sb')">←</button>
+    <span class="tbt">Buscar en Gutenberg</span>
+    <div><button class="ib" onclick="goTo('sg')" title="Buscar en Gutenberg" style="font-size:1.1rem">🔍</button></div>
+  </div>
+  <div style="padding:.8rem 1rem 0">
+    <div style="display:flex;gap:.5rem">
+      <input id="gx-input" type="search" placeholder="Título o autor…"
+        style="flex:1;padding:.6rem .8rem;border-radius:10px;border:1px solid var(--bd);
+               background:var(--sf);color:var(--tx);font-size:.95rem"
+        onkeydown="if(event.key==='Enter')gxSearch()">
+      <div style="display:flex;gap:.4rem">
+        <select id="gx-lang" style="padding:.5rem;border-radius:10px;border:1px solid var(--bd);
+                background:var(--sf);color:var(--tx);font-size:.88rem">
+          <option value="">Todos</option>
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="de">DE</option>
+          <option value="pt">PT</option>
+          <option value="it">IT</option>
+        </select>
+        <button class="ib" onclick="gxSearch()" style="padding:.5rem .9rem;font-size:.9rem">🔍</button>
+      </div>
+    </div>
+  </div>
+  <div id="gx-results" style="padding:.6rem 1rem 1rem;overflow-y:auto;flex:1"></div>
+</div>
+
 
 <!-- WORD DETAIL SHEET (bottom sheet) -->
 <div id="word-sheet" onclick="closeWordSheet(event)">
@@ -2044,8 +2080,8 @@ function saveBookmark(){
   const pct = pane.scrollHeight > pane.clientHeight
     ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight)
     : 0;
-  if(pct < 0.01) return; // don't save if still at the very top
-  try { localStorage.setItem(bmKey(), JSON.stringify({pct, ts: Date.now()})); } catch{}
+  if(pct < 0.01) return;
+  try { localStorage.setItem(bmKey(), JSON.stringify({pct, si: S.si||0, ts: Date.now()})); } catch{}
 }
 
 function loadBookmark(){
@@ -2059,6 +2095,7 @@ function jumpToBookmark(){
   const bm = loadBookmark();
   if(!bm) return;
   dismissResume();
+  if(bm.si) S.si = bm.si;  // restore TTS position
   const pane = document.getElementById('tpn');
   setTimeout(()=>{
     pane.scrollTop = bm.pct * (pane.scrollHeight - pane.clientHeight);
@@ -2114,50 +2151,52 @@ async function startRead(){
   document.getElementById('ltx').textContent = 'Abriendo "'+S.book.title+'"…';
 
   try{
-    const res = await fetch(S.book.url);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-
-    const total    = parseInt(res.headers.get('content-length')||'0');
-    const reader   = res.body.getReader();
-    const isLatin1 = S.book.enc === 'latin1';
-
-    // Collect ALL bytes first, then decode once.
-    // Streaming UTF-8 decode with {stream:true} is fragile when the same
-    // TextDecoder instance is reused — it corrupts multi-byte sequences.
-    let chunks = [];
-    let received = 0;
-
-    while(true){
-      const {done, value} = await reader.read();
-      if(done) break;
-      chunks.push(value);
-      received += value.length;
-      if(total > 0)
-        bar.style.width = Math.min(5 + (received/total)*90, 95) + '%';
-      else
-        bar.style.width = Math.min((parseFloat(bar.style.width)||5) + 3, 90) + '%';
-    }
-
-    bar.style.width = '98%';
-
-    // Decode the full buffer in one shot
-    const fullBuf = mergeChunks(chunks);
-    let rawText;
-    if(isLatin1){
-      rawText = new TextDecoder('iso-8859-1').decode(fullBuf);
+    // ── Try cache first ──────────────────────────────────────────────────
+    let fullText = null;
+    const cached = await cacheGet(S.book.id);
+    if(cached){
+      bar.style.width = '100%';
+      document.getElementById('ltx').textContent = 'Abriendo "'+S.book.title+'"…';
+      fullText = cached.text;
     } else {
-      // Strip UTF-8 BOM (EF BB BF) if present
-      const slice = fullBuf[0]===0xEF && fullBuf[1]===0xBB && fullBuf[2]===0xBF
-        ? fullBuf.slice(3) : fullBuf;
-      rawText = new TextDecoder('utf-8').decode(slice);
-    }
+      // ── Fetch from network ─────────────────────────────────────────────
+      const res = await fetch(S.book.url);
+      if(!res.ok) throw new Error('HTTP '+res.status);
 
-    const fullText = cleanGutenberg(rawText);
-    bar.style.width = '100%';
+      const total  = parseInt(res.headers.get('content-length')||'0');
+      const reader = res.body.getReader();
+      const isLatin1 = S.book.enc === 'latin1';
+      let chunks = [], received = 0;
+
+      while(true){
+        const {done, value} = await reader.read();
+        if(done) break;
+        chunks.push(value);
+        received += value.length;
+        bar.style.width = total > 0
+          ? Math.min(5 + (received/total)*90, 95) + '%'
+          : Math.min((parseFloat(bar.style.width)||5) + 3, 90) + '%';
+      }
+      bar.style.width = '98%';
+
+      const fullBuf = mergeChunks(chunks);
+      let rawText;
+      if(isLatin1){
+        rawText = new TextDecoder('iso-8859-1').decode(fullBuf);
+      } else {
+        const slice = fullBuf[0]===0xEF && fullBuf[1]===0xBB && fullBuf[2]===0xBF
+          ? fullBuf.slice(3) : fullBuf;
+        rawText = new TextDecoder('utf-8').decode(slice);
+      }
+      fullText = cleanGutenberg(rawText);
+      bar.style.width = '100%';
+
+      // Save to cache for next time (fire and forget)
+      cachePut(S.book.id, fullText);
+    }
 
     // Show reader immediately with full text
     S.raw   = fullText;
-    // Build paras first (single newlines → space), then sents from the SAME para text
     S.paras = fullText.split(/\n\n+/).map(p=>p.replace(/\n/g,' ').trim()).filter(Boolean);
     S.sents = splitSentsFromParas(S.paras);
     renderReader();
@@ -2670,7 +2709,7 @@ function renderBookCard(b, lang){
   const onclick = isDoc ? `openDoc('${b.id}')` : `selBook('${b.id}')`;
   const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
   const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
-  return `<div class="bc ${b.lv}" onclick="${onclick}">
+  return `<div class="bc ${b.lv}" data-bid="${b.id}" onclick="${onclick}">
     ${resumeBadge}
     <div class="btt">${b.title}</div>
     <div class="ba">${b.author}</div>
@@ -2690,6 +2729,24 @@ function renderLib(lang){
         ${c.books.map(b=>renderBookCard(b, lang)).join('')}
       </div>
     </div>`).join('');
+  // After render, mark cached books asynchronously
+  updateCacheBadges(lang);
+}
+
+async function updateCacheBadges(lang){
+  const ids = await cachedIds();
+  const cached = new Set(ids);
+  (BOOKS[lang]||[]).flatMap(c=>c.books).forEach(b=>{
+    if(b.fmt) return; // skip PDF
+    const card = document.querySelector(`.bc[data-bid="${b.id}"]`);
+    if(!card) return;
+    const badge = card.querySelector('.cache-badge');
+    if(cached.has(b.id)){
+      if(!badge){ card.insertAdjacentHTML('afterbegin','<span class="cache-badge" title="Guardado sin conexión">📥</span>'); }
+    } else {
+      if(badge) badge.remove();
+    }
+  });
 }
 
 // ── PDF VIEWER ──
@@ -2849,6 +2906,154 @@ function pwaInstall(){
 
 // ── BOOT ──
 setupPWA();
+
+// ── GUTENDEX SEARCH ──────────────────────────────────────────────────────────
+const GX_API = 'https://gutendex.com/books/';
+let _gxNextUrl = null;
+
+async function gxSearch(url){
+  const resultsEl = document.getElementById('gx-results');
+  if(!url){
+    // Fresh search
+    const q    = document.getElementById('gx-input').value.trim();
+    if(!q) return;
+    const lang = document.getElementById('gx-lang').value;
+    const params = new URLSearchParams({search: q});
+    if(lang) params.set('languages', lang);
+    url = GX_API + '?' + params;
+    resultsEl.innerHTML = '<div style="color:var(--dm);padding:1rem 0">Buscando…</div>';
+    _gxNextUrl = null;
+  } else {
+    // Load more — append
+    resultsEl.querySelector('.gx-more')?.remove();
+  }
+
+  try {
+    const res  = await fetch(url);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    _gxNextUrl = data.next || null;
+
+    if(!data.results.length){
+      if(!url.includes('page=')) resultsEl.innerHTML = '<div style="color:var(--dm);padding:1rem 0">Sin resultados.</div>';
+      return;
+    }
+
+    const cards = data.results.map(gxBookCard).join('');
+    if(url.includes('page=') || url.includes('&page=')){
+      resultsEl.insertAdjacentHTML('beforeend', cards);
+    } else {
+      resultsEl.innerHTML = `<div style="color:var(--dm);font-size:.8rem;margin-bottom:.6rem">${data.count} resultados</div>` + cards;
+    }
+
+    if(_gxNextUrl){
+      resultsEl.insertAdjacentHTML('beforeend',
+        `<button class="gx-more" onclick="gxSearch('${_gxNextUrl}')"
+          style="width:100%;margin-top:.6rem;padding:.7rem;border-radius:10px;
+                 border:1px solid var(--bd);background:var(--sf);color:var(--tx);
+                 cursor:pointer;font-size:.88rem">Cargar más…</button>`);
+    }
+  } catch(e) {
+    if(!url.includes('page=')) resultsEl.innerHTML = '<div style="color:var(--r,#f66);padding:1rem 0">Error de red. Comprueba la conexión.</div>';
+  }
+}
+
+function gxBookCard(b){
+  // Pick the best plain-text URL
+  const txtUrl = b.formats['text/plain; charset=utf-8']
+               || b.formats['text/plain; charset=us-ascii']
+               || b.formats['text/plain']
+               || '';
+  if(!txtUrl) return ''; // skip books with no plain text
+
+  const title   = b.title || 'Sin título';
+  const authors = b.authors.map(a => a.name.replace(/,\s*/, ' ')).join(', ') || 'Autor desconocido';
+  const langs   = (b.languages||[]).join(', ').toUpperCase();
+  const dl      = b.download_count ? `${b.download_count.toLocaleString()} descargas` : '';
+  const enc     = b.formats['text/plain; charset=utf-8'] ? 'utf-8' : 'latin1';
+
+  return `<div class="gx-card" onclick="gxOpen(${JSON.stringify(JSON.stringify({
+    id: 'gx_'+b.id, title, author: authors, url: txtUrl, enc,
+    desc: langs, lv:'b1', lang: (b.languages||['en'])[0]
+  }))})">
+    <div style="font-weight:600;font-size:.93rem;margin-bottom:.18rem">${esc(title)}</div>
+    <div style="font-size:.8rem;color:var(--dm)">${esc(authors)}</div>
+    <div style="font-size:.75rem;color:var(--dmr);margin-top:.25rem;display:flex;gap:.6rem">
+      <span>${langs}</span>${dl?`<span>${dl}</span>`:''}
+    </div>
+  </div>`;
+}
+
+function gxOpen(bookJson){
+  const book = JSON.parse(bookJson);
+  // Switch to the book's language if we know it
+  const knownLangs = ['en','es','fr','de','pt','it'];
+  if(knownLangs.includes(book.lang) && book.lang !== S.lang){
+    selLang(book.lang);
+  }
+  // Set as current book and open reader
+  S.book = book;
+  startRead();
+}
+
+// ── INDEXEDDB BOOK CACHE ─────────────────────────────────────────────────────
+// Stores the full cleaned text of each book so it's not re-downloaded.
+// DB: libreo_cache  |  Store: books  |  Key: book.id  |  Value: {id, text, ts}
+
+let _db = null;
+
+function openDB(){
+  if(_db) return Promise.resolve(_db);
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('libreo_cache', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('books', {keyPath:'id'});
+    };
+    req.onsuccess = e => { _db = e.target.result; res(_db); };
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+async function cacheGet(id){
+  try {
+    const db = await openDB();
+    return await new Promise((res, rej) => {
+      const req = db.transaction('books','readonly').objectStore('books').get(id);
+      req.onsuccess = () => res(req.result || null);
+      req.onerror   = () => rej(req.error);
+    });
+  } catch { return null; }
+}
+
+async function cachePut(id, text){
+  try {
+    const db = await openDB();
+    await new Promise((res, rej) => {
+      const req = db.transaction('books','readwrite').objectStore('books').put({id, text, ts: Date.now()});
+      req.onsuccess = res;
+      req.onerror   = () => rej(req.error);
+    });
+  } catch {}
+}
+
+async function cacheHas(id){
+  const rec = await cacheGet(id);
+  return !!rec;
+}
+
+// Returns all cached book ids
+async function cachedIds(){
+  try {
+    const db = await openDB();
+    return await new Promise((res, rej) => {
+      const req = db.transaction('books','readonly').objectStore('books').getAllKeys();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror   = () => rej(req.error);
+    });
+  } catch { return []; }
+}
+
+
 loadFont();
 loadTheme();
 // Wire context menu buttons
