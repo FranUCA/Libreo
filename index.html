@@ -3226,6 +3226,9 @@ async function gxSearch(url){
   }
 }
 
+// Map from card key → book object, avoids passing JSON through onclick attributes
+const _gxMap = {};
+
 function gxBookCard(b){
   const txtUrl = b.formats['text/plain; charset=utf-8']
                || b.formats['text/plain; charset=us-ascii']
@@ -3238,26 +3241,25 @@ function gxBookCard(b){
   const langs   = (b.languages||[]).join(', ').toUpperCase();
   const dl      = b.download_count ? `${b.download_count.toLocaleString()} desc.` : '';
   const enc     = b.formats['text/plain; charset=utf-8'] ? 'utf-8' : 'latin1';
-  const bookObj = {
-    id: 'gx_' + b.id,
-    title, author: authors, url: txtUrl, enc,
-    desc: langs, lv: 'b1',
-    lang: (b.languages||['en'])[0]
+  const key     = 'gx_' + b.id;
+
+  _gxMap[key] = {
+    id: key, title, author: authors, url: txtUrl, enc,
+    desc: langs, lv: 'b1', lang: (b.languages||['en'])[0]
   };
 
-  return `<div class="gx-card" onclick='gxOpen(${JSON.stringify(JSON.stringify(bookObj))})'>
+  return `<div class="gx-card" onclick="gxOpen('${key}')">
     <div style="font-weight:600;font-size:.9rem">${esc(title)}</div>
     <div style="font-size:.78rem;color:var(--dm);margin-top:.1rem">${esc(authors)}</div>
     <div style="font-size:.72rem;color:var(--dmr);margin-top:.2rem">${langs}${dl?' · '+dl:''}</div>
   </div>`;
 }
 
-function gxOpen(bookJson){
-  const book = JSON.parse(bookJson);
-  // Close search results
+function gxOpen(key){
+  const book = _gxMap[key];
+  if(!book){ toast('Error: libro no encontrado'); return; }
   gxClear();
   document.getElementById('gx-input').value = '';
-  // Switch to book's language if supported
   const supported = ['en','es','fr','de','pt','it'];
   if(supported.includes(book.lang) && book.lang !== S.lang) selLang(book.lang);
   S.book = book;
