@@ -321,9 +321,20 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .resume-badge{position:absolute;top:6px;right:6px;
   background:var(--ac);color:#fff;font-size:.6rem;font-weight:700;
   padding:.15rem .4rem;border-radius:6px;letter-spacing:.03em;}
-.gx-card{padding:.7rem .8rem;border-radius:10px;border:1px solid var(--bd);
-  background:var(--sf);margin-bottom:.5rem;cursor:pointer;transition:background .15s;}
+.gx-bar{padding:.6rem 1rem .2rem;border-bottom:1px solid var(--bd);}
+.gx-row{display:flex;gap:.4rem;align-items:center;}
+.gx-inp{flex:1;padding:.55rem .75rem;border-radius:10px;border:1px solid var(--bd);
+  background:var(--sf);color:var(--tx);font-size:.88rem;min-width:0;}
+.gx-inp:focus{outline:none;border-color:var(--ac);}
+.gx-sel{padding:.5rem .3rem;border-radius:10px;border:1px solid var(--bd);
+  background:var(--sf);color:var(--tx);font-size:.8rem;cursor:pointer;}
+.gx-btn{padding:.5rem .8rem;border-radius:10px;border:none;
+  background:var(--ac);color:#fff;font-size:.85rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.gx-res{margin-top:.5rem;max-height:55vh;overflow-y:auto;}
+.gx-card{padding:.65rem .75rem;border-radius:10px;border:1px solid var(--bd);
+  background:var(--sf);margin-bottom:.4rem;cursor:pointer;transition:background .12s;}
 .gx-card:active{background:var(--sf2);}
+.gx-status{font-size:.8rem;color:var(--dm);padding:.4rem 0;}
 .cache-badge{position:absolute;top:.4rem;left:.4rem;font-size:.8rem;line-height:1;}
 
 /* ── VOCABULARY SCREEN ── */
@@ -437,6 +448,25 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       </div>
     </div>
   </div>
+  <!-- Integrated Gutendex search -->
+  <div class="gx-bar">
+    <div class="gx-row">
+      <input id="gx-input" type="search" class="gx-inp" placeholder="🔍 Buscar en 70.000 libros de Gutenberg…"
+        onkeydown="if(event.key==='Enter')gxSearch()"
+        oninput="if(!this.value.trim())gxClear()">
+      <select id="gx-lang" class="gx-sel">
+        <option value="">Todos</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="fr">FR</option>
+        <option value="de">DE</option>
+        <option value="pt">PT</option>
+        <option value="it">IT</option>
+      </select>
+      <button class="gx-btn" onclick="gxSearch()">Buscar</button>
+    </div>
+    <div id="gx-results" class="gx-res" style="display:none"></div>
+  </div>
   <div class="lby" id="lby"></div>
 </div>
 
@@ -477,38 +507,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   </div>
   <div class="vocab-body" id="vocab-body"></div>
 </div>
-
-<!-- GUTENDEX SEARCH SCREEN -->
-<div id="sg" class="sc">
-  <div class="tb">
-    <button class="ib" onclick="goTo('sb')">←</button>
-    <span class="tbt">Buscar en Gutenberg</span>
-    <div><button class="ib" onclick="goTo('sg')" title="Buscar en Gutenberg" style="font-size:1.1rem">🔍</button></div>
-  </div>
-  <div style="padding:.8rem 1rem 0">
-    <div style="display:flex;gap:.5rem">
-      <input id="gx-input" type="search" placeholder="Título o autor…"
-        style="flex:1;padding:.6rem .8rem;border-radius:10px;border:1px solid var(--bd);
-               background:var(--sf);color:var(--tx);font-size:.95rem"
-        onkeydown="if(event.key==='Enter')gxSearch()">
-      <div style="display:flex;gap:.4rem">
-        <select id="gx-lang" style="padding:.5rem;border-radius:10px;border:1px solid var(--bd);
-                background:var(--sf);color:var(--tx);font-size:.88rem">
-          <option value="">Todos</option>
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-          <option value="fr">FR</option>
-          <option value="de">DE</option>
-          <option value="pt">PT</option>
-          <option value="it">IT</option>
-        </select>
-        <button class="ib" onclick="gxSearch()" style="padding:.5rem .9rem;font-size:.9rem">🔍</button>
-      </div>
-    </div>
-  </div>
-  <div id="gx-results" style="padding:.6rem 1rem 1rem;overflow-y:auto;flex:1"></div>
-</div>
-
 
 <!-- WORD DETAIL SHEET (bottom sheet) -->
 <div id="word-sheet" onclick="closeWordSheet(event)">
@@ -1859,11 +1857,16 @@ function exitR(){ stopAudio(); goTo('sm'); }
 let _vocabAll = [];   // current book's full word list
 let _vocabFiltered = [];
 
-function openVocab(){
+async function openVocab(){
   if(!S.book) return;
-  const data = VOCAB[S.book.id];
   document.getElementById('vocab-title').textContent = S.book.title;
   document.getElementById('vocab-search').value = '';
+  // For Gutendex books: try loading vocab from IndexedDB if not in memory
+  if(S.book.id.startsWith('gx_') && !VOCAB[S.book.id]?.words?.length){
+    const cached = await loadCachedVocab(S.book.id);
+    if(cached) { if(!VOCAB[S.book.id]) VOCAB[S.book.id]={}; VOCAB[S.book.id].words = cached; }
+  }
+  const data = VOCAB[S.book.id];
 
   if(!data || !data.words || data.words.length === 0){
     // No preset vocab - generate it via Claude
@@ -2137,7 +2140,7 @@ function relTime(ts){
 const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
 const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
 
-async function startRead(){
+async function startRead(generateVocab=false){
   S.mode='read'; S.cache={}; S.hist=[]; S.si=0; stopAudio();
   dismissResume();
 
@@ -2202,6 +2205,10 @@ async function startRead(){
     renderReader();
     goTo('sr');
     showResumeBar();
+    // Generate vocab for Gutendex books (fires async, doesn't block reader)
+    if(generateVocab && !VOCAB[S.book.id]?.words?.length){
+      generateGxVocab(fullText);
+    }
 
   } catch(e){
     console.error(e);
@@ -2907,94 +2914,160 @@ function pwaInstall(){
 // ── BOOT ──
 setupPWA();
 
+// ── GUTENDEX VOCAB GENERATION ───────────────────────────────────────────────
+// Called after a Gutendex book is loaded. Uses Claude to pick 40 characteristic
+// words from the actual text, with Spanish translation, explanation in the
+// book's language, and a real sentence from the book containing each word.
+
+async function generateGxVocab(fullText){
+  const api = await getSample();
+  if(!api) return;
+
+  const book = S.book;
+  const langNames = {en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const srcLang   = langNames[book.lang] || book.lang;
+
+  // Send a 3000-char sample of the text so Claude can pick real words and sentences
+  const sample = fullText.slice(0, 8000);
+
+  const prompt = `Eres un profesor de idiomas. Analiza este fragmento del libro "${book.title}" de ${book.author} en ${srcLang}.
+
+Extrae exactamente 40 palabras características, interesantes o difíciles para un estudiante hispanohablante. Para cada una proporciona:
+- w: la palabra exactamente como aparece en el texto (sin mayúsculas innecesarias)
+- tr: traducción al español (1-3 palabras)  
+- exp: explicación breve en ${srcLang} (máximo 15 palabras)
+- ex: frase corta del texto donde aparece esa palabra (máximo 20 palabras, debe contener la palabra)
+
+Responde SOLO con JSON válido, sin markdown, sin texto adicional:
+{"words":[{"w":"...","tr":"...","exp":"...","ex":"..."},...]}
+
+Texto:
+${sample}`;
+
+  try {
+    const r = await api(prompt, {modelTier:'quick'});
+    let txt = r.text.trim();
+    if(txt.startsWith('```')) txt = txt.replace(/```json\n?|```/g,'').trim();
+    const parsed = JSON.parse(txt);
+    const words = (parsed.words||[]).filter(e=>e.w&&e.tr&&e.exp&&e.ex).slice(0,40);
+    if(!words.length) return;
+
+    if(!VOCAB[book.id]) VOCAB[book.id] = {};
+    VOCAB[book.id].words = words;
+
+    // Also save to IndexedDB alongside the text so it persists
+    cacheVocab(book.id, words);
+
+    // If vocab screen is currently open for this book, refresh it
+    const vocabScreen = document.getElementById('sv');
+    if(vocabScreen?.classList.contains('on') && S.book?.id === book.id){
+      _vocabAll = words;
+      _vocabFiltered = words;
+      renderVocab();
+    }
+  } catch(e){
+    console.warn('Vocab generation failed:', e);
+  }
+}
+
 // ── GUTENDEX SEARCH ──────────────────────────────────────────────────────────
 const GX_API = 'https://gutendex.com/books/';
 let _gxNextUrl = null;
 
+function gxClear(){
+  const res = document.getElementById('gx-results');
+  res.style.display = 'none';
+  res.innerHTML = '';
+  _gxNextUrl = null;
+}
+
 async function gxSearch(url){
-  const resultsEl = document.getElementById('gx-results');
+  const res = document.getElementById('gx-results');
+
   if(!url){
     // Fresh search
-    const q    = document.getElementById('gx-input').value.trim();
-    if(!q) return;
+    const q = document.getElementById('gx-input').value.trim();
+    if(!q){ gxClear(); return; }
     const lang = document.getElementById('gx-lang').value;
     const params = new URLSearchParams({search: q});
     if(lang) params.set('languages', lang);
     url = GX_API + '?' + params;
-    resultsEl.innerHTML = '<div style="color:var(--dm);padding:1rem 0">Buscando…</div>';
+    res.style.display = 'block';
+    res.innerHTML = '<div class="gx-status">Buscando…</div>';
     _gxNextUrl = null;
   } else {
-    // Load more — append
-    resultsEl.querySelector('.gx-more')?.remove();
+    // Load more — remove old "más" button
+    res.querySelector('.gx-more')?.remove();
   }
 
   try {
-    const res  = await fetch(url);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    const r    = await fetch(url);
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
     _gxNextUrl = data.next || null;
 
-    if(!data.results.length){
-      if(!url.includes('page=')) resultsEl.innerHTML = '<div style="color:var(--dm);padding:1rem 0">Sin resultados.</div>';
+    const cards = (data.results || []).map(gxBookCard).filter(Boolean).join('');
+
+    if(_gxNextUrl === null && !cards){
+      res.innerHTML = '<div class="gx-status">Sin resultados.</div>';
       return;
     }
 
-    const cards = data.results.map(gxBookCard).join('');
-    if(url.includes('page=') || url.includes('&page=')){
-      resultsEl.insertAdjacentHTML('beforeend', cards);
+    if(!url.includes('page=')){
+      res.innerHTML = `<div class="gx-status">${data.count.toLocaleString()} resultados</div>` + cards;
     } else {
-      resultsEl.innerHTML = `<div style="color:var(--dm);font-size:.8rem;margin-bottom:.6rem">${data.count} resultados</div>` + cards;
+      res.insertAdjacentHTML('beforeend', cards);
     }
 
     if(_gxNextUrl){
-      resultsEl.insertAdjacentHTML('beforeend',
-        `<button class="gx-more" onclick="gxSearch('${_gxNextUrl}')"
-          style="width:100%;margin-top:.6rem;padding:.7rem;border-radius:10px;
-                 border:1px solid var(--bd);background:var(--sf);color:var(--tx);
-                 cursor:pointer;font-size:.88rem">Cargar más…</button>`);
+      res.insertAdjacentHTML('beforeend',
+        `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
+          onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
     }
-  } catch(e) {
-    if(!url.includes('page=')) resultsEl.innerHTML = '<div style="color:var(--r,#f66);padding:1rem 0">Error de red. Comprueba la conexión.</div>';
+  } catch {
+    if(!url.includes('page='))
+      res.innerHTML = '<div class="gx-status" style="color:#f66">Error de red. Comprueba la conexión.</div>';
   }
 }
 
 function gxBookCard(b){
-  // Pick the best plain-text URL
   const txtUrl = b.formats['text/plain; charset=utf-8']
                || b.formats['text/plain; charset=us-ascii']
                || b.formats['text/plain']
                || '';
-  if(!txtUrl) return ''; // skip books with no plain text
+  if(!txtUrl) return '';
 
   const title   = b.title || 'Sin título';
-  const authors = b.authors.map(a => a.name.replace(/,\s*/, ' ')).join(', ') || 'Autor desconocido';
+  const authors = b.authors.map(a => a.name.replace(/,\s*(\S)/,'$1 ').trim()).join(', ') || 'Autor desconocido';
   const langs   = (b.languages||[]).join(', ').toUpperCase();
-  const dl      = b.download_count ? `${b.download_count.toLocaleString()} descargas` : '';
+  const dl      = b.download_count ? `${b.download_count.toLocaleString()} desc.` : '';
   const enc     = b.formats['text/plain; charset=utf-8'] ? 'utf-8' : 'latin1';
+  const bookObj = {
+    id: 'gx_' + b.id,
+    title, author: authors, url: txtUrl, enc,
+    desc: langs, lv: 'b1',
+    lang: (b.languages||['en'])[0]
+  };
 
-  return `<div class="gx-card" onclick="gxOpen(${JSON.stringify(JSON.stringify({
-    id: 'gx_'+b.id, title, author: authors, url: txtUrl, enc,
-    desc: langs, lv:'b1', lang: (b.languages||['en'])[0]
-  }))})">
-    <div style="font-weight:600;font-size:.93rem;margin-bottom:.18rem">${esc(title)}</div>
-    <div style="font-size:.8rem;color:var(--dm)">${esc(authors)}</div>
-    <div style="font-size:.75rem;color:var(--dmr);margin-top:.25rem;display:flex;gap:.6rem">
-      <span>${langs}</span>${dl?`<span>${dl}</span>`:''}
-    </div>
+  return `<div class="gx-card" onclick='gxOpen(${JSON.stringify(JSON.stringify(bookObj))})'>
+    <div style="font-weight:600;font-size:.9rem">${esc(title)}</div>
+    <div style="font-size:.78rem;color:var(--dm);margin-top:.1rem">${esc(authors)}</div>
+    <div style="font-size:.72rem;color:var(--dmr);margin-top:.2rem">${langs}${dl?' · '+dl:''}</div>
   </div>`;
 }
 
 function gxOpen(bookJson){
   const book = JSON.parse(bookJson);
-  // Switch to the book's language if we know it
-  const knownLangs = ['en','es','fr','de','pt','it'];
-  if(knownLangs.includes(book.lang) && book.lang !== S.lang){
-    selLang(book.lang);
-  }
-  // Set as current book and open reader
+  // Close search results
+  gxClear();
+  document.getElementById('gx-input').value = '';
+  // Switch to book's language if supported
+  const supported = ['en','es','fr','de','pt','it'];
+  if(supported.includes(book.lang) && book.lang !== S.lang) selLang(book.lang);
   S.book = book;
-  startRead();
+  startRead(/*generateVocab=*/true);
 }
+
 
 // ── INDEXEDDB BOOK CACHE ─────────────────────────────────────────────────────
 // Stores the full cleaned text of each book so it's not re-downloaded.
@@ -3005,9 +3078,11 @@ let _db = null;
 function openDB(){
   if(_db) return Promise.resolve(_db);
   return new Promise((res, rej) => {
-    const req = indexedDB.open('libreo_cache', 1);
+    const req = indexedDB.open('libreo_cache', 2);
     req.onupgradeneeded = e => {
-      e.target.result.createObjectStore('books', {keyPath:'id'});
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('books')) db.createObjectStore('books', {keyPath:'id'});
+      if(!db.objectStoreNames.contains('vocab')) db.createObjectStore('vocab', {keyPath:'id'});
     };
     req.onsuccess = e => { _db = e.target.result; res(_db); };
     req.onerror   = () => rej(req.error);
@@ -3034,6 +3109,27 @@ async function cachePut(id, text){
       req.onerror   = () => rej(req.error);
     });
   } catch {}
+}
+
+async function cacheVocab(id, words){
+  try {
+    const db = await openDB();
+    await new Promise((res, rej) => {
+      const req = db.transaction('vocab','readwrite').objectStore('vocab').put({id, words, ts: Date.now()});
+      req.onsuccess = res; req.onerror = () => rej(req.error);
+    });
+  } catch {}
+}
+
+async function loadCachedVocab(id){
+  try {
+    const db = await openDB();
+    return await new Promise((res, rej) => {
+      const req = db.transaction('vocab','readonly').objectStore('vocab').get(id);
+      req.onsuccess = () => res(req.result?.words || null);
+      req.onerror   = () => rej(req.error);
+    });
+  } catch { return null; }
 }
 
 async function cacheHas(id){
