@@ -3146,11 +3146,33 @@ function gxClear(){
   _gxNextUrl = null;
 }
 
+// Fetch Gutendex JSON, trying direct then two CORS proxies
+async function gxFetch(url){
+  // 1. Direct
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    if(r.ok) return await r.json();
+  } catch {}
+  // 2. allorigins proxy
+  try {
+    const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+                          {signal: AbortSignal.timeout(8000)});
+    if(r.ok) return await r.json();
+  } catch {}
+  // 3. corsproxy.io
+  try {
+    const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url),
+                          {signal: AbortSignal.timeout(8000)});
+    if(r.ok) return await r.json();
+  } catch {}
+  throw new Error('unreachable');
+}
+
 async function gxSearch(url){
   const res = document.getElementById('gx-results');
+  let isLoadMore = !!url;
 
   if(!url){
-    // Fresh search
     const q = document.getElementById('gx-input').value.trim();
     if(!q){ gxClear(); return; }
     const params = new URLSearchParams({search: q});
@@ -3160,58 +3182,37 @@ async function gxSearch(url){
     res.innerHTML = '<div class="gx-status">Buscando…</div>';
     _gxNextUrl = null;
   } else {
-    // Load more — remove old "más" button
     res.querySelector('.gx-more')?.remove();
   }
 
   try {
-    const r    = await fetch(url);
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
+    const data = await gxFetch(url);
     _gxNextUrl = data.next || null;
 
     const cards = (data.results || []).map(gxBookCard).filter(Boolean).join('');
 
-    if(_gxNextUrl === null && !cards){
-      res.innerHTML = '<div class="gx-status">Sin resultados.</div>';
-      return;
-    }
-
-    if(!url.includes('page=')){
-      res.innerHTML = `<div class="gx-status">${data.count.toLocaleString()} resultados</div>` + cards;
+    if(!isLoadMore){
+      if(!cards){
+        res.innerHTML = '<div class="gx-status">Sin resultados.</div>';
+        return;
+      }
+      res.innerHTML = `<div class="gx-status">${(data.count||0).toLocaleString()} resultados</div>` + cards;
     } else {
       res.insertAdjacentHTML('beforeend', cards);
     }
 
     if(_gxNextUrl){
       res.insertAdjacentHTML('beforeend',
-        `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
+        `<button class="gx-more gx-btn"
+          style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
           onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
     }
-  } catch(err) {
-    if(!url.includes('page=')){
-      // Try CORS proxy fallback
-      if(!url.includes('corsproxy') && !url.includes('allorigins')){
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-        try {
-          const r2   = await fetch(proxyUrl);
-          const data = await r2.json();
-          _gxNextUrl = data.next || null;
-          const cards = (data.results||[]).map(gxBookCard).filter(Boolean).join('');
-          if(!cards){ res.innerHTML='<div class="gx-status">Sin resultados.</div>'; return; }
-          res.innerHTML = `<div class="gx-status">${(data.count||0).toLocaleString()} resultados (vía proxy)</div>` + cards;
-          if(_gxNextUrl)
-            res.insertAdjacentHTML('beforeend',
-              `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
-                onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
-          return;
-        } catch {}
-      }
+  } catch {
+    if(!isLoadMore)
       res.innerHTML = `<div class="gx-status" style="color:#f66">
-        No se pudo conectar con Gutenberg.<br>
+        Sin conexión con Gutenberg.<br>
         <small>Comprueba la conexión a internet.</small>
       </div>`;
-    }
   }
 }
 
