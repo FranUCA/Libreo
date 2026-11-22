@@ -2211,8 +2211,27 @@ async function startRead(generateVocab=false){
       fullText = cached.text;
     } else {
       // ── Fetch from network ─────────────────────────────────────────────
-      const res = await fetch(S.book.url);
-      if(!res.ok) throw new Error('HTTP '+res.status);
+      // gutenberg.org blocks CORS — proxy those URLs; GITenberg (raw.githubusercontent.com) is open
+      const bookUrl = S.book.url;
+      const needsProxy = bookUrl.includes('gutenberg.org') && !bookUrl.includes('raw.githubusercontent');
+      let res = null;
+      if(needsProxy){
+        // Try two proxies in sequence
+        const proxies = [
+          'https://api.allorigins.win/raw?url=' + encodeURIComponent(bookUrl),
+          'https://corsproxy.io/?' + encodeURIComponent(bookUrl),
+        ];
+        for(const p of proxies){
+          try {
+            res = await fetch(p, {signal: AbortSignal.timeout(15000)});
+            if(res.ok) break;
+          } catch { res = null; }
+        }
+        if(!res || !res.ok) throw new Error('No se pudo descargar el libro');
+      } else {
+        res = await fetch(bookUrl);
+        if(!res.ok) throw new Error('HTTP '+res.status);
+      }
 
       const total  = parseInt(res.headers.get('content-length')||'0');
       const reader = res.body.getReader();
