@@ -451,8 +451,8 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <!-- Integrated Gutendex search -->
   <div class="gx-bar">
     <div class="gx-row">
-      <input id="gx-input" type="search" class="gx-inp" placeholder="🔍 Buscar en 70.000 libros de Gutenberg…"
-        onkeydown="if(event.key==='Enter')gxSearch()"
+      <input id="gx-input" type="search" class="gx-inp" placeholder="🔍 Buscar en Gutenberg (título o autor)…"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();gxSearch();}"
         oninput="if(!this.value.trim())gxClear()">
       <select id="gx-lang" class="gx-sel">
         <option value="">Todos</option>
@@ -1834,6 +1834,9 @@ function selLang(lang){
   r.style.setProperty('--soft',`rgba(${m.rgb},.13)`);
   const b=document.getElementById('bdg');
   b.className='bdg '+lang; b.textContent=m.badge;
+  // Pre-set search language filter to match selected language
+  const gxSel = document.getElementById('gx-lang');
+  if(gxSel) gxSel.value = lang;
   renderLib(lang); goTo('sb');
 }
 
@@ -3024,9 +3027,30 @@ async function gxSearch(url){
         `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
           onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
     }
-  } catch {
-    if(!url.includes('page='))
-      res.innerHTML = '<div class="gx-status" style="color:#f66">Error de red. Comprueba la conexión.</div>';
+  } catch(err) {
+    if(!url.includes('page=')){
+      // Try CORS proxy fallback
+      if(!url.includes('corsproxy') && !url.includes('allorigins')){
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+        try {
+          const r2   = await fetch(proxyUrl);
+          const data = await r2.json();
+          _gxNextUrl = data.next || null;
+          const cards = (data.results||[]).map(gxBookCard).filter(Boolean).join('');
+          if(!cards){ res.innerHTML='<div class="gx-status">Sin resultados.</div>'; return; }
+          res.innerHTML = `<div class="gx-status">${(data.count||0).toLocaleString()} resultados (vía proxy)</div>` + cards;
+          if(_gxNextUrl)
+            res.insertAdjacentHTML('beforeend',
+              `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
+                onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
+          return;
+        } catch {}
+      }
+      res.innerHTML = `<div class="gx-status" style="color:#f66">
+        No se pudo conectar con Gutenberg.<br>
+        <small>Comprueba la conexión a internet.</small>
+      </div>`;
+    }
   }
 }
 
