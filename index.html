@@ -480,9 +480,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
     <button class="ws-close" onclick="closeWordSheet()">✕</button>
     <div class="ws-word"  id="ws-word"></div>
     <div id="ws-word-tr" class="ws-word-tr"></div>
-    <div id="ws-trans-wrap">
-      <div class="ws-tld"><div class="sp2"></div> Traduciendo…</div>
-    </div>
+    <div id="ws-trans-wrap"></div>
     <div class="ws-label">Explicación</div>
     <div class="ws-exp" id="ws-exp"></div>
     <div class="ws-label">Ejemplo en el libro</div>
@@ -1976,90 +1974,32 @@ function openWordSheet(word, exp, ex, tr){
 
   document.getElementById('ws-word').textContent = word;
   const _trEl = document.getElementById('ws-word-tr');
-  if(_trEl){ _trEl.textContent = (tr && tr !== word) ? '→ ' + tr : ''; }
-  document.getElementById('ws-exp').textContent  = exp;
-  document.getElementById('ws-ex').innerHTML =
-    '<span style="color:var(--dmr);font-size:.82rem">Buscando frase…</span>';
-  document.getElementById('ws-trans-wrap').innerHTML =
-    `<div class="ws-tld"><div class="sp2"></div> Traduciendo…</div>`;
-  document.getElementById('word-sheet').classList.add('show');
+  if(_trEl) _trEl.textContent = (tr && tr !== word) ? '\u2192 ' + tr : '';
 
-  // 1. Try to find a real sentence from the already-loaded book text
+  document.getElementById('ws-exp').textContent = exp;
+
+  // Translation already in tr — instant, no network call
+  const wrap = document.getElementById('ws-trans-wrap');
+  wrap.innerHTML = (tr && tr !== word) ? `<div class="ws-trans">${esc(tr)}</div>` : '';
+
+  // Example: prefer real sentence from loaded text, else use preset ex
   const found = findBookSentence(word);
   if(found){
     _sheetSi = found.si;
     _ctxSi   = found.si;
     document.getElementById('ws-ex').innerHTML = highlightWord(found.text, word);
   } else {
-    // 2. Book not loaded (or word not in loaded fragment): ask Claude for a real quote
-    fetchBookExample(word, exp, ex);
+    document.getElementById('ws-ex').innerHTML = highlightWord(ex, word);
   }
 
-  translateWord(word);
+  // "Leer desde aquí" button when sentence is known
+  if(_sheetSi >= 0)
+    wrap.insertAdjacentHTML('beforeend',
+      `<button class="rfh-btn" style="margin-top:.6rem" onclick="closeWordSheet();ctxReadFrom()">\u25b6 Leer desde aqu\u00ed</button>`);
+
+  document.getElementById('word-sheet').classList.add('show');
 }
 
-async function fetchBookExample(word, exp, fallbackEx){
-  const exEl = document.getElementById('ws-ex');
-  const api  = await getSample();
-  if(!api){
-    // No API: show preset example, warn if word absent
-    const hasWord = fallbackEx.toLowerCase().includes(word.toLowerCase());
-    exEl.innerHTML = highlightWord(fallbackEx, word)
-      + (hasWord ? '' : `<span style="display:block;font-size:.7rem;color:var(--dmr);margin-top:.3rem;font-style:normal">⚠️ La frase de ejemplo puede no contener la palabra exacta</span>`);
-    return;
-  }
-  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
-  const srcLang = langNames[S.lang]||S.lang;
-  const prompt = `Dame UNA frase corta (máximo 20 palabras) extraída o inspirada en "${S.book?.title||'el libro'}" de ${S.book?.author||''} en ${srcLang} que contenga la palabra "${word}".
-La frase DEBE contener exactamente la palabra "${word}".
-Responde SOLO con la frase, sin comillas ni explicación.`;
-  try{
-    const res = await api(prompt, {modelTier:'quick'});
-    const sentence = res.text.trim().replace(/^["«»""]|["«»""]$/g,'');
-    if(sentence.toLowerCase().includes(word.toLowerCase())){
-      exEl.innerHTML = highlightWord(sentence, word);
-    } else {
-      // Claude returned something without the word — use fallback
-      exEl.innerHTML = highlightWord(fallbackEx, word);
-    }
-  } catch{
-    exEl.innerHTML = highlightWord(fallbackEx, word);
-  }
-}
-
-async function translateWord(word){
-  const target=TRANS_TARGET[S.lang]||'es';
-  const label=TRANS_LABEL[S.lang]||'español';
-  const key=word.toLowerCase().trim()+'|'+target;
-  const wrap=document.getElementById('ws-trans-wrap');
-  if(S.cache[key]){wrap.innerHTML=renderTransHtml(S.cache[key].t,S.cache[key].alts,label,word);return;}
-  const api=await getSample();
-  if(!api){wrap.innerHTML='<div style="color:var(--dm);font-size:.82rem">Sin traducción disponible.</div>';return;}
-  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
-  const prompt=`Traduce del ${langNames[S.lang]||S.lang} al ${label} la palabra "${word}" del libro "${S.book?.title||''}".
-Responde SOLO con JSON: {"t":"traducción","alts":["alt1","alt2"]}`;
-  try{
-    const res=await api(prompt,{modelTier:'quick',cache:true});
-    const p=JSON.parse(res.text.replace(/\`\`\`json|\`\`\`/g,'').trim());
-    const t=p.t||'',alts=(p.alts||[]).slice(0,3);
-    S.cache[key]={t,alts};wrap.innerHTML=renderTransHtml(t,alts,label,word);
-  }catch{wrap.innerHTML='<div style="color:var(--dm);font-size:.82rem">Sin traducción disponible.</div>';}
-}
-
-
-function renderTransHtml(t, alts, label, word){
-  const rfhBtn = _sheetSi >= 0
-    ? `<button class="rfh-btn" style="margin-top:.5rem" onclick="closeWordSheet();ctxReadFrom()">▶ Leer desde aquí</button>`
-    : '';
-  return `
-    <div class="ws-label">En ${label}</div>
-    <div class="ws-trans">${esc(t)}</div>
-    ${alts&&alts.length?`
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem">
-        ${alts.map(a=>`<span style="background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:.12rem .4rem;font-size:.76rem">${esc(a)}</span>`).join('')}
-      </div>`:''}
-    ${rfhBtn}`;
-}
 
 function closeWordSheet(e){
   if(e && e.target !== document.getElementById('word-sheet')) return;
