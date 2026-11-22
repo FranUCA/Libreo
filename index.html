@@ -260,11 +260,13 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 /* ── FAB ── */
 .fab{display:none;position:fixed;right:1rem;
   bottom:calc(1.2rem + var(--safe-b));
-  background:var(--ac);color:#fff;border:none;width:44px;height:44px;
-  border-radius:50%;cursor:pointer;font-size:1.1rem;
+  background:var(--ac);color:#fff;border:none;width:48px;height:48px;
+  border-radius:50%;cursor:pointer;font-size:1.3rem;
   box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:30;
-  align-items:center;justify-content:center;transition:transform .15s;}
-.fab:active{transform:scale(.9);}
+  align-items:center;justify-content:center;
+  transition:transform .15s, background .2s;}
+.fab:active{transform:scale(.88);}
+.fab.pinned-on{background:#f59e0b;box-shadow:0 4px 16px rgba(245,158,11,.5);}
 
 @media(max-width:620px){
   .tp2{position:fixed;bottom:0;left:0;right:0;width:100%!important;
@@ -2249,6 +2251,7 @@ async function startRead(generateVocab=false){
     S.sents = splitSentsFromParas(S.paras);
     renderReader();
     goTo('sr');
+    syncFabPin();
     showResumeBar();
     // Generate vocab for Gutendex books (fires async, doesn't block reader)
     if(generateVocab && !VOCAB[S.book.id]?.words?.length){
@@ -2350,31 +2353,62 @@ function cleanGutenberg(t){
 // Long-press a word to drop a pin. Saved to localStorage. Shown on book card.
 // On next open, reader starts at the pinned sentence.
 
-// Pin at current reading position (called from FAB button)
+// Toggle pin at current reading position
+// First press: sets pin + turns button amber
+// Second press: removes pin + returns button to accent color
 function pinHere(){
+  if(!S.book) return;
+  const btn  = document.getElementById('fab-pin');
+  const bm   = loadBookmark();
+
+  // If there's already a manual pin → remove it (toggle off)
+  if(bm && bm.manual){
+    try { localStorage.removeItem(bmKey()); } catch {}
+    if(btn) btn.classList.remove('pinned-on');
+    updateCacheBadges(S.lang);
+    toast('📌 Marcador eliminado');
+    return;
+  }
+
+  // Set pin at current position
   const pane = document.getElementById('tpn');
-  if(!pane || !S.book) return;
+  if(!pane) return;
+
   const pct = pane.scrollHeight > pane.clientHeight
     ? pane.scrollTop / (pane.scrollHeight - pane.clientHeight) : 0;
-  // Find which sentence is currently visible in the middle of the screen
-  const mid = pane.getBoundingClientRect().top + pane.clientHeight / 2;
-  let bestSi = S.si, bestDist = Infinity;
-  pane.querySelectorAll('.rw[data-si]').forEach(span => {
-    const r = span.getBoundingClientRect();
+
+  // Find the sentence closest to the vertical centre of the visible area
+  const paneRect = pane.getBoundingClientRect();
+  const mid = paneRect.top + paneRect.height / 2;
+  let bestSi = S.si || 0, bestDist = Infinity;
+  pane.querySelectorAll('.rw[data-si]').forEach(sp => {
+    const r = sp.getBoundingClientRect();
     const dist = Math.abs((r.top + r.bottom) / 2 - mid);
-    if(dist < bestDist){ bestDist = dist; bestSi = parseInt(span.getAttribute('data-si')); }
+    if(dist < bestDist){ bestDist = dist; bestSi = parseInt(sp.getAttribute('data-si')||'0'); }
   });
-  // Get a sample word from that sentence for the toast
-  const span = pane.querySelector(`.rw[data-si="${bestSi}"]`);
-  const word = span ? span.textContent.trim() : '';
+
+  // First word of that sentence = label
+  const firstSpan = pane.querySelector('.rw[data-si="'+bestSi+'"]');
+  const word = firstSpan ? firstSpan.textContent.trim() : '';
+
   try {
-    localStorage.setItem(bmKey(), JSON.stringify({pct, si: bestSi, word, ts: Date.now(), manual: true}));
+    localStorage.setItem(bmKey(), JSON.stringify(
+      {pct, si: bestSi, word, ts: Date.now(), manual: true}
+    ));
   } catch {}
-  toast('📌 Marcador puesto' + (word ? ' en «' + word + '»' : ''));
+
+  if(btn) btn.classList.add('pinned-on');
   updateCacheBadges(S.lang);
-  // Flash the button
+  toast('📌 Marcador puesto' + (word ? ' en «' + word + '»' : ''));
+}
+
+// Sync FAB button state with stored bookmark
+function syncFabPin(){
   const btn = document.getElementById('fab-pin');
-  if(btn){ btn.textContent='✅'; setTimeout(()=>{ btn.textContent='📌'; },1200); }
+  if(!btn) return;
+  const bm = loadBookmark();
+  if(bm && bm.manual) btn.classList.add('pinned-on');
+  else                btn.classList.remove('pinned-on');
 }
 
 function pinWord(el){
@@ -2393,11 +2427,9 @@ function pinWord(el){
   el.classList.add('pinned');
   setTimeout(() => el.classList.remove('pinned'), 1200);
 
-  // Show toast
   toast('📌 Marcador puesto en «' + word + '»');
-
-  // Update book card badge
   updateCacheBadges(S.lang);
+  syncFabPin();
 }
 
 let _bmSaveTimer = null;
