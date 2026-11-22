@@ -451,16 +451,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       </div>
     </div>
   </div>
-  <!-- Integrated Gutendex search -->
-  <div class="gx-bar">
-    <div class="gx-row">
-      <input id="gx-input" type="search" class="gx-inp" placeholder="🔍 Buscar en Gutenberg (título o autor)…"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();gxSearch();}"
-        oninput="if(!this.value.trim())gxClear()">
-      <button class="gx-btn" onclick="gxSearch()">Buscar</button>
-    </div>
-    <div id="gx-results" class="gx-res" style="display:none"></div>
-  </div>
   <div class="lby" id="lby"></div>
 </div>
 
@@ -679,6 +669,8 @@ const BOOKS = {
        url:G+"The-War-of-the-Worlds_36/master/36.txt"},
       {id:"journey", title:"Journey to the Centre of the Earth",author:"Jules Verne", lv:"b1",desc:"Exploración al interior del planeta.",
        url:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857.txt"},
+      {id:"tomsawyer",title:"The Adventures of Tom Sawyer",author:"Mark Twain",lv:"a2",desc:"Las travesuras de Tom Sawyer a orillas del Misisipi.",
+       url:G+"The-Adventures-of-Tom-Sawyer_74/master/74.txt"},
     ]},
     {cat:"Asimov — Fundación 🌌",desc:"PDF · C1",books:[
       {id:"foundation",    title:"Foundation",                     author:"Isaac Asimov",lv:"c1",desc:"Hari Seldon funda la Fundación para preservar el conocimiento.",
@@ -766,10 +758,6 @@ const BOOKS = {
     {cat:"Lectura fácil 📖",desc:"B1",books:[
       {id:"fabeln9158", title:"Fabeln und Erzählungen",        author:"C. F. Gellert",    lv:"b1",desc:"Fábulas morales del siglo XVIII alemán.",
        url:G+"Fabeln-und-Erzahlungen_9158/master/9158-8.txt",enc:"latin1"},
-      {id:"tomsawyer_de",title:"Die Abenteuer Tom Sawyers",   author:"Mark Twain",       lv:"b1",desc:"Las aventuras de Tom Sawyer en alemán.",
-       url:G+"Die-Abenteuer-Tom-Sawyers_30165/master/30165-8.txt",enc:"latin1"},
-      {id:"tomsawyer2_de",title:"Tom Sawyers neue Abenteuer", author:"Mark Twain",       lv:"b1",desc:"Nuevas aventuras de Tom Sawyer en alemán.",
-       url:G+"Tom-Sawyers-Neue-Abenteuer_65346/master/65346-0.txt"},
       {id:"winterm",    title:"Deutschland: Ein Wintermärchen",author:"Heinrich Heine",   lv:"b1",desc:"Poema épico-satírico del viaje de Heine por Alemania.",
        url:G+"Deutschland-Ein-Wintermarchen_6079/master/6079-8.txt",enc:"latin1"},
     ]},
@@ -1827,6 +1815,159 @@ const VOCAB = {
     {w:"wisdom",tr:"wisdom",exp:"The quality of having experience and good judgement.",ex:"Twenty thousand years of wisdom lay in that robot mind."},
     {w:"world",tr:"mundo",exp:"A planet; here each world has its own culture.",ex:"Each world they visited held a piece of the puzzle."},
   ]},
+  struwwel:{words:[
+    {w:"Strafe",tr:"castigo",exp:"Konsequenz für schlechtes Benehmen.",ex:"Das Kind bekam eine Strafe weil es den Daumen lutschte."},
+    {w:"Daumen",tr:"pulgar",exp:"Der erste und breiteste Finger der Hand.",ex:"Der Scheerenschleifer schnitt dem Jungen die Daumen ab."},
+    {w:"Feuer",tr:"fuego",exp:"Flammen die brennen und gefährlich sind.",ex:"Das Mädchen spielte mit dem Feuer und ihre Kleider brannten."},
+    {w:"Kind",tr:"niño",exp:"Ein junger Mensch im Kindesalter.",ex:"Das Kind wollte seine Suppe nicht essen."},
+    {w:"böse",tr:"malo",exp:"Moralisch schlecht oder schädlich.",ex:"Der böse Friedrich schlug alle Tiere im Dorf."},
+    {w:"Haar",tr:"pelo",exp:"Fadenförmige Gebilde die auf dem Kopf wachsen.",ex:"Struwwelpeter hatte wilde ungekämmte Haare."},
+    {w:"Nägel",tr:"uñas",exp:"Harte Platten an den Fingerspitzen.",ex:"Struwwelpeter hatte lange schmutzige Nägel wie Klauen."},
+    {w:"Suppe",tr:"sopa",exp:"Flüssiges warmes Gericht in einem Teller.",ex:"Der Suppenkaspar weigerte sich seine Suppe zu essen."},
+    {w:"Warnung",tr:"advertencia",exp:"Hinweis auf eine drohende Gefahr.",ex:"Die Warnung der Mutter ignorierte das Kind vollständig."},
+    {w:"Angst",tr:"miedo",exp:"Gefühl von Furcht vor einer Gefahr.",ex:"Die Angst des Kindes kam erst als die Schere erschien."},
+    {w:"lustig",tr:"gracioso",exp:"Komisch und zum Lachen bringend.",ex:"Die Geschichten sind lustig aber enthalten eine ernste Moral."},
+    {w:"Moral",tr:"moraleja",exp:"Die Lehre oder Botschaft einer Geschichte.",ex:"Jede Geschichte im Struwwelpeter hat eine klare Moral."},
+    {w:"Regen",tr:"lluvia",exp:"Wassertropfen die aus den Wolken fallen.",ex:"Hans schaute in den Regen und fiel in den Fluss."},
+    {w:"Hund",tr:"perro",exp:"Häufig gehaltenes Haustier.",ex:"Friedrich schlug sogar den armen Hund mit seiner Peitsche."},
+    {w:"Schere",tr:"tijera",exp:"Werkzeug zum Schneiden aus zwei Klingen.",ex:"Der Schneider kam mit einer großen Schere und schnitt die Daumen."}
+  ]},
+  marchen64:{words:[
+    {w:"Zauberer",tr:"mago",exp:"Person mit übernatürlichen Fähigkeiten.",ex:"Der Zauberer verwandelte den Prinzen in einen Frosch."},
+    {w:"Hexe",tr:"bruja",exp:"Alte Frau mit bösen magischen Kräften.",ex:"Die böse Hexe vergiftete den Apfel für das Mädchen."},
+    {w:"Wunsch",tr:"deseo",exp:"Ein starkes Verlangen nach etwas.",ex:"Der Fischer hatte drei Wünsche frei."},
+    {w:"Fluch",tr:"maldición",exp:"Ein böser Zauber der Unglück bringt.",ex:"Der Fluch der Hexe konnte nur durch wahre Liebe gebrochen werden."},
+    {w:"Prinzessin",tr:"princesa",exp:"Die Tochter eines Königs.",ex:"Die Prinzessin war in einem hohen Turm eingesperrt."},
+    {w:"König",tr:"rey",exp:"Der männliche Herrscher eines Königreichs.",ex:"Der König versprach dem Ritter die Hand seiner Tochter."},
+    {w:"Liebe",tr:"amor",exp:"Tiefes Gefühl der Zuneigung.",ex:"Nur die wahre Liebe konnte den Fluch brechen."},
+    {w:"Fee",tr:"hada",exp:"Ein kleines Wesen mit guten magischen Kräften.",ex:"Die gute Fee erfüllte dem Mädchen drei Wünsche."},
+    {w:"Schatz",tr:"tesoro",exp:"Eine Sammlung wertvoller Gegenstände.",ex:"Der Schatz war tief im Wald versteckt."},
+    {w:"Wald",tr:"bosque",exp:"Großes Gebiet mit vielen Bäumen.",ex:"Das Kind verlor sich im dunklen Wald."},
+    {w:"gut",tr:"bueno",exp:"Moralisch positiv und hilfsbereit.",ex:"Das gute Mädchen wurde am Ende reich belohnt."},
+    {w:"Held",tr:"héroe",exp:"Eine mutige Person die anderen hilft.",ex:"Der Held besiegte den Drachen und befreite die Prinzessin."},
+    {w:"verwandeln",tr:"transformar",exp:"Die Form von jemandem ändern.",ex:"Die Hexe konnte Menschen in Tiere verwandeln."},
+    {w:"Schloss",tr:"castillo",exp:"Ein großes Gebäude in dem Könige wohnen.",ex:"Das verzauberte Schloss stand mitten im dunklen Wald."},
+    {w:"Mut",tr:"valor",exp:"Die Fähigkeit trotz Angst zu handeln.",ex:"Der Held zeigte Mut als er in die Höhle einstieg."}
+  ]},
+  fabeln9375:{words:[
+    {w:"Fuchs",tr:"zorro",exp:"Schlaues Tier das Betrug symbolisiert.",ex:"Der Fuchs schmeichelte dem Raben um ihm den Käse zu stehlen."},
+    {w:"Rabe",tr:"cuervo",exp:"Schwarzer Vogel der als eitel gilt.",ex:"Der eitle Rabe ließ sich vom Fuchs täuschen."},
+    {w:"Moral",tr:"moraleja",exp:"Die Lehre die eine Fabel vermittelt.",ex:"Die Moral der Fabel war dass Schmeichelei oft täuscht."},
+    {w:"Lüge",tr:"mentira",exp:"Eine falsche Aussage.",ex:"Die Lüge des Fuchses überzeugte den gutgläubigen Raben."},
+    {w:"Gier",tr:"codicia",exp:"Übermäßiges Verlangen nach mehr.",ex:"Die Gier des Hundes ließ ihn sein Fleisch verlieren."},
+    {w:"Löwe",tr:"león",exp:"Der König der Tiere.",ex:"Der Löwe war dankbar dem Mäuschen das ihm geholfen hatte."},
+    {w:"Wahrheit",tr:"verdad",exp:"Das was der Realität entspricht.",ex:"Die Wahrheit kam am Ende ans Licht trotz aller Lügen."},
+    {w:"Klugheit",tr:"inteligencia",exp:"Die Fähigkeit klug zu denken.",ex:"Klugheit war immer wichtiger als rohe Stärke."},
+    {w:"Neid",tr:"envidia",exp:"Schmerzhaftes Gefühl wegen des Glücks anderer.",ex:"Der Neid des Frosches auf den Stier wurde zu seinem Verhängnis."},
+    {w:"Schmeichelei",tr:"halago",exp:"Übertriebenes Lob um jemanden zu gewinnen.",ex:"Die Schmeichelei des Fuchses ließ den Raben unvorsichtig werden."},
+    {w:"Wolf",tr:"lobo",exp:"Wildes Tier das Gefahr symbolisiert.",ex:"Der Wolf beschuldigte das Lamm um einen Grund zum Angriff zu haben."},
+    {w:"Lamm",tr:"cordero",exp:"Junges Schaf das Unschuld symbolisiert.",ex:"Das unschuldige Lamm wurde vom Wolf grundlos angegriffen."},
+    {w:"Belohnung",tr:"recompensa",exp:"Etwas Positives das man für gute Taten erhält.",ex:"Die Belohnung für Ehrlichkeit war in dieser Fabel besonders groß."},
+    {w:"Freundschaft",tr:"amistad",exp:"Enge Beziehung gegenseitiger Zuneigung.",ex:"Die echte Freundschaft zeigte sich in der Not."},
+    {w:"weise",tr:"sabio",exp:"Mit großer Erfahrung und gutem Urteilsvermögen.",ex:"Der weise Alte warnte die anderen vor der Gefahr."}
+  ]},
+  marchen6641:{words:[
+    {w:"Sage",tr:"leyenda",exp:"Mündlich überlieferte Geschichte.",ex:"Die alte Sage erzählte von einem Schatz im Berg."},
+    {w:"Geist",tr:"espíritu",exp:"Übernatürliches Wesen oder Seele.",ex:"Der Geist des alten Ritters erschien nachts auf der Burg."},
+    {w:"Fluss",tr:"río",exp:"Fließendes Gewässer.",ex:"Am Fluss lebte eine Nixe die Reisende in die Tiefe lockte."},
+    {w:"Ritter",tr:"caballero",exp:"Bewaffneter Krieger des Mittelalters.",ex:"Der tapfere Ritter besiegte den Drachen."},
+    {w:"Schatz",tr:"tesoro",exp:"Sammlung wertvoller verborgener Gegenstände.",ex:"Der Schatz war von einem bösen Geist bewacht."},
+    {w:"Fluch",tr:"maldición",exp:"Ein böser Zauber der Unglück bringt.",ex:"Der Fluch lag seit hundert Jahren auf der ganzen Familie."},
+    {w:"Erlösung",tr:"salvación",exp:"Befreiung von einem Fluch.",ex:"Die Erlösung des verwandelten Prinzen kam durch einen Kuss."},
+    {w:"Liebe",tr:"amor",exp:"Tiefes Gefühl der Zuneigung.",ex:"Nur die wahre Liebe konnte den Fluch brechen."},
+    {w:"Nacht",tr:"noche",exp:"Die Zeit der Dunkelheit.",ex:"In der Nacht erschienen die Geister aus ihren Gräbern."},
+    {w:"Nixe",tr:"ninfa",exp:"Weibliches Wasserwesen aus der Mythologie.",ex:"Die Nixe lockte den Fischer mit ihrem Gesang."},
+    {w:"Drachen",tr:"dragón",exp:"Ein mythisches feuerspeiendes Reptil.",ex:"Der Drachen bewachte den Schatz tief im Berg."},
+    {w:"verwandeln",tr:"transformar",exp:"Die Form von jemandem ändern.",ex:"Die böse Hexe konnte Menschen in Tiere verwandeln."},
+    {w:"Tod",tr:"muerte",exp:"Das Ende des Lebens.",ex:"Der Tod des bösen Zauberers befreite alle seine Opfer."},
+    {w:"Berg",tr:"montaña",exp:"Große natürliche Erhebung.",ex:"Im Berg schlief der alte Kaiser und wartete."},
+    {w:"Mut",tr:"valor",exp:"Die Fähigkeit trotz Angst zu handeln.",ex:"Der Held zeigte Mut als er in die Höhle betrat."}
+  ]},
+  mondnacht:{words:[
+    {w:"Mond",tr:"luna",exp:"Der natürliche Satellit der Erde.",ex:"Der Mond schien hell auf das stille Dorf hinunter."},
+    {w:"Nacht",tr:"noche",exp:"Die Zeit der Dunkelheit.",ex:"In der Nacht des Vollmondes erwachten die Geister."},
+    {w:"Traum",tr:"sueño",exp:"Bilder und Erlebnisse im Schlaf.",ex:"Der Traum des Jünglings führte ihn zu einem Schloss."},
+    {w:"Geist",tr:"espíritu",exp:"Übernatürliches Wesen oder Seele.",ex:"Ein freundlicher Geist zeigte dem Wanderer den Weg."},
+    {w:"Stille",tr:"silencio",exp:"Vollständige Abwesenheit von Lärm.",ex:"In der Stille der Mondnacht hörte man die Natur atmen."},
+    {w:"Schatten",tr:"sombra",exp:"Dunkle Fläche wenn Licht blockiert wird.",ex:"Im Schatten der alten Eiche saß eine geheimnisvolle Gestalt."},
+    {w:"Liebe",tr:"amor",exp:"Tiefes Gefühl der Zuneigung.",ex:"Die Liebe überlebt den Tod in den schönsten Erzählungen."},
+    {w:"Seele",tr:"alma",exp:"Der geistige und unsterbliche Teil des Menschen.",ex:"Die Seele der Verstorbenen kehrte an Mondnächten zurück."},
+    {w:"Geheimnis",tr:"secreto",exp:"Etwas was nur wenige Menschen wissen.",ex:"Das Geheimnis des alten Hauses offenbarte sich im Mondlicht."},
+    {w:"Licht",tr:"luz",exp:"Energie die Dinge sichtbar macht.",ex:"Das Mondlicht enthüllte was der Tag verborgen hatte."},
+    {w:"Ferne",tr:"lejanía",exp:"Ein weit entfernter Ort.",ex:"In der Ferne hörte man das Rauschen des Flusses."},
+    {w:"Ahnung",tr:"presentimiento",exp:"Ein unklares Gefühl das etwas passieren wird.",ex:"Eine dunkle Ahnung befiel ihn als er das Haus betrat."},
+    {w:"flüstern",tr:"susurrar",exp:"Sehr leise sprechen.",ex:"Die Blätter flüsterten Geheimnisse in der stillen Mondnacht."},
+    {w:"Natur",tr:"naturaleza",exp:"Die gesamte natürliche Welt.",ex:"Die Natur in der Mondnacht wirkte lebendig und geheimnisvoll."},
+    {w:"Vision",tr:"visión",exp:"Ein übernatürliches Bild oder eine Erscheinung.",ex:"Eine mystische Vision erschien dem Wanderer im Mondlicht."}
+  ]},
+  fabeln9158:{words:[
+    {w:"Tugend",tr:"virtud",exp:"Eine positive moralische Eigenschaft.",ex:"Die Tugend wurde in Gellerts Fabeln immer belohnt."},
+    {w:"Laster",tr:"vicio",exp:"Eine schlechte Gewohnheit oder moralische Schwäche.",ex:"Jedes Laster hat seinen gerechten Lohn in den Fabeln."},
+    {w:"Vernunft",tr:"razón",exp:"Die Fähigkeit logisch zu denken.",ex:"Die Vernunft war für Gellert die höchste menschliche Tugend."},
+    {w:"Neid",tr:"envidia",exp:"Schmerzhaftes Gefühl wegen des Glücks anderer.",ex:"Der Neid des Nachbarn war der Anfang seines Unglücks."},
+    {w:"Ehrlichkeit",tr:"honestidad",exp:"Die Qualität immer die Wahrheit zu sagen.",ex:"Die Ehrlichkeit des einfachen Mannes wurde am Ende belohnt."},
+    {w:"Mitleid",tr:"compasión",exp:"Das Mitfühlen mit dem Leid anderer.",ex:"Das Mitleid mit dem kranken Tier rettete den Bauern."},
+    {w:"Pflicht",tr:"deber",exp:"Eine moralische Verpflichtung.",ex:"Der gute Christ erfüllte seine Pflicht gegenüber allen."},
+    {w:"Reue",tr:"arrepentimiento",exp:"Das Bedauern über etwas Falsches.",ex:"Die Reue kam zu spät um das Verlorene zurückzubringen."},
+    {w:"Weisheit",tr:"sabiduría",exp:"Tiefes Wissen und gutes Urteilsvermögen.",ex:"Die Weisheit des alten Mannes half dem Jungen seinen Fehler zu verstehen."},
+    {w:"Gier",tr:"codicia",exp:"Übermäßiges Verlangen nach mehr.",ex:"Die Gier des reichen Mannes führte zu seinem Ruin."},
+    {w:"Freundschaft",tr:"amistad",exp:"Enge Beziehung gegenseitiger Zuneigung.",ex:"Die wahre Freundschaft besteht auch in Zeiten der Not."},
+    {w:"Klugheit",tr:"inteligencia",exp:"Die Fähigkeit klug zu denken.",ex:"Klugheit war immer die Waffe der Schwachen."},
+    {w:"Strafe",tr:"castigo",exp:"Eine Konsequenz für schlechtes Verhalten.",ex:"Die Strafe für den Lügner war immer gerecht."},
+    {w:"Moral",tr:"moraleja",exp:"Die Lehre die eine Geschichte vermittelt.",ex:"Die Moral jeder Fabel war klar und lehrreich."},
+    {w:"Güte",tr:"bondad",exp:"Die Qualität gütig und freundlich zu sein.",ex:"Die Güte des einfachen Bauern rettete am Ende alle."}
+  ]},
+  winterm:{words:[
+    {w:"Vaterland",tr:"patria",exp:"Das Land in dem man geboren wurde.",ex:"Heine besuchte das Vaterland nach vielen Jahren im Exil."},
+    {w:"Freiheit",tr:"libertad",exp:"Der Zustand ohne politische Unterdrückung.",ex:"Heine sehnte sich nach Freiheit für Deutschland."},
+    {w:"Satire",tr:"sátira",exp:"Literarische Form die Missstände durch Ironie kritisiert.",ex:"Das Wintermärchen ist eine scharfe Satire auf Deutschland."},
+    {w:"Zensur",tr:"censura",exp:"Staatliche Unterdrückung von Meinungen.",ex:"Heines Werke unterlagen strenger Zensur in Deutschland."},
+    {w:"Zoll",tr:"aduana",exp:"Behörde die an der Grenze Waren kontrolliert.",ex:"An der Grenze musste Heine durch den Zoll."},
+    {w:"Rhein",tr:"Rin",exp:"Der wichtigste Fluss Deutschlands.",ex:"Der Rhein begrüßte Heine bei seiner Rückkehr ins Vaterland."},
+    {w:"Traum",tr:"sueño",exp:"Bilder oder Erlebnisse in der Fantasie.",ex:"Im Traum sprach Heine mit dem alten Barbarossa."},
+    {w:"Ironie",tr:"ironía",exp:"Aussage deren Bedeutung das Gegenteil ist.",ex:"Heines Ironie machte seine Kritik schärfer."},
+    {w:"Spott",tr:"burla",exp:"Hohn gegenüber jemandem oder etwas.",ex:"Heines Spott über die deutschen Zustände war vernichtend."},
+    {w:"Hoffnung",tr:"esperanza",exp:"Der Glaube dass etwas Gutes passiert.",ex:"Trotz aller Kritik hegte Heine Hoffnung für Deutschland."},
+    {w:"Exil",tr:"exilio",exp:"Das Leben in einem fremden Land aus politischen Gründen.",ex:"Heine lebte im Exil in Paris und schrieb über Deutschland."},
+    {w:"Kritik",tr:"crítica",exp:"Beurteilung von Mängeln mit dem Ziel der Verbesserung.",ex:"Heines Kritik an Deutschland war scharf aber von Liebe geprägt."},
+    {w:"Winter",tr:"invierno",exp:"Die kälteste Jahreszeit.",ex:"Der Winter symbolisiert die politische Kälte Deutschlands."},
+    {w:"Reaktion",tr:"reacción",exp:"Politisch konservative Bewegung gegen Fortschritt.",ex:"Die Reaktion in Deutschland unterdrückte jede liberale Stimme."},
+    {w:"Reise",tr:"viaje",exp:"Eine Fahrt von einem Ort zu einem anderen.",ex:"Die Reise durch Deutschland war eine Reise in die Vergangenheit."}
+  ]},
+  verwandlung:{words:[
+    {w:"Verwandlung",tr:"transformación",exp:"Vollständige Veränderung der äußeren Erscheinung.",ex:"Gregor Samsas Verwandlung in ein Ungeziefer veränderte alles."},
+    {w:"Ungeziefer",tr:"bicho",exp:"Ein großes lästiges Insekt.",ex:"Gregor erwachte eines Morgens als riesiges Ungeziefer."},
+    {w:"Familie",tr:"familia",exp:"Gruppe von Menschen die durch Blut verbunden sind.",ex:"Die Familie Samsa reagierte auf Gregors Verwandlung mit Entsetzen."},
+    {w:"Angst",tr:"angustia",exp:"Gefühl tiefer Besorgnis und Furcht.",ex:"Die Angst der Mutter beim Anblick Gregors war überwältigend."},
+    {w:"Schuld",tr:"culpa",exp:"Die Verantwortung für etwas Schlechtes.",ex:"Gregor fühlte Schuld dass er seiner Familie nicht mehr helfen konnte."},
+    {w:"Isolation",tr:"aislamiento",exp:"Zustand der Trennung von anderen.",ex:"Die Isolation Gregors in seinem Zimmer wurde immer vollständiger."},
+    {w:"Arbeit",tr:"trabajo",exp:"Körperliche Tätigkeit um Geld zu verdienen.",ex:"Gregor war Handlungsreisender und seine Arbeit ernährte die Familie."},
+    {w:"Schwester",tr:"hermana",exp:"Weibliches Mitglied derselben Familie.",ex:"Grete die Schwester kümmerte sich am längsten um Gregor."},
+    {w:"Zimmer",tr:"habitación",exp:"Einzelner Raum in einem Gebäude.",ex:"Gregor verbrachte die meiste Zeit in seinem verdunkelten Zimmer."},
+    {w:"Tod",tr:"muerte",exp:"Das Ende des Lebens.",ex:"Gregors Tod wurde von der Familie mit Erleichterung aufgenommen."},
+    {w:"Einsamkeit",tr:"soledad",exp:"Der Zustand allein zu sein.",ex:"Die Einsamkeit Gregors nach der Verwandlung war absolut."},
+    {w:"Vater",tr:"padre",exp:"Männliches Elternteil eines Kindes.",ex:"Der Vater warf Äpfel nach Gregor als er ihn bedrohlich fand."},
+    {w:"Last",tr:"carga",exp:"Eine schwere Bürde für andere.",ex:"Gregor wurde zur Last für die Familie die er einst versorgt hatte."},
+    {w:"Menschlichkeit",tr:"humanidad",exp:"Qualitäten die Menschen von Tieren unterscheiden.",ex:"Gregor bewahrte seine Menschlichkeit auch nach der Verwandlung."},
+    {w:"Wandel",tr:"cambio",exp:"Eine Veränderung im Zustand von etwas.",ex:"Der Wandel in der Familie nach Gregors Verwandlung war erschreckend."}
+  ]},
+  tomsawyer:{words:[
+    {w:"adventure",tr:"aventura",exp:"An exciting or dangerous experience.",ex:"Tom Sawyer loved adventure and was always looking for trouble."},
+    {w:"fence",tr:"valla",exp:"A barrier made of wood used to mark a boundary.",ex:"Tom tricked the other boys into painting the fence for him."},
+    {w:"cave",tr:"cueva",exp:"A natural hollow space inside a rock or hill.",ex:"Tom and Becky were lost in the cave for several frightening days."},
+    {w:"treasure",tr:"tesoro",exp:"A collection of valuable objects hidden away.",ex:"Tom and Huck found real treasure hidden in the cave at last."},
+    {w:"river",tr:"río",exp:"A large natural stream of water.",ex:"Tom and Huck built a raft and floated down the river."},
+    {w:"mischief",tr:"travesura",exp:"Playful bad behaviour that causes minor problems.",ex:"Tom was always getting into mischief that annoyed Aunt Polly."},
+    {w:"murder",tr:"asesinato",exp:"The crime of deliberately killing another person.",ex:"Tom and Huck witnessed a murder in the graveyard at midnight."},
+    {w:"secret",tr:"secreto",exp:"Something known only to a few people.",ex:"Tom kept the secret of what he had seen in the graveyard."},
+    {w:"pirate",tr:"pirata",exp:"A robber who attacks and robs ships at sea.",ex:"Tom dreamed of running away to sea and becoming a famous pirate."},
+    {w:"island",tr:"isla",exp:"A piece of land completely surrounded by water.",ex:"Tom and Huck hid on the island while everyone thought they were dead."},
+    {w:"widow",tr:"viuda",exp:"A woman whose husband has died.",ex:"Huck was adopted by the Widow Douglas after the adventure ended."},
+    {w:"school",tr:"escuela",exp:"A place where children go to learn.",ex:"Tom hated going to school and was always trying to avoid it."},
+    {w:"graveyard",tr:"cementerio",exp:"A place where dead people are buried.",ex:"The boys sneaked out at night to visit the graveyard."},
+    {w:"reward",tr:"recompensa",exp:"Something given in return for good work.",ex:"There was a large reward offered for the capture of Injun Joe."},
+    {w:"Becky",tr:"Becky",exp:"Tom's friend who gets lost in the cave with him.",ex:"Becky Thatcher was the girl that Tom Sawyer wanted to impress."}
+  ]}
 };
 // ── STATE ──
 const S = {
@@ -3079,181 +3220,7 @@ function pwaInstall(){
 // ── BOOT ──
 setupPWA();
 
-// ── GUTENDEX VOCAB GENERATION ───────────────────────────────────────────────
-// Called after a Gutendex book is loaded. Uses Claude to pick 40 characteristic
-// words from the actual text, with Spanish translation, explanation in the
-// book's language, and a real sentence from the book containing each word.
-
-async function generateGxVocab(fullText){
-  const api = await getSample();
-  if(!api) return;
-
-  const book = S.book;
-  const langNames = {en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
-  const srcLang   = langNames[book.lang] || book.lang;
-
-  // Send a 3000-char sample of the text so Claude can pick real words and sentences
-  const sample = fullText.slice(0, 8000);
-
-  const prompt = `Eres un profesor de idiomas. Analiza este fragmento del libro "${book.title}" de ${book.author} en ${srcLang}.
-
-Extrae exactamente 40 palabras características, interesantes o difíciles para un estudiante hispanohablante. Para cada una proporciona:
-- w: la palabra exactamente como aparece en el texto (sin mayúsculas innecesarias)
-- tr: traducción al español (1-3 palabras)  
-- exp: explicación breve en ${srcLang} (máximo 15 palabras)
-- ex: frase corta del texto donde aparece esa palabra (máximo 20 palabras, debe contener la palabra)
-
-Responde SOLO con JSON válido, sin markdown, sin texto adicional:
-{"words":[{"w":"...","tr":"...","exp":"...","ex":"..."},...]}
-
-Texto:
-${sample}`;
-
-  try {
-    const r = await api(prompt, {modelTier:'quick'});
-    let txt = r.text.trim();
-    if(txt.startsWith('```')) txt = txt.replace(/```json\n?|```/g,'').trim();
-    const parsed = JSON.parse(txt);
-    const words = (parsed.words||[]).filter(e=>e.w&&e.tr&&e.exp&&e.ex).slice(0,40);
-    if(!words.length) return;
-
-    if(!VOCAB[book.id]) VOCAB[book.id] = {};
-    VOCAB[book.id].words = words;
-
-    // Also save to IndexedDB alongside the text so it persists
-    cacheVocab(book.id, words);
-
-    // If vocab screen is currently open for this book, refresh it
-    const vocabScreen = document.getElementById('sv');
-    if(vocabScreen?.classList.contains('on') && S.book?.id === book.id){
-      _vocabAll = words;
-      _vocabFiltered = words;
-      renderVocab();
-    }
-  } catch(e){
-    console.warn('Vocab generation failed:', e);
-  }
-}
-
 // ── GUTENDEX SEARCH ──────────────────────────────────────────────────────────
-const GX_API = 'https://gutendex.com/books/';
-let _gxNextUrl = null;
-
-function gxClear(){
-  const res = document.getElementById('gx-results');
-  res.style.display = 'none';
-  res.innerHTML = '';
-  _gxNextUrl = null;
-}
-
-async function gxSearch(url){
-  const res = document.getElementById('gx-results');
-
-  if(!url){
-    // Fresh search
-    const q = document.getElementById('gx-input').value.trim();
-    if(!q){ gxClear(); return; }
-    const params = new URLSearchParams({search: q});
-    if(S.lang) params.set('languages', S.lang);
-    url = GX_API + '?' + params;
-    res.style.display = 'block';
-    res.innerHTML = '<div class="gx-status">Buscando…</div>';
-    _gxNextUrl = null;
-  } else {
-    // Load more — remove old "más" button
-    res.querySelector('.gx-more')?.remove();
-  }
-
-  try {
-    const r    = await fetch(url);
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
-    _gxNextUrl = data.next || null;
-
-    const cards = (data.results || []).map(gxBookCard).filter(Boolean).join('');
-
-    if(_gxNextUrl === null && !cards){
-      res.innerHTML = '<div class="gx-status">Sin resultados.</div>';
-      return;
-    }
-
-    if(!url.includes('page=')){
-      res.innerHTML = `<div class="gx-status">${data.count.toLocaleString()} resultados</div>` + cards;
-    } else {
-      res.insertAdjacentHTML('beforeend', cards);
-    }
-
-    if(_gxNextUrl){
-      res.insertAdjacentHTML('beforeend',
-        `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
-          onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
-    }
-  } catch(err) {
-    if(!url.includes('page=')){
-      // Try CORS proxy fallback
-      if(!url.includes('corsproxy') && !url.includes('allorigins')){
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-        try {
-          const r2   = await fetch(proxyUrl);
-          const data = await r2.json();
-          _gxNextUrl = data.next || null;
-          const cards = (data.results||[]).map(gxBookCard).filter(Boolean).join('');
-          if(!cards){ res.innerHTML='<div class="gx-status">Sin resultados.</div>'; return; }
-          res.innerHTML = `<div class="gx-status">${(data.count||0).toLocaleString()} resultados (vía proxy)</div>` + cards;
-          if(_gxNextUrl)
-            res.insertAdjacentHTML('beforeend',
-              `<button class="gx-more gx-btn" style="width:100%;margin-top:.3rem;background:var(--sf2);color:var(--tx)"
-                onclick="gxSearch('${_gxNextUrl}')">Cargar más…</button>`);
-          return;
-        } catch {}
-      }
-      res.innerHTML = `<div class="gx-status" style="color:#f66">
-        No se pudo conectar con Gutenberg.<br>
-        <small>Comprueba la conexión a internet.</small>
-      </div>`;
-    }
-  }
-}
-
-function gxBookCard(b){
-  const txtUrl = b.formats['text/plain; charset=utf-8']
-               || b.formats['text/plain; charset=us-ascii']
-               || b.formats['text/plain']
-               || '';
-  if(!txtUrl) return '';
-
-  const title   = b.title || 'Sin título';
-  const authors = b.authors.map(a => a.name.replace(/,\s*(\S)/,'$1 ').trim()).join(', ') || 'Autor desconocido';
-  const langs   = (b.languages||[]).join(', ').toUpperCase();
-  const dl      = b.download_count ? `${b.download_count.toLocaleString()} desc.` : '';
-  const enc     = b.formats['text/plain; charset=utf-8'] ? 'utf-8' : 'latin1';
-  const bookObj = {
-    id: 'gx_' + b.id,
-    title, author: authors, url: txtUrl, enc,
-    desc: langs, lv: 'b1',
-    lang: (b.languages||['en'])[0]
-  };
-
-  return `<div class="gx-card" onclick='gxOpen(${JSON.stringify(JSON.stringify(bookObj))})'>
-    <div style="font-weight:600;font-size:.9rem">${esc(title)}</div>
-    <div style="font-size:.78rem;color:var(--dm);margin-top:.1rem">${esc(authors)}</div>
-    <div style="font-size:.72rem;color:var(--dmr);margin-top:.2rem">${langs}${dl?' · '+dl:''}</div>
-  </div>`;
-}
-
-function gxOpen(bookJson){
-  const book = JSON.parse(bookJson);
-  // Close search results
-  gxClear();
-  document.getElementById('gx-input').value = '';
-  // Switch to book's language if supported
-  const supported = ['en','es','fr','de','pt','it'];
-  if(supported.includes(book.lang) && book.lang !== S.lang) selLang(book.lang);
-  S.book = book;
-  startRead(/*generateVocab=*/true);
-}
-
-
 // ── INDEXEDDB BOOK CACHE ─────────────────────────────────────────────────────
 // Stores the full cleaned text of each book so it's not re-downloaded.
 // DB: libreo_cache  |  Store: books  |  Key: book.id  |  Value: {id, text, ts}
