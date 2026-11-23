@@ -294,11 +294,11 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 #load-bar{height:100%;width:0%;background:var(--ac);transition:width .4s ease;}
 
 /* ── WORD CONTEXT MENU ── */
-#ctx-menu{display:none;position:fixed;z-index:9999;touch-action:manipulation;
+#ctx-menu{display:none;position:fixed;z-index:500;
   background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
   box-shadow:0 8px 28px rgba(0,0,0,.45);overflow:hidden;min-width:160px;}
 #ctx-menu.show{display:block;}
-.ctx-item{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.1);
+.ctx-item{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;
   display:flex;align-items:center;gap:.6rem;
   transition:background .12s;white-space:nowrap;}
 .ctx-item:hover,.ctx-item:active{background:var(--sf2);}
@@ -580,9 +580,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <button class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</button>
+  <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
   <div class="ctx-sep"></div>
-  <button class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</button>
+  <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
 </div>
 
 <script>
@@ -2459,6 +2459,7 @@ let _ctxWord = '';
 let _ctxSi   = 0;
 
 function clickW(el){
+  alert("clickW: "+el.textContent.trim());
   // Single tap on a word: show small context menu near the word
   document.querySelectorAll('.rw.hl').forEach(e=>e.classList.remove('hl'));
   el.classList.add('hl');
@@ -2485,7 +2486,10 @@ document.addEventListener('click', e=>{
   if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
     hideCtxMenu();
 }, true);
-// touchstart removed — menu hidden by click handler only
+document.addEventListener('touchstart', e=>{
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
+    hideCtxMenu();
+}, {passive:true});
 
 // Context menu actions (wired after DOM ready, see boot)
 function ctxTranslate(){
