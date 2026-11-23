@@ -2482,27 +2482,17 @@ function hideCtxMenu(){ document.getElementById('ctx-menu').classList.remove('sh
 
 // Close menu on tap outside
 document.addEventListener('click', e=>{
-  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
+  const t = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+  if(t && !t.closest('#ctx-menu') && !t.closest('.rw'))
     hideCtxMenu();
 }, true);
 document.addEventListener('touchstart', e=>{
-  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
+  const t = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+  if(t && !t.closest('#ctx-menu') && !t.closest('.rw'))
     hideCtxMenu();
 }, {passive:true});
 
 // Context menu actions (wired after DOM ready, see boot)
-
-function handleCtxTouch(e){
-  e.preventDefault();
-  const id = e.target.id || e.target.closest('[id]')?.id;
-  if(id === 'ctx-translate'){ hideCtxMenu(); translate(_ctxWord); }
-  else if(id === 'ctx-readfrom'){ hideCtxMenu(); readFromSentenceGesture(_ctxSi); }
-}
-function handleCtxClick(e){
-  const id = e.target.id || e.target.closest('[id]')?.id;
-  if(id === 'ctx-translate'){ hideCtxMenu(); translate(_ctxWord); }
-  else if(id === 'ctx-readfrom'){ hideCtxMenu(); readFromSentenceGesture(_ctxSi); }
-}
 function ctxTranslate(){
   toast('ctxTranslate: ' + _ctxWord);
   hideCtxMenu();
