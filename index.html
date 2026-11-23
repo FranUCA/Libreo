@@ -2570,8 +2570,25 @@ function showWordTr(word){
     (tr
       ? '<div style="font-size:1.1rem;font-weight:600;margin:.6rem 0">' + esc(tr) + '</div>' +
         (ve.exp ? '<div style="font-size:.82rem;color:var(--dm);margin-bottom:.4rem">' + esc(ve.exp) + '</div>' : '')
-      : '<div style="color:var(--dm);font-size:.88rem;margin-top:.5rem">Palabra no encontrada en el vocabulario del libro.</div>'
+      : '<div id="tr-fetching" style="color:var(--dm);font-size:.88rem;margin-top:.5rem">Buscando traducción…</div>'
     );
+  // If not in VOCAB, try MyMemory
+  if(!tr){
+    const srcLang = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
+    fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+srcLang+'|es')
+      .then(r=>r.json())
+      .then(data=>{
+        const t = data?.responseData?.translatedText;
+        const el = document.getElementById('tr-fetching');
+        if(el) el.outerHTML = t && t.toLowerCase()!==word.toLowerCase()
+          ? '<div style="font-size:1.1rem;font-weight:600;margin:.6rem 0">'+esc(t)+'</div>'
+          : '<div style="color:var(--dm);font-size:.88rem;margin-top:.5rem">Traducción no disponible.</div>';
+      })
+      .catch(()=>{
+        const el = document.getElementById('tr-fetching');
+        if(el) el.textContent = 'Sin conexión.';
+      });
+  }
 }
 
 async function translate(word){
