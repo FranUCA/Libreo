@@ -2525,6 +2525,30 @@ async function getSample(){
   return _sampleApi;
 }
 
+// ── TRANSLATION PANEL ────────────────────────────────────────────────────────
+function openPanel(){
+  const p = document.getElementById('tpanel');
+  if(!p) return;
+  p.classList.remove('clo');
+  p.classList.add('mob');
+  S.panelOpen = true;
+}
+
+function closePanel(){
+  const p = document.getElementById('tpanel');
+  if(!p) return;
+  p.classList.remove('mob');
+  p.classList.add('clo');
+  S.panelOpen = false;
+}
+
+function togPanel(){
+  const p = document.getElementById('tpanel');
+  if(!p) return;
+  const isOpen = p.classList.contains('mob') || !p.classList.contains('clo');
+  isOpen ? closePanel() : openPanel();
+}
+
 async function translate(word){
   if(!word) return;
   openPanel();
