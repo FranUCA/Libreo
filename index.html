@@ -2562,22 +2562,6 @@ async function translate(word){
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
 
-    // MyMemory fallback when Claude API not available
-    try {
-      const _sl = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
-      const _ctrl = new AbortController();
-      const _tmr = setTimeout(()=>_ctrl.abort(), 6000);
-      const _r = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+_sl+'|es',{signal:_ctrl.signal});
-      clearTimeout(_tmr);
-      const _d = await _r.json();
-      const _tr = _d?.responseData?.translatedText;
-      if(_tr && _tr.toLowerCase() !== word.toLowerCase()){
-        const _res = {t:_tr, alts:[]};
-        S.cache[key]=_res; showTrans(word,_res,label); addHist(word,_tr); return;
-      }
-    } catch {}
-    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
-    return;
   
   const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
   const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
