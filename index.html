@@ -2492,12 +2492,10 @@ document.addEventListener('touchstart', e=>{
 
 // Context menu actions (wired after DOM ready, see boot)
 function ctxTranslate(){
-  toast('ctxTranslate: ' + _ctxWord);
   hideCtxMenu();
   translate(_ctxWord);
 }
 function ctxReadFrom(){
-  toast('ctxReadFrom: si=' + _ctxSi);
   hideCtxMenu();
   readFromSentenceGesture(_ctxSi);
 }
@@ -2528,9 +2526,8 @@ async function getSample(){
 
 // ── TRANSLATION PANEL ────────────────────────────────────────────────────────
 function openPanel(){
-  toast('openPanel called');
   const p = document.getElementById('tpanel');
-  if(!p){ toast('tpanel NOT FOUND'); return; }
+  if(!p) return;
   p.classList.remove('clo');
   p.classList.add('mob');
   S.panelOpen = true;
@@ -2555,274 +2552,48 @@ async function translate(word){
   if(!word) return;
   openPanel();
   const tbody = document.getElementById('tbody');
-  const target = TRANS_TARGET[S.lang]||'es';
-  const label  = TRANS_LABEL[S.lang]||'español';
+  const langpairMap = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'};
+  const srcLang = langpairMap[S.lang] || 'en';
+  const label   = 'español';
   tbody.innerHTML = `<div class="tw">${esc(word)}</div>
-    <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
-  const key = word.toLowerCase().trim()+'|'+target;
+    <div class="tld"><div class="sp2"></div> Traduciendo…</div>`;
+
+  const key = word.toLowerCase().trim() + '|es';
+  // 1. Session cache
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
-  const api = await getSample();
-  if(!api){
-    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
+
+  // 2. VOCAB lookup (instant, no network)
+  const vocabData = VOCAB[S.book?.id];
+  const entry = vocabData?.words?.find(e => e.w.toLowerCase() === word.toLowerCase());
+  if(entry && entry.tr && entry.tr !== entry.w){
+    const result = {t: entry.tr, alts: []};
+    S.cache[key] = result;
+    showTrans(word, result, label);
+    addHist(word, entry.tr);
     return;
   }
-  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
-  const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
-Responde SOLO con JSON (sin markdown): {"t":"traducción principal","alts":["alt1","alt2"]}
-Palabra: "${word}"`;
-  try{
-    const res = await api(prompt, {modelTier:'quick', cache:true});
-    const parsed = JSON.parse(res.text.replace(/\`\`\`json|\`\`\`/g,'').trim());
-    const result = {t:parsed.t||'', alts:(parsed.alts||[]).slice(0,3)};
-    S.cache[key]=result; showTrans(word,result,label); addHist(word,result.t);
-  } catch{
-    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">No se encontró traducción.</div>`;
-  }
-}
 
-
-function showTrans(word, res, label){
-  const tbody = document.getElementById('tbody');
-  // Find real sentence from loaded book that contains the word
-  const found = findBookSentence(word);
-  const exHtml = found
-    ? `<div style="margin-top:.8rem">
-        <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Frase del libro</div>
-        <div style="font-size:.82rem;color:var(--dm);font-style:italic;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.6">${highlightWord(found.text, word)}</div>
-       </div>`
-    : '';
-  const rfhHtml = `<button class="rfh-btn" onclick="ctxReadFrom()">▶ Leer desde esta palabra</button>`;
-  tbody.innerHTML = `
-    <div class="tw">${esc(word)}</div>
-    <div>
-      <div style="font-size:1rem;font-weight:600;margin-bottom:.4rem">${esc(res.t)}</div>
-      ${res.alts&&res.alts.length?`
-        <div style="margin-bottom:.6rem">
-          <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Alternativas</div>
-          ${res.alts.map(a=>`<span style="display:inline-block;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:.12rem .4rem;font-size:.76rem;margin:.12rem .12rem .12rem 0">${esc(a)}</span>`).join('')}
-        </div>`:''}
-      ${exHtml}
-      ${rfhHtml}
-      <div style="font-size:.7rem;color:var(--dmr);margin-top:.6rem">Traducción: Claude AI</div>
-    </div>
-    <div id="hlist"></div>`;
-  renderHist();
-}
-
-function addHist(word, trad){
-  S.hist = [{w:word,t:trad}, ...S.hist.filter(h=>h.w!==word)].slice(0,20);
-  renderHist();
-}
-
-function renderHist(){
-  const el = document.getElementById('hlist');
-  if(!el||S.hist.length<2) return;
-  el.innerHTML = '<div class="hs"><h4>Historial</h4>' +
-    S.hist.slice(1,8).map(h=>`
-      <div class="hi" onclick="translate('${h.w.replace(/'/g,"\\'")}')">
-        <div class="ho">${esc(h.w)}</div>
-        <div class="ht">${esc(h.t)}</div>
-      </div>`).join('') + '</div>';
-}
-
-// ── SENTENCE SPLITTER ──────────────────────────────────────────────
-// Split text into sentences suitable for TTS.
-// Rules:
-//  - Split on . ! ? followed by whitespace+capital OR end of string
-//  - Don't split on common abbreviations (Mr. Mrs. Dr. St. etc.)
-//  - Don't split if the char before . is a single uppercase letter (initials)
-//  - Minimum 15 chars per sentence to skip headers and stray fragments
-// Run splitSents on each paragraph independently, then merge.
-// This ensures paragraph boundaries are respected — chapter headings,
-// preamble text and body paragraphs never merge into one giant sentence.
-// Returns a flat array of sentences in document order.
-function splitSentsFromParas(paras){
-  const result = [];
-  for(const para of paras){
-    if(!para || para.length < 15) continue;
-    const ss = splitSents(para);
-    if(ss.length) for(const s of ss) result.push(s);
-    else if(para.length >= 15) result.push(para); // keep unsplit para as one sentence
-  }
-  return result;
-}
-
-function splitSents(text){
-  if(!text) return [];
-  // Protect abbreviations: "Mr. " -> "Mr\u25ce " so the dot is not a sentence boundary.
-  // No lookbehind (crashes Safari < 16.4 and older Android WebView).
-  const abbrevs = ['Mr','Mrs','Dr','St','Prof','Jr','Sr','Vs','Etc','Fig','No','Vol','Inc','Ltd','vs','etc'];
-  let t = text;
-  abbrevs.forEach(a => {
-    t = t.replace(new RegExp(a + '\\.(?=\\s)', 'gi'), a + '\u25ce');
-  });
-  // Protect single uppercase initials: "A. " -> "A\u25ce "
-  t = t.replace(/\b([A-Z])\.(?=\s)/g, '$1\u25ce');
-  // Mark sentence boundaries: punctuation + spaces + uppercase -> insert \x01
-  // This avoids lookbehind entirely.
-  t = t.replace(/([.!?]["\u2019\xbb]?)([ \t\r\n]+)([A-Z\xc0-\xd6\xd8-\xde\u00c0-\u017e\"\u201c])/g, '$1\x01$3');
-  return t.split('\x01')
-    .map(s => s.replace(/\u25ce/g, '.').replace(/\s+/g, ' ').trim())
-    .filter(s => s.length >= 15);
-}
-
-// ── WEB SPEECH TTS ──────────────────────────────────────────────────
-// Uses window.speechSynthesis (built into Chrome/Android/Safari)
-// No gesture restriction, no API key, works on GitHub Pages
-const syn = window.speechSynthesis || null;
-
-function bestVoice(lang){
-  if(!syn) return null;
-  const vs = syn.getVoices(), code = LMETA[lang].tts, base = code.split('-')[0];
-  return vs.find(v=>v.lang===code)
-      || vs.find(v=>v.lang.startsWith(base+'-'))
-      || vs.find(v=>v.lang.startsWith(base))
-      || null;
-}
-
-function startAudio(){
-  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
-  S.playing = true;
-  speakS(S.si);
-}
-
-let _ttsGen = 0; // incremented on every cancel — stale onend checks this
-
-function speakS(i){
-  if(!syn) return;
-  if(!S.sents.length){ S.playing=false; updBtn(); toast('Sin frases para leer.'); return; }
-  i = Math.max(0, Math.min(i, S.sents.length - 1));
-  S.si = i;
-  hlSent(i);
-  const myGen = ++_ttsGen;   // this utterance's generation token
-  const u = new SpeechSynthesisUtterance(S.sents[i]);
-  u.lang = LMETA[S.lang].tts;
-  u.rate = S.rate;
-  const v = bestVoice(S.lang); if(v) u.voice = v;
-  u.onend = ()=>{
-    if(myGen !== _ttsGen) return;   // stale — a newer speakS() already took over
-    clrHl();
-    if(S.playing){
-      const next = S.si + 1;
-      if(next < S.sents.length) speakS(next);
-      else { S.playing=false; updBtn(); toast('Fin del texto'); }
+  // 3. MyMemory free translation API (600 req/day, no key needed, CORS open)
+  try {
+    const url = 'https://api.mymemory.translated.net/get?q='
+      + encodeURIComponent(word)
+      + '&langpair=' + srcLang + '|es';
+    const res  = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    const data = await res.json();
+    const tr   = data?.responseData?.translatedText;
+    if(tr && tr.toLowerCase() !== word.toLowerCase()){
+      const result = {t: tr, alts: []};
+      S.cache[key] = result;
+      showTrans(word, result, label);
+      addHist(word, tr);
+      return;
     }
-  };
-  u.onerror = e=>{
-    if(myGen !== _ttsGen) return;
-    if(e.error === 'interrupted' || e.error === 'canceled') return;
-    S.playing=false; updBtn();
-  };
-  syn.cancel();
-  syn.speak(u);
-  updBtn();
+  } catch {}
+
+  tbody.innerHTML = `<div class="tw">${esc(word)}</div>
+    <div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
 }
 
-function hlSent(i){
-  clrHl();
-  const spans = document.querySelectorAll(`.rw[data-si="${i}"]`);
-  if(!spans.length) return;
-  spans.forEach(s=>s.classList.add('sk'));
-  spans[0].scrollIntoView({behavior:'smooth', block:'center'});
-}
-function clrHl(){ document.querySelectorAll('.rw.sk').forEach(e=>e.classList.remove('sk')); }
-function updBtn(){
-  const b = document.getElementById('bplay'); if(!b) return;
-  b.textContent = S.playing ? '⏸' : '▶';
-  b.classList.toggle('pon', S.playing);
-}
-let _needsRebuild = false;  // set by backgroundAppend when it skips DOM update
-
-function stopAudio(){
-  ++_ttsGen;        // invalidate any pending onend BEFORE cancel
-  if(syn) syn.cancel();
-  S.playing=false; clrHl(); updBtn();
-  // Only rebuild DOM if backgroundAppend queued an update while we were playing
-  if(_needsRebuild){ _needsRebuild=false; renderReaderContent(); }
-}
-function togPlay(){
-  if(!syn){ toast('Tu navegador no soporta síntesis de voz.'); return; }
-  if(S.playing){ stopAudio(); }
-  else { S.playing=true; speakS(S.si); }
-}
-function prevS(){
-  if(S.si <= 0) return;
-  const was = S.playing;
-  ++_ttsGen; syn.cancel(); S.playing = was;
-  speakS(S.si - 1);
-}
-function nextS(){
-  if(S.si >= S.sents.length - 1) return;
-  const was = S.playing;
-  ++_ttsGen; syn.cancel(); S.playing = was;
-  speakS(S.si + 1);
-}
-function chRate(v){
-  S.rate = parseFloat(v);
-  if(S.playing){ ++_ttsGen; syn.cancel(); speakS(S.si); }
-}
-// Called from word-tap context menu (also activates audio if not in that mode)
-function readFromSentenceGesture(si){
-  // Show audio controls
-  document.getElementById('actl').style.display = 'flex';
-  // stopAudio increments _ttsGen and cancels — speakS will then do its own increment
-  stopAudio();
-  // Now start from the requested sentence
-  S.playing = true;
-  speakS(si);
-  toast('▶ Leyendo desde la frase ' + (si + 1));
-}
-if(syn) syn.addEventListener('voiceschanged', ()=>{});
-
-
-// ── KEYBOARD ──
-document.addEventListener('keydown', e=>{
-  if(!document.getElementById('sr').classList.contains('on')) return;
-  if(e.key===' '&&S.mode==='audio'){ e.preventDefault(); togPlay(); }
-  if(e.key==='ArrowRight'&&S.mode==='audio') nextS();
-  if(e.key==='ArrowLeft' &&S.mode==='audio') prevS();
-});
-document.querySelectorAll('.lc').forEach(c=>{
-  c.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') c.click(); });
-});
-
-// ── LIBRARY RENDER (text + HTML/PDF books) ──
-function renderBookCard(b, lang){
-  const isDoc = !!b.fmt;
-  let bm = null;
-  if(!isDoc){
-    try { const r=localStorage.getItem('libreo_bm_'+b.id); bm=r?JSON.parse(r):null; } catch{}
-  }
-  const pct = bm ? Math.round(bm.pct*100) : 0;
-  const resumeBadge = bm?.manual
-    ? `<span class="resume-badge">📌</span>`
-    : pct > 1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-  const onclick = `selBook('${b.id}')`;
-  const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
-  const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
-  return `<div class="bc ${b.lv}" data-bid="${b.id}" onclick="${onclick}">
-    ${resumeBadge}
-    <div class="btt">${b.title}</div>
-    <div class="ba">${b.author}</div>
-    <div class="bm">
-      <span class="lp ${b.lv}">${b.lv.toUpperCase()}</span>
-      ${fmtBadge}${audioIcon}
-    </div>
-    <div class="bdsc">${b.desc}</div>
-  </div>`;
-}
-
-function renderLib(lang){
-  document.getElementById('lby').innerHTML = (BOOKS[lang]||[]).map(c=>`
-    <div class="cs">
-      <div class="ch"><span class="ct">${c.cat}</span><span class="cd">${c.desc}</span></div>
-      <div class="bg">
-        ${c.books.map(b=>renderBookCard(b, lang)).join('')}
-      </div>
-    </div>`).join('');
-  // After render, mark cached books asynchronously
-  updateCacheBadges(lang);
-}
 
 async function updateCacheBadges(lang){
   const ids = await cachedIds();
