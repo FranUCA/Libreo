@@ -580,9 +580,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
+  <div class="ctx-item" id="ctx-translate" onclick="hideCtxMenu();translate(_ctxWord);">🌐 Traducir</div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
+  <div class="ctx-item" id="ctx-readfrom" onclick="hideCtxMenu();readFromSentenceGesture(_ctxSi);">▶ Leer desde aquí</div>
 </div>
 
 <script>
