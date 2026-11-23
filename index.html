@@ -580,9 +580,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
+  <div class="ctx-item" id="ctx-translate" onclick="alert('CLICK TRADUCIR')" ontouchstart="alert('TOUCH TRADUCIR')">🌐 Traducir</div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
+  <div class="ctx-item" id="ctx-readfrom" onclick="alert('CLICK LEER')" ontouchstart="alert('TOUCH LEER')">▶ Leer desde aquí</div>
 </div>
 
 <script>
@@ -2482,13 +2482,11 @@ function hideCtxMenu(){ document.getElementById('ctx-menu').classList.remove('sh
 
 // Close menu on tap outside
 document.addEventListener('click', e=>{
-  const t = e.target.nodeType === 1 ? e.target : e.target.parentElement;
-  if(t && !t.closest('#ctx-menu') && !t.closest('.rw'))
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
     hideCtxMenu();
 }, true);
 document.addEventListener('touchstart', e=>{
-  const t = e.target.nodeType === 1 ? e.target : e.target.parentElement;
-  if(t && !t.closest('#ctx-menu') && !t.closest('.rw'))
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
     hideCtxMenu();
 }, {passive:true});
 
