@@ -215,7 +215,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .tp2{width:280px;background:var(--sf);border-left:1px solid var(--bd);
   display:flex;flex-direction:column;flex-shrink:0;
   transition:width .25s;overflow:hidden;}
-.tp2.clo{width:0;pointer-events:none;}
+.tp2.clo{width:0;}
 .th{padding:.8rem .9rem;border-bottom:1px solid var(--bd);
   display:flex;align-items:center;gap:.5rem;}
 .th h3{font-size:.84rem;font-weight:600;flex:1;}
@@ -274,8 +274,8 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
     border-radius:16px 16px 0 0;z-index:40;
     transform:translateY(100%);
     transition:transform .3s cubic-bezier(.4,0,.2,1);}
-  .tp2.mob{transform:translateY(0);pointer-events:auto;}
-  .tp2.clo{width:100%!important;transform:translateY(100%);pointer-events:none;}
+  .tp2.mob{transform:translateY(0);}
+  .tp2.clo{width:100%!important;transform:translateY(100%);}
   .fab{display:flex;}
   .rsel{font-size:.7rem;}
 }
@@ -294,11 +294,11 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 #load-bar{height:100%;width:0%;background:var(--ac);transition:width .4s ease;}
 
 /* ── WORD CONTEXT MENU ── */
-#ctx-menu{display:none;position:fixed;z-index:500;
+#ctx-menu{display:none;position:fixed;z-index:9999;touch-action:manipulation;
   background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
   box-shadow:0 8px 28px rgba(0,0,0,.45);overflow:hidden;min-width:160px;}
 #ctx-menu.show{display:block;}
-.ctx-item{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;
+.ctx-item{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.1);
   display:flex;align-items:center;gap:.6rem;
   transition:background .12s;white-space:nowrap;}
 .ctx-item:hover,.ctx-item:active{background:var(--sf2);}
@@ -580,9 +580,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
+  <button class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</button>
   <div class="ctx-sep"></div>
-  <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
+  <button class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</button>
 </div>
 
 <script>
@@ -2485,10 +2485,7 @@ document.addEventListener('click', e=>{
   if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
     hideCtxMenu();
 }, true);
-document.addEventListener('touchstart', e=>{
-  if(!e.target.closest('#ctx-menu') && !e.target.closest('.rw'))
-    hideCtxMenu();
-}, {passive:true});
+// touchstart removed — menu hidden by click handler only
 
 // Context menu actions (wired after DOM ready, see boot)
 function ctxTranslate(){
