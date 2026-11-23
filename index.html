@@ -2464,7 +2464,6 @@ function clickW(el){
   el.classList.add('hl');
   _ctxWord = el.textContent.trim();
   _ctxSi   = parseInt(el.getAttribute('data-si') || '0');
-  toast('tap: ' + _ctxWord);
 
   const menu = document.getElementById('ctx-menu');
   const rect = el.getBoundingClientRect();
@@ -3065,13 +3064,17 @@ async function cachedIds(){
 loadFont();
 loadTheme();
 // Wire context menu buttons
-// Use touchend+preventDefault so the menu doesn't hide before the action fires
-// Also keep click for desktop mouse users
 (function(){
   function wire(id, fn){
     const el = document.getElementById(id);
     if(!el) return;
-    el.addEventListener('touchend', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }, {passive:false});
+    // touchstart fires BEFORE the document touchstart that hides the menu
+    // using stopPropagation prevents the document handler from running at all
+    el.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      fn();
+    }, {passive:false});
     el.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
   }
   wire('ctx-translate', ctxTranslate);
