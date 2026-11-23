@@ -566,18 +566,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <div class="doc-topbar">
     <button class="bbtn" onclick="closeDoc()">← Volver</button>
     <span class="doc-title" id="doc-title"></span>
-    <div style="display:flex;align-items:center;gap:.4rem;margin-left:auto;flex-shrink:0">
-      <label style="font-size:.75rem;color:var(--dm)">Pág.</label>
-      <input id="pdf-page" type="number" min="1" value="1"
-        style="width:52px;padding:.3rem .4rem;border-radius:8px;border:1px solid var(--bd);
-               background:var(--sf);color:var(--tx);font-size:.82rem;text-align:center"
-        onchange="pdfGoPage(this.value)"
-        title="Ir a página">
-      <button id="pdf-pin-btn" onclick="pdfPin()"
-        style="border:none;background:none;font-size:1.3rem;cursor:pointer;padding:.2rem;
-               line-height:1;transition:filter .15s"
-        title="Guardar página como marcador">📌</button>
-    </div>
   </div>
   <iframe id="doc-frame" title="Visor PDF" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"></iframe>
 </div>
@@ -640,6 +628,28 @@ const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 function setupPWA(){
   document.getElementById('logo-svg').innerHTML = ICON_SVG.replace(
     'viewBox="0 0 512 512"','viewBox="0 0 512 512" width="80" height="80"');
+
+  // Build a proper Web App Manifest and inject it
+  const manifest = {
+    name:'Libreo', short_name:'Libreo',
+    description:'Aprende idiomas leyendo literatura clásica',
+    start_url:'./', display:'standalone',
+    background_color:'#1a1a2e', theme_color:'#4a9eff',
+    orientation:'portrait-primary',
+    icons:[{src:'data:image/svg+xml,'+encodeURIComponent(ICON_SVG),
+            sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]
+  };
+  const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  document.getElementById('pwa-manifest').href = URL.createObjectURL(mBlob);
+
+  // Pre-cache the app shell so it works offline from the first visit
+  if('caches' in window){
+    caches.open('libreo-v4').then(cache =>
+      cache.match(location.href).then(hit => {
+        if(!hit) cache.add(location.href).catch(()=>{});
+      })
+    );
+  }
 }
 
 
@@ -999,7 +1009,51 @@ const VOCAB = {
     {w:"vengeance",tr:"venganza",exp:"Punishment inflicted in return for an injury; revenge.",ex:"Cursed, cursed creator! Why did I live?"},
     {w:"wretch",tr:"desgraciado",exp:"A very unfortunate or unhappy person.",ex:"Cursed, cursed creator! Why did I live?"},
   ]},
-  quijote:{words:[]},
+  quijote:{words:[
+    {w:"andante",tr:"andante",exp:"Que anda errante; caballero andante busca aventuras.",ex:"Quiero que se me llame don Quijote de la Mancha."},
+    {w:"armas",tr:"armas",exp:"Instrumentos de guerra; don Quijote lleva anticuadas armas.",ex:"Limpió sus armas, que sin haber salido a ningún servicio estaban llenas de orín."},
+    {w:"aventura",tr:"aventura",exp:"Empresa peligrosa o imprevista que se acomete.",ex:"Y así, del poco dormir y del mucho leer, se le secó el celebro."},
+    {w:"bachiller",tr:"bachiller",exp:"Persona que ha obtenido el grado académico más básico.",ex:"Tenía en su casa una ama que pasaba de los cuarenta."},
+    {w:"batalla",tr:"batalla",exp:"Combate o enfrentamiento entre fuerzas opuestas.",ex:"Don Quijote acometió con su lanza en ristre."},
+    {w:"caballero",tr:"caballero",exp:"Hombre de clase noble que combate montado.",ex:"Yo sé quién soy, respondió don Quijote."},
+    {w:"caballo",tr:"caballo",exp:"Animal de montar; Rocinante es el caballo flaco de don Quijote.",ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+    {w:"calidad",tr:"calidad",exp:"Conjunto de propiedades que caracterizan a algo.",ex:"La de su calidad no podía ser sino princesa."},
+    {w:"camino",tr:"camino",exp:"Vía o sendero por el que se transita.",ex:"Siguieron su camino por la venta adelante."},
+    {w:"cordura",tr:"cordura",exp:"Sensatez, juicio sano; lo opuesto a la locura.",ex:"Al cabo se le secó el celebro y vino a perder el juicio."},
+    {w:"cueva",tr:"cueva",exp:"Cavidad natural en la tierra; don Quijote baja a la Cueva de Montesinos.",ex:"Don Quijote se descolgó a la cueva con una soga."},
+    {w:"dama",tr:"dama",exp:"Mujer noble; los caballeros luchan por su dama.",ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+    {w:"derrota",tr:"derrota",exp:"Acción de ser vencido en un combate.",ex:"Quedó don Quijote muy malparado en el suelo."},
+    {w:"disfraz",tr:"disfraz",exp:"Vestimenta con que alguien se disfraza para no ser reconocido.",ex:"Dorotea se disfrazó de princesa Micomicona."},
+    {w:"don",tr:"don",exp:"Tratamiento de respeto que precede al nombre de pila.",ex:"Don Quijote de la Mancha."},
+    {w:"Dulcinea",tr:"Dulcinea",exp:"Nombre idealizado que don Quijote da a Aldonza Lorenzo.",ex:"Dulcinea del Toboso, dama de sus pensamientos."},
+    {w:"encantamiento",tr:"encantamiento",exp:"Acción mágica que transforma la realidad.",ex:"Sin duda los encantadores me persiguen."},
+    {w:"escudero",tr:"escudero",exp:"Sirviente que acompaña al caballero y lleva sus armas.",ex:"Sancho Panza se llamaba un labrador vecino suyo."},
+    {w:"fama",tr:"fama",exp:"Renombre y gloria que se adquieren por las buenas acciones.",ex:"Quiso parecer a los que él había leído en sus libros."},
+    {w:"gigante",tr:"gigante",exp:"Ser de estatura y fuerza extraordinarias; los molinos de viento.",ex:"¿Qué gigantes? dijo Sancho Panza. Aquellos que allí ves, respondió su amo."},
+    {w:"gloria",tr:"gloria",exp:"Fama y honor conquistados por las grandes acciones.",ex:"Felice edad y siglos dichosos aquellos a quien los antiguos pusieron nombre de dorados."},
+    {w:"hidalgo",tr:"hidalgo",exp:"Noble de sangre de rango inferior que no tiene título.",ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme, vivía un hidalgo."},
+    {w:"honor",tr:"honor",exp:"Cualidad moral que obliga a actuar con rectitud y nobleza.",ex:"Más vale morir en pie que vivir de rodillas."},
+    {w:"ilusión",tr:"ilusión",exp:"Percepción equivocada de la realidad.",ex:"Todo lo que veo y toco es encantamiento."},
+    {w:"ínsula",tr:"ínsula",exp:"Isla; Sancho sueña con gobernar una ínsula.",ex:"¿Cómo te fue con tu gobierno, Sancho?"},
+    {w:"justicia",tr:"justicia",exp:"Principio moral de dar a cada uno lo que le corresponde.",ex:"Deshacer agravios y socorrer a los menesterosos."},
+    {w:"labrador",tr:"labrador",exp:"Persona que labra la tierra; Sancho es un labrador.",ex:"Sancho Panza, que así se llamaba el labrador."},
+    {w:"lanza",tr:"lanza",exp:"Arma de asta larga con punta de acero.",ex:"Con estas razones perdía el pobre caballero el juicio."},
+    {w:"locura",tr:"locura",exp:"Estado mental alterado; pérdida del juicio.",ex:"Viéndole don Quijote de aquella manera, con muestras de tanta tristeza."},
+    {w:"Mancha",tr:"Mancha",exp:"Región de España donde vivía don Quijote.",ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme."},
+    {w:"molino",tr:"molino",exp:"Edificio con aspas para moler cereal.",ex:"Acometió con su lanza al primero molino que estaba delante."},
+    {w:"mundo",tr:"mundo",exp:"La Tierra y todo lo que existe en ella.",ex:"Recorrió el mundo en busca de aventuras."},
+    {w:"pastora",tr:"pastora",exp:"Mujer que cuida ovejas; don Quijote quiere hacerse pastor.",ex:"Hagámonos pastores."},
+    {w:"refrán",tr:"refrán",exp:"Dicho popular que expresa una verdad general; Sancho los usa constantemente.",ex:"Sancho Panza tenía la memoria llena de refranes."},
+    {w:"reino",tr:"reino",exp:"Estado gobernado por un rey o una reina.",ex:"Prometió hacerle gobernador de una ínsula."},
+    {w:"Rocinante",tr:"Rocinante",exp:"El caballo flaco y viejo de don Quijote.",ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
+    {w:"Sancho",tr:"Sancho",exp:"Sancho Panza, el escudero fiel de don Quijote.",ex:"Sancho Panza no dijo nada."},
+    {w:"señor",tr:"señor",exp:"Título de respeto; Sancho llama siempre señor a don Quijote.",ex:"Señor, respondió Sancho Panza."},
+    {w:"venta",tr:"venta",exp:"Posada o mesón en un camino.",ex:"Llegaron a una venta que don Quijote tuvo por castillo."},
+    {w:"ventura",tr:"ventura",exp:"Suerte o fortuna.",ex:"¡Felice edad y siglos dichosos!"},
+    {w:"verdad",tr:"verdad",exp:"Conformidad de las cosas con lo que se dice de ellas.",ex:"En esto de la verdad, señor cura, digo que tiene razón."},
+    {w:"viejo",tr:"viejo",exp:"De avanzada edad; don Quijote es un hidalgo ya mayor.",ex:"Frisaba la edad de nuestro hidalgo con los cincuenta años."},
+    {w:"yelmo",tr:"yelmo",exp:"Pieza de armadura que cubre y protege la cabeza.",ex:"Limpió su adarga, adobó su lanza y puso nombre a su rocín."},
+  ]},
   mousq:{words:[
     {w:"ami",tr:"amigo",exp:"Personne avec qui on a des liens d affection et de confiance.",ex:"Mon ami, dit Athos, tu es brave."},
     {w:"amour",tr:"amor",exp:"Sentiment affectif intense envers une personne.",ex:"Madame Bonacieux était jolie."},
@@ -1348,17 +1402,28 @@ const VOCAB = {
     {w:"tunnel",tr:"túnel",exp:"An underground passageway.",ex:"The tunnel led deeper into the earth."},
     {w:"volcano",tr:"volcán",exp:"A mountain with an opening through which lava erupts.",ex:"The volcano offered the only way back to the surface."},
   ]},
-  lazarillo:{words:[]},
-  quevedo:{words:[]},
-  calderon:{words:[]},
-  lope:{words:[]},
-  becquer:{words:[]},
-  regenta:{words:[]},
-  fortunata:{words:[]},
-  marianela:{words:[]},
-  pepita:{words:[]},
-  cuentos:{words:[]},
-  dueno:{words:[]},
+  lazarillo:{words:[
+  ]},
+  quevedo:{words:[
+  ]},
+  calderon:{words:[
+  ]},
+  lope:{words:[
+  ]},
+  becquer:{words:[
+  ]},
+  regenta:{words:[
+  ]},
+  fortunata:{words:[
+  ]},
+  marianela:{words:[
+  ]},
+  pepita:{words:[
+  ]},
+  cuentos:{words:[
+  ]},
+  dueno:{words:[
+  ]},
   miser:{words:[
     {w:"barricade",tr:"barricada",exp:"Obstacle fait avec des objets entassés en travers d une rue.",ex:"Éponine mourut sur la barricade."},
     {w:"bagne",tr:"presidio",exp:"Prison pour les condamnés aux travaux forcés.",ex:"Valjean avait passé dix-neuf ans au bagne."},
@@ -1808,14 +1873,7 @@ async function openVocab(){
   const data = VOCAB[S.book.id];
 
   if(!data || !data.words || data.words.length === 0){
-    // Spanish books: vocab coming soon. Other books: generate via Claude.
-    if(S.lang === 'es'){
-      goTo('sv');
-      document.getElementById('vocab-body').innerHTML =
-        '<p style="color:var(--dm);font-size:.92rem;padding:2rem 1rem;text-align:center">' +
-        '📖 El vocabulario para los libros en español<br>estará disponible próximamente.</p>';
-      return;
-    }
+    // No preset vocab - generate it via Claude
     goTo('sv');
     generateVocab();
     return;
@@ -2118,11 +2176,6 @@ const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
 const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
 
 async function startRead(generateVocab=false){
-  // PDF books open in the doc viewer instead of the text reader
-  if(S.book && S.book.fmt === 'pdf'){
-    openDoc(S.book.id);
-    return;
-  }
   S.mode='read'; S.cache={}; S.hist=[]; stopAudio();
   dismissResume();
 
@@ -2812,7 +2865,7 @@ function renderBookCard(b, lang){
   const resumeBadge = bm?.manual
     ? `<span class="resume-badge">📌</span>`
     : pct > 1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-  const onclick = `selBook('${b.id}')`;  // PDFs and TXT both go through detail screen
+  const onclick = isDoc ? `openDoc('${b.id}')` : `selBook('${b.id}')`;
   const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
   const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
   return `<div class="bc ${b.lv}" data-bid="${b.id}" onclick="${onclick}">
@@ -2866,77 +2919,20 @@ function findDocBook(id){
   return null;
 }
 
-function pdfBmKey(){ return S.book ? 'libreo_pdf_' + S.book.id : null; }
-
-function pdfViewerUrl(page){
-  page = parseInt(page) || 1;
-  // Google Docs viewer supports #page=N in the outer URL only as a hint;
-  // we store the page in localStorage and restore via the page input
-  return 'https://docs.google.com/gview?url=' + encodeURIComponent(S.book.hurl) + '&embedded=true';
-}
-
 function openDoc(id){
   const book = findDocBook(id);
   if(!book) return;
-  S.book = book;   // keep S.book in sync for pdfBmKey
   document.getElementById('doc-title').textContent = book.title + ' — ' + book.author;
-  // Restore saved page
-  let savedPage = 1;
-  try {
-    const raw = localStorage.getItem('libreo_pdf_' + book.id);
-    if(raw){ const bm = JSON.parse(raw); savedPage = bm.page || 1; }
-  } catch {}
-  const pageInput = document.getElementById('pdf-page');
-  pageInput.value = savedPage;
-  // Update pin button color
-  pdfSyncPin();
-  // Load viewer
   const frame = document.getElementById('doc-frame');
-  frame.src = pdfViewerUrl(savedPage);
+  // Use Google Docs viewer to render PDFs (works inside iframes, no CSP issue)
+  const viewerUrl = 'https://docs.google.com/gview?url=' + encodeURIComponent(book.hurl) + '&embedded=true';
+  frame.src = viewerUrl;
   goTo('sv-doc');
-  // If saved page > 1 show a small toast so user knows we restored it
-  if(savedPage > 1) setTimeout(()=>toast('📌 Continuando en pág. ' + savedPage), 800);
 }
 
 function closeDoc(){
   document.getElementById('doc-frame').src = 'about:blank';
   goTo('sb');
-}
-
-function pdfGoPage(page){
-  page = Math.max(1, parseInt(page) || 1);
-  document.getElementById('pdf-page').value = page;
-  // Google Docs viewer doesn't support direct page navigation via URL change
-  // without a full reload, so we just save the page — user navigates inside the viewer
-  // and updates the input manually. We reload the frame only if they changed page on open.
-}
-
-function pdfPin(){
-  const key = pdfBmKey();
-  if(!key) return;
-  const page = parseInt(document.getElementById('pdf-page').value) || 1;
-  try {
-    const existing = JSON.parse(localStorage.getItem(key) || 'null');
-    if(existing){
-      // Toggle off
-      localStorage.removeItem(key);
-      pdfSyncPin();
-      toast('📌 Marcador eliminado');
-      return;
-    }
-    localStorage.setItem(key, JSON.stringify({page, ts: Date.now()}));
-  } catch {}
-  pdfSyncPin();
-  toast('📌 Marcador guardado en pág. ' + page);
-}
-
-function pdfSyncPin(){
-  const btn = document.getElementById('pdf-pin-btn');
-  if(!btn) return;
-  const key = pdfBmKey();
-  const hasBm = key && !!localStorage.getItem(key);
-  btn.style.filter = hasBm ? 'sepia(1) saturate(5) hue-rotate(5deg)' : 'none';
-  btn.title = hasBm ? 'Marcador activo — pulsa para borrar' : 'Guardar página como marcador';
 }
 
 // ── THEME ──
@@ -3028,21 +3024,56 @@ function setupPWA(){
   // Service Worker — caches book text files for offline use
   if('serviceWorker' in navigator){
     const swCode = `
-const CACHE = 'libreo-v2';
-const CACHEABLE = u => u.includes('raw.githubusercontent.com');
-self.addEventListener('install',  () => self.skipWaiting());
+const CACHE = 'libreo-v4';
+
+// Cache the app shell (HTML) + book text files
+function isBook(u){ return u.includes('raw.githubusercontent.com'); }
+function isShell(u){ return u.includes('.html') || u === self.registration.scope; }
+
+self.addEventListener('install', () => self.skipWaiting());
+
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks =>
-    Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
-  ).then(()=>self.clients.claim()));
+  e.waitUntil(
+    caches.keys()
+      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
+
 self.addEventListener('fetch', e => {
-  if(!CACHEABLE(e.request.url)) return;
-  e.respondWith(caches.open(CACHE).then(cache =>
-    cache.match(e.request).then(hit => hit ||
-      fetch(e.request).then(res => { if(res.ok) cache.put(e.request,res.clone()); return res; })
-    )
-  ));
+  if(e.request.method !== 'GET') return;
+  const url = e.request.url;
+
+  // App shell: stale-while-revalidate (serve cached, update in background)
+  if(isShell(url)){
+    e.respondWith(
+      caches.open(CACHE).then(cache =>
+        cache.match(e.request).then(cached => {
+          const fresh = fetch(e.request)
+            .then(res => { if(res && res.ok) cache.put(e.request, res.clone()); return res; })
+            .catch(() => null);
+          return cached || fresh;
+        })
+      )
+    );
+    return;
+  }
+
+  // Book TXT files: cache-first
+  if(isBook(url)){
+    e.respondWith(
+      caches.open(CACHE).then(cache =>
+        cache.match(e.request).then(hit => hit ||
+          fetch(e.request).then(res => {
+            if(res.ok) cache.put(e.request, res.clone());
+            return res;
+          })
+        )
+      )
+    );
+    return;
+  }
+  // Everything else (Google Docs viewer, TTS voices, etc.): network only
 });`;
     const swBlob = new Blob([swCode], {type:'application/javascript'});
     navigator.serviceWorker.register(URL.createObjectURL(swBlob), {scope:'./'})
