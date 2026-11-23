@@ -2492,12 +2492,13 @@ document.addEventListener('touchstart', e=>{
 
 // Context menu actions (wired after DOM ready, see boot)
 function ctxTranslate(){
+  toast('ctxTranslate: ' + _ctxWord);
   hideCtxMenu();
   translate(_ctxWord);
 }
 function ctxReadFrom(){
+  toast('ctxReadFrom: si=' + _ctxSi);
   hideCtxMenu();
-  // ctxReadFrom is called from a button click = user gesture
   readFromSentenceGesture(_ctxSi);
 }
 function updProg(){
@@ -2527,8 +2528,9 @@ async function getSample(){
 
 // ── TRANSLATION PANEL ────────────────────────────────────────────────────────
 function openPanel(){
+  toast('openPanel called');
   const p = document.getElementById('tpanel');
-  if(!p) return;
+  if(!p){ toast('tpanel NOT FOUND'); return; }
   p.classList.remove('clo');
   p.classList.add('mob');
   S.panelOpen = true;
