@@ -2561,15 +2561,7 @@ async function translate(word){
     <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
-  // VOCAB del libro (sin red, instantáneo)
-  const _vd = VOCAB[S.book?.id];
-  const _ve = _vd?.words?.find(e => e.w.toLowerCase() === word.toLowerCase());
-  if(_ve && _ve.tr && _ve.tr !== _ve.w){
-    const _vr = {t:_ve.tr, alts:[]};
-    S.cache[key]=_vr; showTrans(word,_vr,label); addHist(word,_ve.tr); return;
-  }
-  const api = await getSample();
-  if(!api){
+
     // MyMemory fallback when Claude API not available
     try {
       const _sl = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
@@ -2586,7 +2578,7 @@ async function translate(word){
     } catch {}
     tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
     return;
-  }
+  
   const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
   const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
 Responde SOLO con JSON (sin markdown): {"t":"traducción principal","alts":["alt1","alt2"]}
