@@ -579,7 +579,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 <div class="toast" id="toast"></div>
 
 <!-- Word context menu -->
-<div id="ctx-menu">
+<div id="ctx-menu" ontouchstart="alert('MENU TOUCHED')">
   <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
@@ -2459,7 +2459,6 @@ let _ctxWord = '';
 let _ctxSi   = 0;
 
 function clickW(el){
-  alert("clickW: "+el.textContent.trim());
   // Single tap on a word: show small context menu near the word
   document.querySelectorAll('.rw.hl').forEach(e=>e.classList.remove('hl'));
   el.classList.add('hl');
