@@ -2464,6 +2464,7 @@ function clickW(el){
   el.classList.add('hl');
   _ctxWord = el.textContent.trim();
   _ctxSi   = parseInt(el.getAttribute('data-si') || '0');
+  toast('tap: ' + _ctxWord);
 
   const menu = document.getElementById('ctx-menu');
   const rect = el.getBoundingClientRect();
@@ -3064,12 +3065,18 @@ async function cachedIds(){
 loadFont();
 loadTheme();
 // Wire context menu buttons
-document.getElementById('ctx-translate').addEventListener('click', ctxTranslate);
-document.getElementById('ctx-readfrom').addEventListener('click',  ctxReadFrom);
-// Also wire touchend for iOS where click can be delayed
-document.getElementById('ctx-readfrom').addEventListener('touchend', e=>{
-  e.preventDefault(); ctxReadFrom();
-});
+// Use touchend+preventDefault so the menu doesn't hide before the action fires
+// Also keep click for desktop mouse users
+(function(){
+  function wire(id, fn){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('touchend', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }, {passive:false});
+    el.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
+  }
+  wire('ctx-translate', ctxTranslate);
+  wire('ctx-readfrom',  ctxReadFrom);
+})();
 // getSample is lazy — called on first translate, not at boot
 </script>
 </body>
