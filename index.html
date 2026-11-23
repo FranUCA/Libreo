@@ -2562,7 +2562,10 @@ async function translate(word){
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
   const api = await getSample();
-  
+  if(!api){
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
+    return;
+  }
   const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
   const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
 Responde SOLO con JSON (sin markdown): {"t":"traducción principal","alts":["alt1","alt2"]}
