@@ -2561,30 +2561,44 @@ async function translate(word){
     <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
-  // 1. VOCAB del libro (sin red)
-  const vocabData = VOCAB[S.book?.id];
-  const entry = vocabData?.words?.find(e => e.w.toLowerCase() === word.toLowerCase());
-  if(entry && entry.tr && entry.tr !== entry.w){
-    const result = {t: entry.tr, alts: []};
-    S.cache[key] = result; showTrans(word, result, label); addHist(word, entry.tr);
+  // VOCAB del libro (sin red, instantáneo)
+  const _vd = VOCAB[S.book?.id];
+  const _ve = _vd?.words?.find(e => e.w.toLowerCase() === word.toLowerCase());
+  if(_ve && _ve.tr && _ve.tr !== _ve.w){
+    const _vr = {t:_ve.tr, alts:[]};
+    S.cache[key]=_vr; showTrans(word,_vr,label); addHist(word,_ve.tr); return;
+  }
+  const api = await getSample();
+  if(!api){
+    // MyMemory fallback when Claude API not available
+    try {
+      const _sl = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
+      const _ctrl = new AbortController();
+      const _tmr = setTimeout(()=>_ctrl.abort(), 6000);
+      const _r = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+_sl+'|es',{signal:_ctrl.signal});
+      clearTimeout(_tmr);
+      const _d = await _r.json();
+      const _tr = _d?.responseData?.translatedText;
+      if(_tr && _tr.toLowerCase() !== word.toLowerCase()){
+        const _res = {t:_tr, alts:[]};
+        S.cache[key]=_res; showTrans(word,_res,label); addHist(word,_tr); return;
+      }
+    } catch {}
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
     return;
   }
-  // 2. MyMemory (gratis, sin registro)
-  try {
-    const srcLang = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
-    const ctrl = new AbortController();
-    const timer = setTimeout(()=>ctrl.abort(), 6000);
-    const r = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+srcLang+'|es', {signal:ctrl.signal});
-    clearTimeout(timer);
-    const data = await r.json();
-    const tr = data?.responseData?.translatedText;
-    if(tr && tr.toLowerCase() !== word.toLowerCase()){
-      const result = {t: tr, alts: []};
-      S.cache[key] = result; showTrans(word, result, label); addHist(word, tr);
-      return;
-    }
-  } catch {}
-  tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">Traducción no disponible.</div>`;
+  const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
+  const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
+Responde SOLO con JSON (sin markdown): {"t":"traducción principal","alts":["alt1","alt2"]}
+Palabra: "${word}"`;
+  try{
+    const res = await api(prompt, {modelTier:'quick', cache:true});
+    const parsed = JSON.parse(res.text.replace(/\`\`\`json|\`\`\`/g,'').trim());
+    const result = {t:parsed.t||'', alts:(parsed.alts||[]).slice(0,3)};
+    S.cache[key]=result; showTrans(word,result,label); addHist(word,result.t);
+  } catch{
+    tbody.innerHTML = `<div class="tw">${esc(word)}</div><div style="color:var(--dm);font-size:.82rem">No se encontró traducción.</div>`;
+  }
 }
 
 
