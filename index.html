@@ -2548,6 +2548,30 @@ function togPanel(){
   isOpen ? closePanel() : openPanel();
 }
 
+function showTrans(word, res, label){
+  const tbody = document.getElementById('tbody');
+  const found = findBookSentence(word);
+  const exHtml = found
+    ? `<div style="margin-top:.8rem">
+        <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Frase del libro</div>
+        <div style="font-size:.82rem;color:var(--dm);font-style:italic;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.6">${highlightWord(found.text, word)}</div>
+       </div>`
+    : '';
+  tbody.innerHTML = `
+    <div class="tw">${esc(word)}</div>
+    <div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:.4rem">${esc(res.t)}</div>
+      ${res.alts&&res.alts.length?`
+        <div style="margin-bottom:.6rem">
+          <div style="font-size:.68rem;color:var(--dmr);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Alternativas</div>
+          ${res.alts.map(a=>`<span style="display:inline-block;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:.12rem .4rem;font-size:.76rem;margin:.12rem .12rem .12rem 0">${esc(a)}</span>`).join('')}
+        </div>`:''}
+      ${exHtml}
+    </div>
+    <div id="hlist"></div>`;
+  renderHist();
+}
+
 async function translate(word){
   if(!word) return;
   openPanel();
