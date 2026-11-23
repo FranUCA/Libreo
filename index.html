@@ -580,9 +580,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-translate">🌐 Traducir</div>
+  <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item" id="ctx-readfrom">▶ Leer desde aquí</div>
+  <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
 </div>
 
 <script>
@@ -3064,22 +3064,7 @@ async function cachedIds(){
 loadFont();
 loadTheme();
 // Wire context menu buttons
-(function(){
-  function wire(id, fn){
-    const el = document.getElementById(id);
-    if(!el) return;
-    // touchstart fires BEFORE the document touchstart that hides the menu
-    // using stopPropagation prevents the document handler from running at all
-    el.addEventListener('touchstart', e=>{
-      e.preventDefault();
-      e.stopPropagation();
-      fn();
-    }, {passive:false});
-    el.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
-  }
-  wire('ctx-translate', ctxTranslate);
-  wire('ctx-readfrom',  ctxReadFrom);
-})();
+// ctx-menu buttons handled via onclick attributes in HTML
 // getSample is lazy — called on first translate, not at boot
 </script>
 </body>
