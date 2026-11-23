@@ -628,28 +628,6 @@ const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 function setupPWA(){
   document.getElementById('logo-svg').innerHTML = ICON_SVG.replace(
     'viewBox="0 0 512 512"','viewBox="0 0 512 512" width="80" height="80"');
-
-  // Build a proper Web App Manifest and inject it
-  const manifest = {
-    name:'Libreo', short_name:'Libreo',
-    description:'Aprende idiomas leyendo literatura clásica',
-    start_url:'./', display:'standalone',
-    background_color:'#1a1a2e', theme_color:'#4a9eff',
-    orientation:'portrait-primary',
-    icons:[{src:'data:image/svg+xml,'+encodeURIComponent(ICON_SVG),
-            sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]
-  };
-  const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  document.getElementById('pwa-manifest').href = URL.createObjectURL(mBlob);
-
-  // Pre-cache the app shell so it works offline from the first visit
-  if('caches' in window){
-    caches.open('libreo-v4').then(cache =>
-      cache.match(location.href).then(hit => {
-        if(!hit) cache.add(location.href).catch(()=>{});
-      })
-    );
-  }
 }
 
 
@@ -1005,45 +983,7 @@ const VOCAB = {
     {w:"wretch",tr:"desgraciado",exp:"A very unfortunate or unhappy person.",ex:"Cursed, cursed creator! Why did I live?"}
   ]},
   quijote:{words:[
-    {w:"andante",tr:"andante",exp:"Que anda errante; caballero andante busca aventuras.",ex:"Quiero que se me llame don Quijote de la Mancha."},
-    {w:"armas",tr:"armas",exp:"Instrumentos de guerra; don Quijote lleva anticuadas armas.",ex:"Limpió sus armas, que sin haber salido a ningún servicio estaban llenas de orín."},
-    {w:"aventura",tr:"aventura",exp:"Empresa peligrosa o imprevista que se acomete.",ex:"Y así, del poco dormir y del mucho leer, se le secó el celebro."},
-    {w:"bachiller",tr:"bachiller",exp:"Persona que ha obtenido el grado académico más básico.",ex:"Tenía en su casa una ama que pasaba de los cuarenta."},
-    {w:"batalla",tr:"batalla",exp:"Combate o enfrentamiento entre fuerzas opuestas.",ex:"Don Quijote acometió con su lanza en ristre."},
-    {w:"caballero",tr:"caballero",exp:"Hombre de clase noble que combate montado.",ex:"Yo sé quién soy, respondió don Quijote."},
-    {w:"caballo",tr:"caballo",exp:"Animal de montar; Rocinante es el caballo flaco de don Quijote.",ex:"Rocinante iba tan trotando que apenas lo sentía caminar."},
-    {w:"calidad",tr:"calidad",exp:"Conjunto de propiedades que caracterizan a algo.",ex:"La de su calidad no podía ser sino princesa."},
-    {w:"camino",tr:"camino",exp:"Vía o sendero por el que se transita.",ex:"Siguieron su camino por la venta adelante."},
-    {w:"cordura",tr:"cordura",exp:"Sensatez, juicio sano; lo opuesto a la locura.",ex:"Al cabo se le secó el celebro y vino a perder el juicio."},
-    {w:"cueva",tr:"cueva",exp:"Cavidad natural en la tierra; don Quijote baja a la Cueva de Montesinos.",ex:"Don Quijote se descolgó a la cueva con una soga."},
-    {w:"dama",tr:"dama",exp:"Mujer noble; los caballeros luchan por su dama.",ex:"Dulcinea del Toboso, dama de sus pensamientos."},
-    {w:"derrota",tr:"derrota",exp:"Acción de ser vencido en un combate.",ex:"Quedó don Quijote muy malparado en el suelo."},
-    {w:"disfraz",tr:"disfraz",exp:"Vestimenta con que alguien se disfraza para no ser reconocido.",ex:"Dorotea se disfrazó de princesa Micomicona."},
-    {w:"don",tr:"don",exp:"Tratamiento de respeto que precede al nombre de pila.",ex:"Don Quijote de la Mancha."},
-    {w:"encantamiento",tr:"encantamiento",exp:"Acción mágica que transforma la realidad.",ex:"Sin duda los encantadores me persiguen."},
-    {w:"escudero",tr:"escudero",exp:"Sirviente que acompaña al caballero y lleva sus armas.",ex:"Sancho Panza se llamaba un labrador vecino suyo."},
-    {w:"fama",tr:"fama",exp:"Renombre y gloria que se adquieren por las buenas acciones.",ex:"Quiso parecer a los que él había leído en sus libros."},
-    {w:"gigante",tr:"gigante",exp:"Ser de estatura y fuerza extraordinarias; los molinos de viento.",ex:"¿Qué gigantes? dijo Sancho Panza. Aquellos que allí ves, respondió su amo."},
-    {w:"gloria",tr:"gloria",exp:"Fama y honor conquistados por las grandes acciones.",ex:"Felice edad y siglos dichosos aquellos a quien los antiguos pusieron nombre de dorados."},
-    {w:"hidalgo",tr:"hidalgo",exp:"Noble de sangre de rango inferior que no tiene título.",ex:"En un lugar de la Mancha, de cuyo nombre no quiero acordarme, vivía un hidalgo."},
-    {w:"honor",tr:"honor",exp:"Cualidad moral que obliga a actuar con rectitud y nobleza.",ex:"Más vale morir en pie que vivir de rodillas."},
-    {w:"ilusión",tr:"ilusión",exp:"Percepción equivocada de la realidad.",ex:"Todo lo que veo y toco es encantamiento."},
-    {w:"ínsula",tr:"ínsula",exp:"Isla; Sancho sueña con gobernar una ínsula.",ex:"¿Cómo te fue con tu gobierno, Sancho?"},
-    {w:"justicia",tr:"justicia",exp:"Principio moral de dar a cada uno lo que le corresponde.",ex:"Deshacer agravios y socorrer a los menesterosos."},
-    {w:"labrador",tr:"labrador",exp:"Persona que labra la tierra; Sancho es un labrador.",ex:"Sancho Panza, que así se llamaba el labrador."},
-    {w:"lanza",tr:"lanza",exp:"Arma de asta larga con punta de acero.",ex:"Con estas razones perdía el pobre caballero el juicio."},
-    {w:"locura",tr:"locura",exp:"Estado mental alterado; pérdida del juicio.",ex:"Viéndole don Quijote de aquella manera, con muestras de tanta tristeza."},
-    {w:"molino",tr:"molino",exp:"Edificio con aspas para moler cereal.",ex:"Acometió con su lanza al primero molino que estaba delante."},
-    {w:"mundo",tr:"mundo",exp:"La Tierra y todo lo que existe en ella.",ex:"Recorrió el mundo en busca de aventuras."},
-    {w:"pastora",tr:"pastora",exp:"Mujer que cuida ovejas; don Quijote quiere hacerse pastor.",ex:"Hagámonos pastores."},
-    {w:"refrán",tr:"refrán",exp:"Dicho popular que expresa una verdad general; Sancho los usa constantemente.",ex:"Sancho Panza tenía la memoria llena de refranes."},
-    {w:"reino",tr:"reino",exp:"Estado gobernado por un rey o una reina.",ex:"Prometió hacerle gobernador de una ínsula."},
-    {w:"señor",tr:"señor",exp:"Título de respeto; Sancho llama siempre señor a don Quijote.",ex:"Señor, respondió Sancho Panza."},
-    {w:"venta",tr:"venta",exp:"Posada o mesón en un camino.",ex:"Llegaron a una venta que don Quijote tuvo por castillo."},
-    {w:"ventura",tr:"ventura",exp:"Suerte o fortuna.",ex:"¡Felice edad y siglos dichosos!"},
-    {w:"verdad",tr:"verdad",exp:"Conformidad de las cosas con lo que se dice de ellas.",ex:"En esto de la verdad, señor cura, digo que tiene razón."},
-    {w:"viejo",tr:"viejo",exp:"De avanzada edad; don Quijote es un hidalgo ya mayor.",ex:"Frisaba la edad de nuestro hidalgo con los cincuenta años."},
-    {w:"yelmo",tr:"yelmo",exp:"Pieza de armadura que cubre y protege la cabeza.",ex:"Limpió su adarga, adobó su lanza y puso nombre a su rocín."}
+
   ]},
   mousq:{words:[
     {w:"ami",tr:"amigo",exp:"Personne avec qui on a des liens d affection et de confiance.",ex:"Mon ami, dit Athos, tu es brave."},
@@ -1843,7 +1783,13 @@ async function openVocab(){
   const data = VOCAB[S.book.id];
 
   if(!data || !data.words || data.words.length === 0){
-    // No preset vocab - generate it via Claude
+    if(S.lang === 'es'){
+      goTo('sv');
+      document.getElementById('vocab-body').innerHTML =
+        '<p style="color:var(--dm);font-size:.92rem;padding:2rem 1rem;text-align:center">' +
+        '📖 El vocabulario para los libros en español<br>estará disponible próximamente.</p>';
+      return;
+    }
     goTo('sv');
     generateVocab();
     return;
@@ -1982,25 +1928,14 @@ function highlightWord(sentence, word){
 function openWordSheet(word, exp, ex, tr){
   _sheetWord = word;
   _ctxWord   = word;
-
-  // Word + translation in header
   document.getElementById('ws-word').textContent = word;
   const trEl = document.getElementById('ws-word-tr');
   if(trEl) trEl.textContent = (tr && tr !== word) ? '\u2192 ' + tr : '';
-
-  // Explanation
   document.getElementById('ws-exp').textContent = exp;
-
-  // Translation block (keep for styling consistency, show tr again)
   const wrap = document.getElementById('ws-trans-wrap');
-  wrap.innerHTML = (tr && tr !== word)
-    ? `<div class="ws-trans">${esc(tr)}</div>` : '';
-
-  // Example sentence — prefer a real sentence from the loaded book
+  wrap.innerHTML = (tr && tr !== word) ? `<div class="ws-trans">${esc(tr)}</div>` : '';
   const found = findBookSentence(word);
-  document.getElementById('ws-ex').innerHTML =
-    highlightWord(found ? found.text : ex, word);
-
+  document.getElementById('ws-ex').innerHTML = highlightWord(found ? found.text : ex, word);
   document.getElementById('word-sheet').classList.add('show');
 }
 
@@ -2137,6 +2072,7 @@ const FIRST_CHUNK_BYTES = 40000; // ~1500 words, opens in <1s
 const APPEND_EVERY_BYTES = 50000; // append more text every ~50 KB
 
 async function startRead(generateVocab=false){
+  if(S.book && S.book.fmt === 'pdf'){ openDoc(S.book.id); return; }
   S.mode='read'; S.cache={}; S.hist=[]; stopAudio();
   dismissResume();
 
@@ -2577,16 +2513,14 @@ let _sampleApi = null;
 let _samplePending = false;
 async function getSample(){
   if(_sampleApi) return _sampleApi;
-  if(_samplePending) return null;  // already trying, don't stack calls
+  if(_samplePending) return null;
   _samplePending = true;
   try {
     _sampleApi = await Promise.race([
       claude.use('sample'),
       new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 5000))
     ]);
-  } catch {
-    _sampleApi = null;  // offline or slow — will retry next call
-  }
+  } catch { _sampleApi = null; }
   _samplePending = false;
   return _sampleApi;
 }
@@ -2837,7 +2771,7 @@ function renderBookCard(b, lang){
   const resumeBadge = bm?.manual
     ? `<span class="resume-badge">📌</span>`
     : pct > 1 ? `<span class="resume-badge">▶ ${pct}%</span>` : '';
-  const onclick = isDoc ? `openDoc('${b.id}')` : `selBook('${b.id}')`;
+  const onclick = `selBook('${b.id}')`;
   const fmtBadge = b.fmt==='pdf' ? `<span class="lp b1" style="background:rgba(255,107,107,.15);color:#ff6b6b">PDF</span>` : '';
   const audioIcon = isDoc ? '' : `<span class="sp">🎧</span>`;
   return `<div class="bc ${b.lv}" data-bid="${b.id}" onclick="${onclick}">
@@ -2995,86 +2929,8 @@ function setupPWA(){
 
   // Service Worker — caches book text files for offline use
   if('serviceWorker' in navigator){
-    const swCode = `
-const CACHE = 'libreo-v4';
-
-// Shell = the app HTML itself (any URL under our scope that isn't a book or external resource)
-function isBook(u){ return u.includes('raw.githubusercontent.com'); }
-function isExternal(u){
-  return u.startsWith('blob:') || u.includes('google.com') ||
-         u.includes('googleapis.com') || u.includes('gutenberg.org') ||
-         u.includes('allorigins.win') || u.includes('corsproxy.io');
-}
-function isShell(u){
-  if(isBook(u) || isExternal(u)) return false;
-  // Match the scope origin + path (covers /Libreo/, /Libreo/index.html, etc.)
-  try {
-    const scope = new URL(self.registration.scope);
-    const req   = new URL(u);
-    return req.origin === scope.origin && req.pathname.startsWith(scope.pathname);
-  } catch { return false; }
-}
-
-self.addEventListener('install', e => {
-  // Pre-cache the shell on install so it's available offline immediately
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.add(self.registration.scope).catch(()=>{}))
-      .then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys()
-      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', e => {
-  if(e.request.method !== 'GET') return;
-  const url = e.request.url;
-  if(url.startsWith('blob:') || url.startsWith('chrome-extension:')) return;
-
-  // App shell: cache-first, background refresh
-  if(isShell(url)){
-    e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match(e.request).then(cached => {
-          // Always try to refresh in background
-          fetch(e.request)
-            .then(res => { if(res && res.ok) cache.put(e.request, res.clone()); })
-            .catch(()=>{});
-          // Return cached immediately if available, otherwise wait for network
-          if(cached) return cached;
-          return fetch(e.request)
-            .then(res => { if(res.ok) cache.put(e.request, res.clone()); return res; });
-        })
-      )
-    );
-    return;
-  }
-
-  // Book TXT files: cache-first, fetch on miss
-  if(isBook(url)){
-    e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match(e.request).then(hit => hit ||
-          fetch(e.request).then(res => {
-            if(res.ok) cache.put(e.request, res.clone());
-            return res;
-          })
-        )
-      )
-    );
-    return;
-  }
-
-  // Everything else: network only (Google Docs, TTS, external APIs)
-});`;
-    const swBlob = new Blob([swCode], {type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob), {scope:'./'})
+    // sw.js must be a real file — blob: URLs are not allowed for SW registration
+    navigator.serviceWorker.register('./sw.js')
       .catch(()=>{});
   }
 }
