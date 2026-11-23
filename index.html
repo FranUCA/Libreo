@@ -580,7 +580,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 
 <!-- Word context menu -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-translate" onclick="hideCtxMenu();translate(_ctxWord);">🌐 Traducir</div>
+  <div class="ctx-item" id="ctx-translate" onclick="hideCtxMenu();showWordTr(_ctxWord);">🌐 Traducir</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item" id="ctx-readfrom" onclick="hideCtxMenu();readFromSentenceGesture(_ctxSi);">▶ Leer desde aquí</div>
 </div>
@@ -2549,6 +2549,29 @@ function togPanel(){
   if(!p) return;
   const isOpen = p.classList.contains('mob') || !p.classList.contains('clo');
   isOpen ? closePanel() : openPanel();
+}
+
+
+function showWordTr(word){
+  if(!word) return;
+  // Open panel
+  const p = document.getElementById('tpanel');
+  if(!p) return;
+  p.classList.remove('clo');
+  p.classList.add('mob');
+  S.panelOpen = true;
+  // Find translation in VOCAB
+  const tbody = document.getElementById('tbody');
+  const vd = VOCAB[S.book?.id];
+  const ve = vd?.words?.find(e => e.w.toLowerCase() === word.toLowerCase());
+  const tr = (ve && ve.tr && ve.tr !== ve.w) ? ve.tr : null;
+  tbody.innerHTML =
+    '<div class="tw">' + esc(word) + '</div>' +
+    (tr
+      ? '<div style="font-size:1.1rem;font-weight:600;margin:.6rem 0">' + esc(tr) + '</div>' +
+        (ve.exp ? '<div style="font-size:.82rem;color:var(--dm);margin-bottom:.4rem">' + esc(ve.exp) + '</div>' : '')
+      : '<div style="color:var(--dm);font-size:.88rem;margin-top:.5rem">Palabra no encontrada en el vocabulario del libro.</div>'
+    );
 }
 
 async function translate(word){
