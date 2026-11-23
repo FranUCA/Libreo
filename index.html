@@ -579,7 +579,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 <div class="toast" id="toast"></div>
 
 <!-- Word context menu -->
-<div id="ctx-menu" ontouchstart="alert('MENU TOUCHED')">
+<div id="ctx-menu">
   <div class="ctx-item" id="ctx-translate" onclick="ctxTranslate()">🌐 Traducir</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item" id="ctx-readfrom" onclick="ctxReadFrom()">▶ Leer desde aquí</div>
@@ -2491,6 +2491,18 @@ document.addEventListener('touchstart', e=>{
 }, {passive:true});
 
 // Context menu actions (wired after DOM ready, see boot)
+
+function handleCtxTouch(e){
+  e.preventDefault();
+  const id = e.target.id || e.target.closest('[id]')?.id;
+  if(id === 'ctx-translate'){ hideCtxMenu(); translate(_ctxWord); }
+  else if(id === 'ctx-readfrom'){ hideCtxMenu(); readFromSentenceGesture(_ctxSi); }
+}
+function handleCtxClick(e){
+  const id = e.target.id || e.target.closest('[id]')?.id;
+  if(id === 'ctx-translate'){ hideCtxMenu(); translate(_ctxWord); }
+  else if(id === 'ctx-readfrom'){ hideCtxMenu(); readFromSentenceGesture(_ctxSi); }
+}
 function ctxTranslate(){
   toast('ctxTranslate: ' + _ctxWord);
   hideCtxMenu();
