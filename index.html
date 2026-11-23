@@ -2561,7 +2561,7 @@ async function translate(word){
     <div class="tld"><div class="sp2"></div> Traduciendo al ${label}…</div>`;
   const key = word.toLowerCase().trim()+'|'+target;
   if(S.cache[key]){ showTrans(word, S.cache[key], label); addHist(word, S.cache[key].t); return; }
-
+  const api = await getSample();
   
   const langNames={en:'inglés',es:'español',fr:'francés',de:'alemán',pt:'portugués',it:'italiano'};
   const prompt = `Traduce del ${langNames[S.lang]||S.lang} al ${label} la siguiente palabra del libro "${S.book?.title||''}".
