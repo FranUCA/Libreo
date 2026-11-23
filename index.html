@@ -2613,9 +2613,20 @@ function updProg(){
 
 // ── TRANSLATION — Claude sample capability ──
 let _sampleApi = null;
+let _samplePending = false;
 async function getSample(){
   if(_sampleApi) return _sampleApi;
-  _sampleApi = await claude.use('sample');
+  if(_samplePending) return null;  // already trying, don't stack calls
+  _samplePending = true;
+  try {
+    _sampleApi = await Promise.race([
+      claude.use('sample'),
+      new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 5000))
+    ]);
+  } catch {
+    _sampleApi = null;  // offline or slow — will retry next call
+  }
+  _samplePending = false;
   return _sampleApi;
 }
 
@@ -3192,7 +3203,7 @@ document.getElementById('ctx-readfrom').addEventListener('click',  ctxReadFrom);
 document.getElementById('ctx-readfrom').addEventListener('touchend', e=>{
   e.preventDefault(); ctxReadFrom();
 });
-getSample().catch(()=>{});
+// getSample is lazy — called on first translate, not at boot
 </script>
 </body>
 </html>
