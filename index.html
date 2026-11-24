@@ -205,7 +205,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   -webkit-user-select:none;user-select:none;}
 .rw:hover,.rw:focus{background:var(--soft);color:var(--ac);}
 .rw.hl{background:var(--soft);color:var(--ac);}
-.rw.sk{background:var(--ac);color:#fff;border-radius:3px;}
+.rw.sk{background:rgba(74,158,255,.25);color:var(--tx);border-radius:3px;outline:1px solid rgba(74,158,255,.5);}
 .rw.pinned{background:#f59e0b;color:#fff;border-radius:3px;
   transition:background .15s;box-shadow:0 0 0 3px rgba(245,158,11,.4);}
 .font-sm .rc p{font-size:.93rem;}
@@ -2344,7 +2344,7 @@ function buildParaHtml(){
       // Mark all chars of this sentence with si
       const end = pos + sent.length;
       charSi.fill(si, pos, end);
-      searchFrom = pos + Math.max(1, sent.length - 10); // allow slight overlap
+      searchFrom = end; // strict: next sentence starts after this one ends
     }
   }
 
