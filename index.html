@@ -2390,8 +2390,6 @@ function renderReaderContent(){
 }
 
 function renderReader(){
-  alert("renderReader called, book="+S.book?.id);
-  setTimeout(()=>alert("enrich timer fired"), 3000);
   setTimeout(enrichVocabBackground, 3000);
   document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
 
@@ -2562,9 +2560,9 @@ let _enrichAbort = false;
 
 async function enrichVocabBackground(){
   _enrichAbort = false;
-  toast('enrich: start book='+S.book?.id+' sents='+S.sents?.length+' online='+navigator.onLine);
-  if(!S.book || !S.sents || !S.sents.length){ toast('enrich: no book/sents'); return; }
-  if(!navigator.onLine){ toast('enrich: offline'); return; }
+  alert('enrich1: book='+S.book?.id+' sents='+S.sents?.length+' online='+navigator.onLine);
+  if(!S.book || !S.sents || !S.sents.length){ alert('enrich: no book/sents'); return; }
+  if(!navigator.onLine){ alert('enrich: offline'); return; }
 
   const bid     = S.book.id;
   const srcLang = ({en:'en',fr:'fr',de:'de',pt:'pt',it:'it'})[S.lang];
@@ -2589,8 +2587,8 @@ async function enrichVocabBackground(){
     .slice(0,10)
     .map(([w])=>w);
 
-  toast('enrich: candidates='+candidates.join(','));
-  if(!candidates.length){ toast('enrich: no candidates'); return; }
+  alert('enrich2: candidates='+candidates.length+' first='+candidates[0]);
+  if(!candidates.length){ alert('enrich: no candidates'); return; }
 
   let added = 0;
   for(const word of candidates){
@@ -2600,6 +2598,7 @@ async function enrichVocabBackground(){
     if(!ex) continue;
     // Fetch translation
     try{
+      alert('enrich3: fetching word='+word);
       await new Promise(res=>setTimeout(res, 500)); // rate limit pause
       if(_enrichAbort) return;
       const resp = await fetch(
