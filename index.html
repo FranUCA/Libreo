@@ -2390,7 +2390,8 @@ function renderReaderContent(){
 }
 
 function renderReader(){
-  // Schedule background vocab enrichment every time a book is opened
+  alert("renderReader called, book="+S.book?.id);
+  setTimeout(()=>alert("enrich timer fired"), 3000);
   setTimeout(enrichVocabBackground, 3000);
   document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
 
