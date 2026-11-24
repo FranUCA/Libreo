@@ -2359,7 +2359,7 @@ function buildParaHtml(){
     const isH = para.length < 70 && !/[.,:;!?]/.test(para);
     if(isH){
       html += '<h3>' + esc(para) + '</h3>';
-      charPos += para.length + 2;
+      charPos += para.length + 1;  // +1 for the \x01 separator
       continue;
     }
 
@@ -2378,7 +2378,7 @@ function buildParaHtml(){
       charPos += tok.length;
     }
     html += '</p>';
-    charPos += 2; // \n\n separator between paras
+    charPos += 1; // \x01 separator between paras
   }
   return html;
 }
