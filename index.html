@@ -2152,7 +2152,6 @@ async function startRead(generateVocab=false){
   } finally {
     setTimeout(()=>{ bar.style.width='0%'; wrap.classList.remove('show'); }, 700);
   }
-  // Background vocab enrichment - outside try/catch so it always runs
   setTimeout(enrichVocabBackground, 2500);
 }
 
@@ -2391,6 +2390,8 @@ function renderReaderContent(){
 }
 
 function renderReader(){
+  // Schedule background vocab enrichment every time a book is opened
+  setTimeout(enrichVocabBackground, 3000);
   document.getElementById('rtl').textContent = S.book.title+' — '+S.book.author;
 
 
