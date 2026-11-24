@@ -2560,8 +2560,9 @@ let _enrichAbort = false;
 
 async function enrichVocabBackground(){
   _enrichAbort = false;
-  if(!S.book || !S.sents || !S.sents.length) return;
-  if(!navigator.onLine) return;
+  toast('enrich: start book='+S.book?.id+' sents='+S.sents?.length+' online='+navigator.onLine);
+  if(!S.book || !S.sents || !S.sents.length){ toast('enrich: no book/sents'); return; }
+  if(!navigator.onLine){ toast('enrich: offline'); return; }
 
   const bid     = S.book.id;
   const srcLang = ({en:'en',fr:'fr',de:'de',pt:'pt',it:'it'})[S.lang];
@@ -2586,7 +2587,8 @@ async function enrichVocabBackground(){
     .slice(0,10)
     .map(([w])=>w);
 
-  if(!candidates.length) return;
+  toast('enrich: candidates='+candidates.join(','));
+  if(!candidates.length){ toast('enrich: no candidates'); return; }
 
   let added = 0;
   for(const word of candidates){
