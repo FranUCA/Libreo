@@ -370,7 +370,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .ws-word{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;color:var(--ac);margin-bottom:.2rem;}
 .ws-trans{font-size:1.1rem;font-weight:600;margin-bottom:.8rem;}
-.ws-word-tr{font-size:1.1rem;color:var(--dm);margin-bottom:.5rem;font-style:italic;}
+.ws-word-tr{font-size:1.1rem;color:var(--dm);margin-bottom:.5rem;font-style:italic;font-weight:600;}
 .ws-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dmr);margin-bottom:.3rem;margin-top:.8rem;}
 .ws-exp{font-size:.9rem;line-height:1.6;color:var(--tx);}
 .ws-ex{font-size:.88rem;line-height:1.6;color:var(--dm);font-style:italic;
@@ -1933,7 +1933,7 @@ function openWordSheet(word, exp, ex, tr){
   if(trEl) trEl.textContent = (tr && tr !== word) ? '\u2192 ' + tr : '';
   document.getElementById('ws-exp').textContent = exp;
   const wrap = document.getElementById('ws-trans-wrap');
-  wrap.innerHTML = (tr && tr !== word) ? `<div class="ws-trans">${esc(tr)}</div>` : '';
+  wrap.innerHTML = '';
   const found = findBookSentence(word);
   document.getElementById('ws-ex').innerHTML = highlightWord(found ? found.text : ex, word);
   document.getElementById('word-sheet').classList.add('show');
@@ -2624,10 +2624,13 @@ async function enrichVocabBackground(){
   }
 
   // Top 10 most frequent unknown words
-  const candidates = Object.entries(freq)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,10)
-    .map(([w])=>w);
+  const allWords = Object.keys(freq);
+  // Shuffle randomly and pick 10
+  for(let i = allWords.length-1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [allWords[i],allWords[j]] = [allWords[j],allWords[i]];
+  }
+  const candidates = allWords.slice(0,10);
 
   if(!candidates.length){ alert('enrich: no candidates'); return; }
 
