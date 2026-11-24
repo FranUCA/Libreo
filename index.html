@@ -1761,7 +1761,7 @@ function selBook(id){
   document.getElementById('mauth').textContent  = b.author;
   goTo('sm');
 }
-function exitR(){ stopAudio(); _enrichAbort = true; goTo('sm'); }
+function exitR(){ stopAudio(); _enrichAbort = true; _enrichRunning = false; goTo('sm'); }
 
 // ── HTML / PDF / EPUB VIEWER ──
 
@@ -1773,6 +1773,7 @@ let _vocabFiltered = [];
 
 async function openVocab(){
   if(!S.book) return;
+  _enrichAbort = true; _enrichRunning = false;
   document.getElementById('vocab-title').textContent = S.book.title;
   document.getElementById('vocab-search').value = '';
   // For Gutendex books: try loading vocab from IndexedDB if not in memory
