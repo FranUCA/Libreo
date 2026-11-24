@@ -2556,77 +2556,72 @@ function togPanel(){
 // After opening a book, pick 10 words not yet in VOCAB, fetch translations
 // from MyMemory and find their sentence in the text. Runs fully in background.
 
-let _enrichAbort = false;  // set to true when user exits the book
+let _enrichAbort = false;
 
 async function enrichVocabBackground(){
   _enrichAbort = false;
   if(!S.book || !S.sents || !S.sents.length) return;
+  if(!navigator.onLine) return;
 
-  const bid    = S.book.id;
-  const srcLang = {en:'en',es:'es',fr:'fr',de:'de',pt:'pt',it:'it'}[S.lang]||'en';
-  if(srcLang === 'es') return;  // Spanish books: no enrichment needed
+  const bid     = S.book.id;
+  const srcLang = ({en:'en',fr:'fr',de:'de',pt:'pt',it:'it'})[S.lang];
+  if(!srcLang) return;  // skip Spanish and unknown
 
-  // Words already in VOCAB for this book
   if(!VOCAB[bid]) VOCAB[bid] = {words:[]};
   const known = new Set(VOCAB[bid].words.map(e => e.w.toLowerCase()));
 
-  // Extract candidate words from the text: 4-12 chars, alphabetic, not known
-  const wordFreq = {};
-  const wordRe = /\b([A-Za-zÀ-ÿ]{4,12})\b/g;
+  // Count word frequency across all sentences
+  const freq = {};
   for(const sent of S.sents){
-    let m;
-    wordRe.lastIndex = 0;
-    while((m = wordRe.exec(sent)) !== null){
-      const w = m[1];
+    const matches = sent.match(/\b[A-Za-z\u00C0-\u00FF]{4,12}\b/g) || [];
+    for(const w of matches){
       const wl = w.toLowerCase();
-      if(!known.has(wl)){
-        wordFreq[wl] = (wordFreq[wl]||0) + 1;
-      }
+      if(!known.has(wl)) freq[wl] = (freq[wl]||0) + 1;
     }
   }
 
-  // Pick 10 most frequent unknown words
-  const candidates = Object.entries(wordFreq)
-    .sort((a,b) => b[1]-a[1])
-    .slice(0, 10)
-    .map(([w]) => w);
+  // Top 10 most frequent unknown words
+  const candidates = Object.entries(freq)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,10)
+    .map(([w])=>w);
 
   if(!candidates.length) return;
 
+  let added = 0;
   for(const word of candidates){
     if(_enrichAbort) return;
-
-    // Find first sentence containing this word
-    const sent = S.sents.find(s => s.toLowerCase().includes(word.toLowerCase()));
-    if(!sent) continue;
-
-    // Fetch translation from MyMemory
-    try {
-      const r = await fetch(
+    // Find example sentence
+    const ex = S.sents.find(s => new RegExp('\\b'+word+'\\b','i').test(s)) || '';
+    if(!ex) continue;
+    // Fetch translation
+    try{
+      await new Promise(res=>setTimeout(res, 500)); // rate limit pause
+      if(_enrichAbort) return;
+      const resp = await fetch(
         'https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+srcLang+'|es'
       );
-      if(_enrichAbort) return;
-      const data = await r.json();
-      const tr = data?.responseData?.translatedText;
-      if(!tr || tr.toLowerCase() === word.toLowerCase()) continue;
-
-      // Add to VOCAB
+      const data = await resp.json();
+      const tr = data?.responseData?.translatedText || '';
+      if(!tr || tr.toLowerCase()===word.toLowerCase()) continue;
+      // Check response is good (MyMemory returns error strings sometimes)
+      if(tr.includes('QUERY LENGTH') || tr.includes('PLEASE') || tr.length > 50) continue;
       const entry = {
-        w:   word.charAt(0).toUpperCase() + word.slice(1),
-        tr:  tr,
-        exp: '',   // no explanation from MyMemory
-        ex:  sent.length > 120 ? sent.slice(0,120)+'…' : sent
+        w:  word.charAt(0).toUpperCase()+word.slice(1),
+        tr: tr,
+        exp:'',
+        ex: ex.length>120 ? ex.slice(0,117)+'…' : ex
       };
-      if(!VOCAB[bid].words.find(e => e.w.toLowerCase() === word.toLowerCase())){
+      if(!VOCAB[bid].words.find(e=>e.w.toLowerCase()===word.toLowerCase())){
         VOCAB[bid].words.push(entry);
         known.add(word.toLowerCase());
+        added++;
       }
-
-      // Small delay between requests to avoid rate limiting
-      await new Promise(res => setTimeout(res, 400));
     } catch { continue; }
   }
+  if(added > 0) toast('📚 '+added+' palabras nuevas añadidas al vocabulario');
 }
+
 
 function showWordTr(word){
   if(!word) return;
