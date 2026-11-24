@@ -2573,14 +2573,54 @@ async function enrichVocabBackground(){
   if(!VOCAB[bid]) VOCAB[bid] = {words:[]};
   const known = new Set(VOCAB[bid].words.map(e => e.w.toLowerCase()));
 
+  // Stop-words: articles, pronouns, prepositions, auxiliaries, conjunctions
+  const STOP = new Set([
+    // English
+    'this','that','these','those','with','from','have','been','were','they','their',
+    'them','what','when','where','which','while','your','will','would','could','should',
+    'shall','must','might','than','then','there','here','just','also','into','onto',
+    'upon','over','under','about','after','before','through','between','against','without',
+    'within','during','because','though','although','however','therefore','indeed',
+    'myself','himself','herself','itself','themselves','ourselves','yourself',
+    'each','every','some','many','much','more','most','such','both','either',
+    'very','still','already','always','never','often','again','once','even',
+    // French
+    'avec','dans','pour','mais','cette','celui','celle','ceux','celles','sont',
+    'être','avoir','faire','tout','tous','toute','toutes','plus','bien','très',
+    'comme','même','dont','ainsi','puis','donc','mais','leurs','notre','votre',
+    // German
+    'dass','sich','nicht','auch','noch','oder','aber','denn','wenn','worden',
+    'hatte','haben','waren','würde','sollte','könnte','müssen','dürfen','werden',
+    'einer','eines','einem','einen','dieser','dieses','diesem','diesen','ihnen',
+    // Portuguese / Italian
+    'para','pela','pelo','seus','suas','esse','essa','isso','aqui','onde',
+    'anche','sono','essere','hanno','come','dove','quando','quanto','tutto',
+  ]);
+
   // Count word frequency across all sentences
   const freq = {};
   for(const sent of S.sents){
     const matches = sent.match(/\b[A-Za-z\u00C0-\u00FF]{4,12}\b/g) || [];
     for(const w of matches){
       const wl = w.toLowerCase();
-      if(!known.has(wl)) freq[wl] = (freq[wl]||0) + 1;
+      // Skip stop-words, known words, and proper nouns (start with capital mid-sentence)
+      if(known.has(wl) || STOP.has(wl)) continue;
+      // Skip likely proper nouns: capitalized but not at sentence start
+      // (rough heuristic: if ALL occurrences are capitalized, it's a proper noun)
+      freq[wl] = (freq[wl]||0) + 1;
     }
+  }
+
+  // Remove likely proper nouns: words that appear capitalized more than lowercase
+  const capFreq = {};
+  for(const sent of S.sents){
+    const matches = sent.match(/\b[A-Z][a-z\u00C0-\u00FF]{3,11}\b/g) || [];
+    for(const w of matches) capFreq[w.toLowerCase()] = (capFreq[w.toLowerCase()]||0) + 1;
+  }
+  for(const wl of Object.keys(freq)){
+    const cap = capFreq[wl] || 0;
+    const total = freq[wl];
+    if(cap / total > 0.8) delete freq[wl];  // >80% capitalized = proper noun
   }
 
   // Top 10 most frequent unknown words
