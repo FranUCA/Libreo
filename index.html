@@ -260,13 +260,15 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 /* ── FAB ── */
 .fab{display:none;position:fixed;right:1rem;
   bottom:calc(1.2rem + var(--safe-b));
-  background:var(--ac);color:#fff;border:none;width:48px;height:48px;
+  background:var(--sf);border:1px solid var(--bd);color:#fff;border:none;width:48px;height:48px;
   border-radius:50%;cursor:pointer;font-size:1.3rem;
   box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:30;
   align-items:center;justify-content:center;
-  transition:transform .15s, background .2s;}
+  transition:transform .15s, filter .2s;
+  filter:grayscale(1) opacity(.5);}
 .fab:active{transform:scale(.88);}
-.fab.pinned-on{background:#f59e0b;box-shadow:0 4px 16px rgba(245,158,11,.5);}
+.fab.pinned-on{filter:grayscale(0) sepia(1) saturate(5) hue-rotate(315deg);
+  box-shadow:0 4px 16px rgba(220,50,50,.5);}
 
 @media(max-width:620px){
   .tp2{position:fixed;bottom:0;left:0;right:0;width:100%!important;
@@ -557,7 +559,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       </div>
     </div>
   </div>
-  <button class="fab" id="fab-pin" onclick="pinHere()" title="Poner marcador aquí">📌</button>
+  <button class="fab" id="fab-pin" onclick="pinHere()" title="Poner marcador aquí">🔖</button>
 </div>
 
 
@@ -671,6 +673,8 @@ const BOOKS = {
        url:G+"A-Journey-to-the-Centre-of-the-Earth_18857/master/18857.txt"},
       {id:"tomsawyer",title:"The Adventures of Tom Sawyer",author:"Mark Twain",lv:"a2",desc:"Las travesuras de Tom Sawyer a orillas del Misisipi.",
        url:G+"The-Adventures-of-Tom-Sawyer_74/master/74.txt"},
+      {id:"emma",title:"Emma",author:"Jane Austen",lv:"b1",desc:"La jovencita casamentera que aprende a conocerse a sí misma.",
+       url:G+"Emma_158/master/158-0.txt"},
     ]},
     {cat:"Asimov — Fundación 🌌",desc:"PDF · C1",books:[
       {id:"foundation",    title:"Foundation",                     author:"Isaac Asimov",lv:"c1",desc:"Hari Seldon funda la Fundación para preservar el conocimiento.",
@@ -2251,7 +2255,7 @@ function pinHere(){
   // If there's already a manual pin → remove it (toggle off)
   if(bm && bm.manual){
     try { localStorage.removeItem(bmKey()); } catch {}
-    if(btn) btn.classList.remove('pinned-on');
+    if(btn){ btn.classList.remove('pinned-on'); btn.textContent='🔖'; }
     updateCacheBadges(S.lang);
     toast('📌 Marcador eliminado');
     return;
@@ -2284,7 +2288,7 @@ function pinHere(){
     ));
   } catch {}
 
-  if(btn) btn.classList.add('pinned-on');
+  if(btn){ btn.classList.add('pinned-on'); btn.textContent='🔖'; }
   updateCacheBadges(S.lang);
   toast('📌 Marcador puesto' + (word ? ' en «' + word + '»' : ''));
 }
@@ -2296,6 +2300,7 @@ function syncFabPin(){
   const bm = loadBookmark();
   if(bm && bm.manual) btn.classList.add('pinned-on');
   else                btn.classList.remove('pinned-on');
+  btn.textContent = '🔖';
 }
 
 function pinWord(el){
