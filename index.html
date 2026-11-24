@@ -2558,15 +2558,17 @@ function togPanel(){
 
 let _enrichAbort = false;
 
+let _enrichRunning = false;
 async function enrichVocabBackground(){
+  if(_enrichRunning) return;  // already running, skip
+  _enrichRunning = true;
   _enrichAbort = false;
-  alert('enrich1: book='+S.book?.id+' sents='+S.sents?.length+' online='+navigator.onLine);
   if(!S.book || !S.sents || !S.sents.length){ alert('enrich: no book/sents'); return; }
   if(!navigator.onLine){ alert('enrich: offline'); return; }
 
   const bid     = S.book.id;
   const srcLang = ({en:'en',fr:'fr',de:'de',pt:'pt',it:'it'})[S.lang];
-  if(!srcLang) return;  // skip Spanish and unknown
+  if(!srcLang){ _enrichRunning=false; return; }  // skip Spanish and unknown
 
   if(!VOCAB[bid]) VOCAB[bid] = {words:[]};
   const known = new Set(VOCAB[bid].words.map(e => e.w.toLowerCase()));
@@ -2587,7 +2589,6 @@ async function enrichVocabBackground(){
     .slice(0,10)
     .map(([w])=>w);
 
-  alert('enrich2: candidates='+candidates.length+' first='+candidates[0]);
   if(!candidates.length){ alert('enrich: no candidates'); return; }
 
   let added = 0;
@@ -2598,7 +2599,6 @@ async function enrichVocabBackground(){
     if(!ex) continue;
     // Fetch translation
     try{
-      alert('enrich3: fetching word='+word);
       await new Promise(res=>setTimeout(res, 500)); // rate limit pause
       if(_enrichAbort) return;
       const resp = await fetch(
@@ -2623,6 +2623,7 @@ async function enrichVocabBackground(){
     } catch { continue; }
   }
   if(added > 0) toast('📚 '+added+' palabras nuevas añadidas al vocabulario');
+  _enrichRunning = false;
 }
 
 
