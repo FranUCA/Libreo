@@ -2987,7 +2987,8 @@ function speakS(i){
   const u = new SpeechSynthesisUtterance(S.sents[i]);
   u.lang = LMETA[S.lang].tts;
   u.rate = S.rate;
-  const v = _voiceOverride || bestVoice(S.lang); if(v) u.voice = v;
+  const v = _voiceOverride || bestVoice(S.lang);
+  if(v){ u.voice = v; toast('🔊 '+v.name, 2000); }
   u.onend = ()=>{
     if(myGen !== _ttsGen) return;   // stale — a newer speakS() already took over
     clrHl();
