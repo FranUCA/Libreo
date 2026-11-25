@@ -453,6 +453,10 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
       </div>
     </div>
   </div>
+  <div id="voice-bar" style="display:none;padding:.5rem 1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:.6rem;font-size:.82rem;color:var(--dm)">
+    🔊 <span>Voz:</span>
+    <select id="vsel-sb" onchange="chVoice(this.value)" style="flex:1;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:.25rem .4rem;font-size:.82rem"></select>
+  </div>
   <div class="lby" id="lby"></div>
 </div>
 
@@ -1805,6 +1809,8 @@ function selLang(lang){
   b.className='bdg '+lang; b.textContent=m.badge;
 
   renderLib(lang); goTo('sb');
+  if(syn) syn.onvoiceschanged = populateVoices;
+  populateVoices();
 }
 
 
@@ -2752,6 +2758,37 @@ document.addEventListener('visibilitychange', ()=>{
     requestWakeLock();
 });
 
+
+// ── VOICE SELECTION ───────────────────────────────────────────────────────────
+let _voiceOverride = null;
+
+function populateVoices(){
+  const sel = document.getElementById('vsel-sb');
+  if(!syn) return;
+  const voices = syn.getVoices().filter(v =>
+    v.lang.startsWith((LMETA[S.lang]?.tts||'en').split('-')[0])
+  );
+  const bar = document.getElementById('voice-bar');
+  if(bar) bar.style.display = voices.length > 1 ? 'flex' : 'none';
+  if(!sel || !voices.length) return;
+  sel.innerHTML = voices.map((v,i) =>
+    `<option value="${i}">${v.name.replace(/Google |Microsoft |Apple /g,'')}</option>`
+  ).join('');
+  // Restore saved voice for this lang
+  const saved = localStorage.getItem('libreo_voice_'+S.lang);
+  const savedIdx = voices.findIndex(v=>v.name===saved);
+  if(savedIdx>=0){ sel.value=savedIdx; _voiceOverride=voices[savedIdx]; }
+  else { sel.value=0; _voiceOverride=voices[0]||null; }
+}
+
+function chVoice(idx){
+  const voices = syn.getVoices().filter(v =>
+    v.lang.startsWith((LMETA[S.lang]?.tts||'en').split('-')[0])
+  );
+  _voiceOverride = voices[parseInt(idx)] || null;
+  if(_voiceOverride) localStorage.setItem('libreo_voice_'+S.lang, _voiceOverride.name);
+}
+
 function showWordTr(word){
   if(!word) return;
   // Open panel
@@ -2938,7 +2975,7 @@ function speakS(i){
   const u = new SpeechSynthesisUtterance(S.sents[i]);
   u.lang = LMETA[S.lang].tts;
   u.rate = S.rate;
-  const v = bestVoice(S.lang); if(v) u.voice = v;
+  const v = _voiceOverride || bestVoice(S.lang); if(v) u.voice = v;
   u.onend = ()=>{
     if(myGen !== _ttsGen) return;   // stale — a newer speakS() already took over
     clrHl();
