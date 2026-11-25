@@ -2202,6 +2202,7 @@ async function startRead(generateVocab=false){
     syncFabPin();
     showResumeBar();
     requestWakeLock();
+    populateVoices(); // ensure voice override is set
     // Generate vocab for Gutendex books (fires async, doesn't block reader)
     if(generateVocab && !VOCAB[S.book.id]?.words?.length){
       generateGxVocab(fullText);
@@ -2763,22 +2764,33 @@ document.addEventListener('visibilitychange', ()=>{
 let _voiceOverride = null;
 
 function populateVoices(){
-  const sel = document.getElementById('vsel-sb');
   if(!syn) return;
+  // Voices load async — if empty, wait for onvoiceschanged and retry
   const voices = syn.getVoices().filter(v =>
     v.lang.startsWith((LMETA[S.lang]?.tts||'en').split('-')[0])
   );
+  if(!voices.length){
+    syn.onvoiceschanged = ()=>{ syn.onvoiceschanged=null; populateVoices(); };
+    return;
+  }
   const bar = document.getElementById('voice-bar');
   if(bar) bar.style.display = voices.length > 1 ? 'flex' : 'none';
-  if(!sel || !voices.length) return;
-  sel.innerHTML = voices.map((v,i) =>
-    `<option value="${i}">${v.name.replace(/Google |Microsoft |Apple /g,'')}</option>`
-  ).join('');
-  // Restore saved voice for this lang
-  const saved = localStorage.getItem('libreo_voice_'+S.lang);
-  const savedIdx = voices.findIndex(v=>v.name===saved);
-  if(savedIdx>=0){ sel.value=savedIdx; _voiceOverride=voices[savedIdx]; }
-  else { sel.value=0; _voiceOverride=voices[0]||null; }
+  const sel = document.getElementById('vsel-sb');
+  if(sel){
+    sel.innerHTML = voices.map((v,i) =>
+      `<option value="${i}">${v.name.replace(/Google |Microsoft |Apple /g,'')}</option>`
+    ).join('');
+    const saved = localStorage.getItem('libreo_voice_'+S.lang);
+    const savedIdx = voices.findIndex(v=>v.name===saved);
+    const idx = savedIdx>=0 ? savedIdx : 0;
+    sel.value = idx;
+    _voiceOverride = voices[idx];
+  } else {
+    // Reader is open without the selector — still set _voiceOverride
+    const saved = localStorage.getItem('libreo_voice_'+S.lang);
+    const savedIdx = voices.findIndex(v=>v.name===saved);
+    _voiceOverride = voices[savedIdx>=0 ? savedIdx : 0] || null;
+  }
 }
 
 function chVoice(idx){
