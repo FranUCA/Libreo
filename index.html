@@ -402,6 +402,9 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 #resume-bar button{background:var(--ac);color:#fff;border:none;
   padding:.35rem .8rem;border-radius:14px;font-size:.78rem;font-weight:600;cursor:pointer;}
 #resume-bar .skip{background:none;color:var(--dm);font-size:.8rem;cursor:pointer;border:none;}
+.gr-pill{padding:.3rem .75rem;border-radius:20px;border:1px solid var(--bd);
+  background:var(--sf);color:var(--dm);font-size:.76rem;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.gr-pill-on{background:var(--ac);color:#fff;border-color:var(--ac)}
 </style>
 </head>
 <body>
@@ -848,6 +851,79 @@ const LMETA = {
 // VOCABULARY DATA — pinned + alphabetical per book
 // w: word, exp: explanation in original language, ex: book sentence
 // ══════════════════════════════════════════════════════
+
+const GRAMMAR = {
+  en:[
+    {id:"present_simple",lv:"a2",topic:"Tenses",title:"Present simple — habits and facts",rule:"Used for habits, routines, and general truths. Add -s/-es for he/she/it.",formula:"Subject + verb (+ -s/es)",examples:[{t:"She reads every night before bed.",src:""},{t:"The sun rises in the east.",src:""}],watch:{wrong:"She read every day",right:"She reads every day"}},
+    {id:"present_continuous",lv:"a2",topic:"Tenses",title:"Present continuous — actions in progress",rule:"Used for actions happening now or around now. NOT for stative verbs (know, like, want).",formula:"Subject + am/is/are + verb-ing",examples:[{t:"I am reading a very interesting book right now.",src:""},{t:"I am not sleeping, she said, turning to face him.",src:"Dracula, Stoker"}],watch:{wrong:"I am knowing the answer",right:"I know the answer"}},
+    {id:"present_perfect",lv:"b1",topic:"Tenses",title:"Present perfect — past action, present result",rule:"Used for actions at an unspecified past time relevant to now. Never with specific time expressions (yesterday, last year).",formula:"Subject + have/has + past participle",examples:[{t:"I have seen things you would not believe.",src:""},{t:"She has always been a creature of impulse.",src:"Emma, Austen"}],watch:{wrong:"I have seen him yesterday",right:"I saw him yesterday / I have seen him recently"}},
+    {id:"past_simple",lv:"a2",topic:"Tenses",title:"Past simple — completed past actions",rule:"Used for actions completed at a specific time in the past. Regular verbs add -ed; many common verbs are irregular.",formula:"Subject + verb (past form)",examples:[{t:"He opened the door and stepped inside.",src:""},{t:"Alice fell down the rabbit-hole.",src:"Alice's Adventures in Wonderland, Carroll"}],watch:{wrong:"I have called her yesterday",right:"I called her yesterday"}},
+    {id:"past_continuous",lv:"b1",topic:"Tenses",title:"Past continuous — interrupted past actions",rule:"Used for an action in progress when another action interrupted it.",formula:"Subject + was/were + verb-ing",examples:[{t:"While he was sleeping, the storm began.",src:""},{t:"The crew were working when the whale surfaced.",src:"Moby Dick, Melville"}],watch:{wrong:"I was read when you called",right:"I was reading when you called"}},
+    {id:"will_future",lv:"a2",topic:"Tenses",title:"Will — predictions and spontaneous decisions",rule:"Used for predictions based on opinion and decisions made at the moment of speaking.",formula:"Subject + will + infinitive",examples:[{t:"I will find a way, he said firmly.",src:""},{t:"Time will tell whether we were right.",src:"The Time Machine, Wells"}],watch:{wrong:"I will to go tomorrow",right:"I will go tomorrow"}},
+    {id:"going_to",lv:"a2",topic:"Tenses",title:"Going to — plans and evidence-based predictions",rule:"Used for future plans already decided and predictions based on present evidence.",formula:"Subject + am/is/are + going to + infinitive",examples:[{t:"Look at those clouds — it is going to rain.",src:""},{t:"I am going to write to him today, she decided.",src:"Emma, Austen"}],watch:{wrong:"It going to rain",right:"It is going to rain"}},
+    {id:"zero_conditional",lv:"b1",topic:"Conditionals",title:"Zero conditional — general truths",rule:"Used for facts and situations that are always true. Both clauses use the present simple.",formula:"If + present simple, present simple",examples:[{t:"If you heat water to 100°C, it boils.",src:""},{t:"If the wind blows from the north, the temperature drops.",src:""}],watch:{wrong:"If you heat water, it will boil",right:"If you heat water, it boils"}},
+    {id:"first_conditional",lv:"b1",topic:"Conditionals",title:"First conditional — real future possibility",rule:"Used for real and possible situations in the future.",formula:"If + present simple, will + infinitive",examples:[{t:"If you come with me, I will show you the way.",src:""},{t:"If the creature escapes, we will all be in danger.",src:"Frankenstein, Shelley"}],watch:{wrong:"If it will rain, I stay home",right:"If it rains, I will stay home"}},
+    {id:"second_conditional",lv:"b2",topic:"Conditionals",title:"Second conditional — unreal present/future",rule:"Used for hypothetical or unlikely situations in the present or future.",formula:"If + past simple, would + infinitive",examples:[{t:"If I had wings, I would fly to the top of the world.",src:""},{t:"If I were you, I would not go near that place.",src:"Jekyll and Hyde, Stevenson"}],watch:{wrong:"If I would have money, I will buy it",right:"If I had money, I would buy it"}},
+    {id:"third_conditional",lv:"c1",topic:"Conditionals",title:"Third conditional — unreal past",rule:"Used for hypothetical situations in the past — things that did not happen.",formula:"If + past perfect, would have + past participle",examples:[{t:"If she had known, she would have acted differently.",src:""},{t:"If the captain had listened, the ship would have survived.",src:"Moby Dick, Melville"}],watch:{wrong:"If I knew, I would told you",right:"If I had known, I would have told you"}},
+    {id:"modal_can",lv:"a2",topic:"Modal verbs",title:"Can / could — ability and possibility",rule:"Can expresses present ability or possibility. Could is the past form or a more polite alternative.",formula:"Subject + can/could + infinitive",examples:[{t:"I can read three languages fluently.",src:""},{t:"Could you help me with this? she asked quietly.",src:""}],watch:{wrong:"I can to swim",right:"I can swim"}},
+    {id:"modal_must",lv:"b1",topic:"Modal verbs",title:"Must / have to — obligation and deduction",rule:"Must expresses strong obligation or logical deduction. Must not = prohibition; don't have to = no obligation.",formula:"Subject + must/have to + infinitive",examples:[{t:"You must leave before midnight, he warned.",src:""},{t:"The letter must have arrived by now.",src:""}],watch:{wrong:"You must to go now",right:"You must go now"}},
+    {id:"modal_should",lv:"b1",topic:"Modal verbs",title:"Should — advice and mild obligation",rule:"Used to give or ask for advice, and to express what is considered the right thing to do.",formula:"Subject + should + infinitive",examples:[{t:"You should rest — you look exhausted.",src:""},{t:"We should have left earlier, Ishmael admitted.",src:"Moby Dick, Melville"}],watch:{wrong:"You should to eat more vegetables",right:"You should eat more vegetables"}},
+    {id:"passive_voice",lv:"b1",topic:"Passive voice",title:"Passive voice — focus on the action",rule:"Used when the action is more important than who does it, or when the agent is unknown.",formula:"Subject + to be (correct tense) + past participle",examples:[{t:"The letter was written by an unknown hand.",src:""},{t:"The creature was rejected by all who saw it.",src:"Frankenstein, Shelley"}],watch:{wrong:"The book was wrote in 1851",right:"The book was written in 1851"}},
+    {id:"articles",lv:"a2",topic:"Articles",title:"A / an / the — definite and indefinite articles",rule:"A/an for first mention or non-specific nouns. The for specific or previously mentioned nouns.",formula:"a/an + singular countable · the + specific noun",examples:[{t:"There was a letter on the table. The letter was sealed.",src:""},{t:"A whale surfaced beside the ship.",src:"Moby Dick, Melville"}],watch:{wrong:"She is best student in class",right:"She is the best student in the class"}},
+    {id:"prepositions_time",lv:"a2",topic:"Prepositions",title:"At / on / in — time prepositions",rule:"At for specific times. On for days and dates. In for months, years, seasons, and longer periods.",formula:"at [time] · on [day/date] · in [month/year/period]",examples:[{t:"We will meet at noon on Monday.",src:""},{t:"In the summer of 1891, Holmes disappeared.",src:""}],watch:{wrong:"She arrived in Monday",right:"She arrived on Monday"}},
+    {id:"prepositions_place",lv:"a2",topic:"Prepositions",title:"At / on / in — place prepositions",rule:"At for a specific location. On for a surface. In for an enclosed space or area.",formula:"at [point] · on [surface] · in [enclosed space]",examples:[{t:"She sat at the window, looking at the garden.",src:""},{t:"He found her name carved in the wall of the cave.",src:"The Time Machine, Wells"}],watch:{wrong:"She is on the bed",right:"She is in the bed"}},
+    {id:"reported_speech",lv:"b2",topic:"Reported speech",title:"Reported speech — saying what someone said",rule:"The tense shifts back one step: present to past, past to past perfect, will to would.",formula:"Subject + said (that) + backshifted clause",examples:[{t:"She said that she did not understand the rules.",src:""},{t:"He told me that the creature had escaped.",src:"Frankenstein, Shelley"}],watch:{wrong:"She said \"I am tired\"",right:"She said that she was tired"}},
+    {id:"relative_clauses",lv:"b2",topic:"Relative clauses",title:"Relative clauses — who, which, that, where",rule:"Who for people, which for things, that for both (defining clauses), where for places.",formula:"noun + who/which/that/where + clause",examples:[{t:"The man who saved her did not give his name.",src:""},{t:"Moby Dick, which had destroyed many ships, was spotted again.",src:"Moby Dick, Melville"}],watch:{wrong:"The book which I read it was good",right:"The book which I read was good"}}
+  ],
+  fr:[
+    {id:"present",lv:"a2",topic:"Temps",title:"Présent de l'indicatif — faits et actions en cours",rule:"Utilisé pour les faits généraux, les habitudes et les actions en cours. Trois groupes de verbes: -er, -ir, -re.",formula:"je -e/-s, tu -es/-s, il -e/-t, nous -ons, vous -ez, ils -ent",examples:[{t:"Elle lit chaque soir avant de s'endormir.",src:""},{t:"Je ne comprends pas pourquoi tu fais cela.",src:"Les Misérables, Hugo"}],watch:{wrong:"Nous mangeons tous les jours",right:"✓ correct"}},
+    {id:"passe_compose",lv:"b1",topic:"Temps",title:"Passé composé — action passée achevée",rule:"Actions passées terminées. Avec avoir ou être + participe passé. Avec être, accord avec le sujet.",formula:"sujet + avoir/être + participe passé",examples:[{t:"Il a lu le livre en une nuit.",src:""},{t:"Elle est arrivée trop tard pour le sauver.",src:"Germinal, Zola"}],watch:{wrong:"J'ai allé au marché",right:"Je suis allé au marché"}},
+    {id:"imparfait",lv:"b1",topic:"Temps",title:"Imparfait — description et habitude dans le passé",rule:"Pour les descriptions passées, les habitudes passées et les actions en cours interrompues.",formula:"radical nous (présent) + -ais, -ais, -ait, -ions, -iez, -aient",examples:[{t:"Quand il était enfant, il lisait tous les soirs.",src:""},{t:"Elle regardait par la fenêtre quand il est entré.",src:"Madame Bovary, Flaubert"}],watch:{wrong:"Je lisais un livre hier soir (action terminée)",right:"J'ai lu un livre hier soir"}},
+    {id:"futur_simple",lv:"b1",topic:"Temps",title:"Futur simple — actions futures",rule:"Actions futures. Se forme en ajoutant les terminaisons à l'infinitif (les verbes en -re perdent le e final).",formula:"infinitif + -ai, -as, -a, -ons, -ez, -ont",examples:[{t:"Demain, je partirai à l'aube.",src:""},{t:"Nous reviendrons quand la guerre sera finie.",src:""}],watch:{wrong:"Demain je vais partir (neutre)",right:"Demain je partirai (futur simple)"}},
+    {id:"conditionnel",lv:"b2",topic:"Temps",title:"Conditionnel présent — hypothèse et politesse",rule:"Pour les situations hypothétiques et la politesse. Radical du futur + terminaisons de l'imparfait.",formula:"radical futur + -ais, -ais, -ait, -ions, -iez, -aient",examples:[{t:"Si j'avais le temps, je lirais davantage.",src:""},{t:"Je voudrais vous parler en privé.",src:"Notre-Dame de Paris, Hugo"}],watch:{wrong:"Si j'aurai le temps, je lirai",right:"Si j'avais le temps, je lirais"}},
+    {id:"subjonctif",lv:"c1",topic:"Humeur",title:"Subjonctif présent — doute, émotion, nécessité",rule:"Après les expressions de doute, d'émotion, de volonté et de nécessité. Introduit par que.",formula:"que + sujet + subjonctif",examples:[{t:"Il faut que tu viennes immédiatement.",src:""},{t:"Je veux qu'il parte avant l'aube.",src:"Les Misérables, Hugo"}],watch:{wrong:"Il faut que tu viens",right:"Il faut que tu viennes"}},
+    {id:"accord_adjectif",lv:"a2",topic:"Accord",title:"Accord de l'adjectif — genre et nombre",rule:"Les adjectifs s'accordent en genre et en nombre avec le nom qu'ils qualifient.",formula:"adjectif + -e (fém.) / -s (plur.) / -es (fém. plur.)",examples:[{t:"un homme courageux / une femme courageuse",src:""},{t:"de grandes et belles cathédrales gothiques",src:"Notre-Dame de Paris, Hugo"}],watch:{wrong:"une femme courageux",right:"une femme courageuse"}},
+    {id:"negation",lv:"a2",topic:"Syntaxe",title:"La négation — ne...pas et autres formes",rule:"La négation de base se forme avec ne...pas. Autres: ne...jamais, ne...plus, ne...rien, ne...personne.",formula:"ne + verbe + pas / jamais / plus / rien",examples:[{t:"Je ne comprends pas ce que tu veux dire.",src:""},{t:"Il ne parlait plus depuis des heures.",src:"Germinal, Zola"}],watch:{wrong:"Je comprends pas (familier)",right:"Je ne comprends pas (standard)"}},
+    {id:"articles_partitifs",lv:"b1",topic:"Articles",title:"Articles partitifs — du, de la, des",rule:"Pour des quantités indéfinies. Deviennent de/d' après une négation ou une expression de quantité.",formula:"du (masc.) / de la (fém.) / de l' (voyelle) / des (plur.)",examples:[{t:"Elle buvait du café chaque matin.",src:""},{t:"Il mangeait du pain noir et buvait de l'eau froide.",src:"Germinal, Zola"}],watch:{wrong:"Je mange de la pain",right:"Je mange du pain"}},
+    {id:"pronoms_relatifs",lv:"b2",topic:"Pronoms",title:"Pronoms relatifs — qui, que, dont, où",rule:"Qui = sujet, que = complément d'objet, dont = de + antécédent, où = lieu ou temps.",formula:"antécédent + qui/que/dont/où + proposition",examples:[{t:"Le livre que je lisais était passionnant.",src:""},{t:"La cathédrale dont les tours s'élevaient vers le ciel.",src:"Notre-Dame de Paris, Hugo"}],watch:{wrong:"Le livre qui j'ai lu",right:"Le livre que j'ai lu"}}
+  ],
+  de:[
+    {id:"kasus",lv:"b1",topic:"Grammatik",title:"Die vier Fälle — Nominativ, Akkusativ, Dativ, Genitiv",rule:"Das Deutsche hat vier Fälle. Nominativ = Subjekt, Akkusativ = direktes Objekt, Dativ = indirektes Objekt, Genitiv = Besitz.",formula:"der/die/das → je nach Fall und Genus",examples:[{t:"Der Mann gibt der Frau das Buch.",src:""},{t:"Des Vaters Augen füllten sich mit Tränen.",src:"Die Leiden des jungen Werthers, Goethe"}],watch:{wrong:"Ich sehe der Mann",right:"Ich sehe den Mann (Akkusativ)"}},
+    {id:"praesens",lv:"a2",topic:"Zeiten",title:"Präsens — Gegenwart und allgemeine Wahrheiten",rule:"Für aktuelle Handlungen, Gewohnheiten und allgemeine Wahrheiten. Starke Verben haben oft Vokalwechsel.",formula:"ich -e, du -st, er -t, wir -en, ihr -t, sie -en",examples:[{t:"Sie liest jeden Abend vor dem Schlafen.",src:""},{t:"Er geht jeden Morgen denselben Weg.",src:""}],watch:{wrong:"Er lest das Buch",right:"Er liest das Buch"}},
+    {id:"perfekt",lv:"b1",topic:"Zeiten",title:"Perfekt — abgeschlossene Vergangenheit (gesprochen)",rule:"Im gesprochenen Deutsch für abgeschlossene Handlungen. Mit haben oder sein + Partizip II.",formula:"haben/sein + Partizip II",examples:[{t:"Ich habe das Buch gestern gelesen.",src:""},{t:"Er ist in der Nacht abgereist.",src:"Die Verwandlung, Kafka"}],watch:{wrong:"Ich habe gegangen",right:"Ich bin gegangen"}},
+    {id:"praeteritum",lv:"b2",topic:"Zeiten",title:"Präteritum — Vergangenheit (geschrieben)",rule:"Hauptsächlich in der Schriftsprache und Literatur. Regelmäßige Verben fügen -(e)te hinzu.",formula:"regelmäßig: Stamm + -te / unregelmäßig: Vokalwechsel",examples:[{t:"Er schrieb ihr einen langen Brief.",src:""},{t:"Als Gregor Samsa eines Morgens erwachte...",src:"Die Verwandlung, Kafka"}],watch:{wrong:"Er hat geschrieben ihr",right:"Er schrieb ihr"}},
+    {id:"modalverben",lv:"b1",topic:"Modalverben",title:"Modalverben — können, müssen, dürfen, sollen, wollen",rule:"Modalverben stehen in Position 2; das Hauptverb steht als Infinitiv am Satzende.",formula:"Modalverb (konj.) + ... + Infinitiv (Satzende)",examples:[{t:"Du musst das Buch bis morgen lesen.",src:""},{t:"Er konnte die Wahrheit nicht länger verbergen.",src:"Faust, Goethe"}],watch:{wrong:"Ich muss gehen jetzt",right:"Ich muss jetzt gehen"}},
+    {id:"wortstellung",lv:"b1",topic:"Syntax",title:"Wortstellung — Verb an zweiter Stelle",rule:"Im deutschen Hauptsatz steht das konjugierte Verb immer an zweiter Stelle. Im Nebensatz steht das Verb am Ende.",formula:"Hauptsatz: [Element 1] + Verb + ... / Nebensatz: ... + Verb",examples:[{t:"Heute lese ich ein interessantes Buch.",src:""},{t:"Obwohl er müde war, arbeitete er weiter.",src:""}],watch:{wrong:"Heute ich lese ein Buch",right:"Heute lese ich ein Buch"}},
+    {id:"adjektivdeklination",lv:"b2",topic:"Deklination",title:"Adjektivdeklination — stark, schwach, gemischt",rule:"Nach bestimmtem Artikel: schwache Deklination. Nach unbestimmtem Artikel: gemischte Deklination. Ohne Artikel: starke Deklination.",formula:"der alte Mann / ein alter Mann / alter Mann",examples:[{t:"Der kleine Prinz lebte auf seinem Planeten.",src:""},{t:"Ein junger Mann betrat das dunkle Zimmer.",src:""}],watch:{wrong:"Ein alter Mann / Der alter Mann",right:"Ein alter Mann / Der alte Mann"}},
+    {id:"konjunktiv_II",lv:"c1",topic:"Modus",title:"Konjunktiv II — Irrealis und Höflichkeit",rule:"Drückt irreale Bedingungen (Wünsche, Hypothesen) und höfliche Bitten aus.",formula:"würde + Infinitiv (oder Konjunktivform direkt)",examples:[{t:"Wenn ich Zeit hätte, würde ich mehr lesen.",src:""},{t:"Wenn ich ein Vöglein wär, flög ich zu dir.",src:"Volksweise"}],watch:{wrong:"Wenn ich hätte Zeit, ich würde lesen mehr",right:"Wenn ich Zeit hätte, würde ich mehr lesen"}},
+    {id:"praefixverben",lv:"b2",topic:"Verben",title:"Trennbare und untrennbare Verben",rule:"Präfixe wie ab-, an-, auf-, aus- sind trennbar. Präfixe wie be-, er-, ge-, ver-, zer- sind untrennbar.",formula:"trennbar: auf|stehen → Ich stehe auf / untrennbar: verstehen → ich verstehe",examples:[{t:"Er steht jeden Morgen um sechs Uhr auf.",src:""},{t:"Sie verstand den Sinn seiner Worte nicht.",src:"Die Verwandlung, Kafka"}],watch:{wrong:"Er aufsteht um sechs Uhr",right:"Er steht um sechs Uhr auf"}},
+    {id:"passiv",lv:"c1",topic:"Genus verbi",title:"Passiv — Vorgangs- und Zustandspassiv",rule:"Vorgangspassiv (werden + Partizip II) betont den Vorgang. Zustandspassiv (sein + Partizip II) betont den Zustand.",formula:"werden + Partizip II / sein + Partizip II",examples:[{t:"Das Buch wird von Millionen gelesen.",src:""},{t:"Die Tür war fest verschlossen.",src:"Die Verwandlung, Kafka"}],watch:{wrong:"Das Buch wird gelesen von Millionen",right:"Das Buch wird von Millionen gelesen"}}
+  ],
+  pt:[
+    {id:"presente",lv:"a2",topic:"Tempos",title:"Presente do indicativo — ações habituais e fatos",rule:"Para hábitos, verdades gerais e ações em curso. Três conjugações: -ar, -er, -ir.",formula:"eu -o, tu -as/-es, ele -a/-e, nós -amos/-emos, eles -am/-em",examples:[{t:"Ela lê todos os dias antes de dormir.",src:""},{t:"Eu conheço bem este lugar, disse ele.",src:"Dom Casmurro, Machado de Assis"}],watch:{wrong:"Ele lê todos dias",right:"Ele lê todos os dias"}},
+    {id:"preterito_perfeito",lv:"b1",topic:"Tempos",title:"Pretérito perfeito — ações passadas concluídas",rule:"Para ações concluídas num momento específico do passado.",formula:"eu -ei/-i, tu -aste/-este, ele -ou/-eu, nós -ámos/-emos, eles -aram/-eram",examples:[{t:"Ontem li o livro inteiro de uma vez.",src:""},{t:"Capitu olhou para mim e sorriu.",src:"Dom Casmurro, Machado de Assis"}],watch:{wrong:"Ontem eu tenho lido o livro",right:"Ontem eu li o livro"}},
+    {id:"imperfeito",lv:"b1",topic:"Tempos",title:"Pretérito imperfeito — hábitos no passado",rule:"Para hábitos passados, descrições e ações em curso no passado.",formula:"eu -ava/-ia, tu -avas/-ias, ele -ava/-ia, nós -ávamos/-íamos",examples:[{t:"Quando era criança, lia muito.",src:""},{t:"Ele olhava pela janela enquanto ela falava.",src:"Quincas Borba, Machado de Assis"}],watch:{wrong:"Quando era criança, tenho lido muito",right:"Quando era criança, lia muito"}},
+    {id:"futuro",lv:"b1",topic:"Tempos",title:"Futuro do presente — ações futuras",rule:"Para ações futuras. Em português europeu é mais comum do que no brasileiro.",formula:"infinitivo + -ei, -ás, -á, -emos, -ão",examples:[{t:"Amanhã partirei cedo.",src:""},{t:"Um dia regressarei a esta cidade.",src:"Os Lusíadas, Camões"}],watch:{wrong:"Amanhã eu vou partir cedo (neutro)",right:"Amanhã partirei cedo (futuro simples)"}},
+    {id:"subjuntivo",lv:"c1",topic:"Modos",title:"Conjuntivo/Subjuntivo — dúvida e emoção",rule:"Após expressões de dúvida, desejo, emoção e necessidade. Introduzido por que.",formula:"que + sujeito + conjuntivo",examples:[{t:"É importante que leias este livro.",src:""},{t:"Quero que sejas feliz, seja onde for.",src:""}],watch:{wrong:"É importante que tu lês este livro",right:"É importante que tu leias este livro"}},
+    {id:"ser_estar",lv:"b1",topic:"Verbos",title:"Ser vs estar — estados permanentes e temporários",rule:"Ser para identidade, origem, características permanentes e profissão. Estar para estados temporários e localização.",formula:"ser: identidade/origem · estar: estado/localização",examples:[{t:"Ela é médica. Hoje está cansada.",src:""},{t:"O mar é imenso e está hoje revolto.",src:"Os Lusíadas, Camões"}],watch:{wrong:"Ele está professor",right:"Ele é professor"}},
+    {id:"concordancia",lv:"b1",topic:"Sintaxe",title:"Concordância — género e número",rule:"Artigos, adjetivos e pronomes concordam em género e número com o nome.",formula:"artigo + nome + adjetivo (todos concordantes)",examples:[{t:"As antigas catedrais portuguesas são magníficas.",src:""},{t:"Os bravos navegadores portugueses partiram ao amanhecer.",src:"Os Lusíadas, Camões"}],watch:{wrong:"Os antigas catedrais são magníficos",right:"As antigas catedrais são magníficas"}},
+    {id:"pronomes_relativos",lv:"b2",topic:"Pronomes",title:"Pronomes relativos — que, quem, cujo, onde",rule:"Que para pessoas e coisas. Quem só para pessoas após preposição. Cujo indica posse e concorda com a coisa possuída.",formula:"que (sujeito/objeto) · quem (após prep.) · cujo/cuja (posse)",examples:[{t:"O livro que li era fascinante.",src:""},{t:"Camões, cujos versos percorrem o mundo, nasceu em Portugal.",src:""}],watch:{wrong:"O livro que eu li-o era fascinante",right:"O livro que eu li era fascinante"}},
+    {id:"voz_passiva",lv:"b2",topic:"Sintaxe",title:"Voz passiva — foco na ação",rule:"Usada quando a ação é mais importante do que quem a realiza. O particípio concorda com o sujeito.",formula:"ser (tempo correto) + particípio passado (concordante)",examples:[{t:"O livro foi escrito no século XIX.",src:""},{t:"A cidade foi destruída pelo incêndio.",src:""}],watch:{wrong:"O livro foram escritos",right:"O livro foi escrito"}},
+    {id:"infinitivo_pessoal",lv:"c1",topic:"Verbos",title:"Infinitivo pessoal — exclusivo do português",rule:"O português usa o infinitivo pessoal, que se conjuga e permite sujeitos diferentes em orações subordinadas.",formula:"infinitivo + -es (tu) / -mos (nós) / -em (eles)",examples:[{t:"É bom lermos juntos.",src:""},{t:"Partir é difícil, mesmo sabermos que regressaremos.",src:""}],watch:{wrong:"É bom nós ler juntos",right:"É bom nós lermos juntos"}}
+  ],
+  it:[
+    {id:"presente",lv:"a2",topic:"Tempi",title:"Presente indicativo — abitudini e fatti generali",rule:"Per abitudini, verità generali e azioni in corso. Tre coniugazioni: -are, -ere, -ire.",formula:"io -o, tu -i, lui -a/-e, noi -iamo, voi -ate/-ete, loro -ano/-ono",examples:[{t:"Lei legge ogni sera prima di dormire.",src:""},{t:"Io non capisco perché tu faccia questo.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Lui legga ogni giorno",right:"Lui legge ogni giorno"}},
+    {id:"passato_prossimo",lv:"b1",topic:"Tempi",title:"Passato prossimo — azioni passate recenti",rule:"Con avere o essere + participio passato. Con essere il participio concorda con il soggetto.",formula:"avere/essere + participio passato",examples:[{t:"Ho letto quel libro tre volte.",src:""},{t:"Lucia è arrivata tardi al convento.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Sono andato al mercato (con avere)",right:"Sono andato ✓ (essere) / Ho comprato ✓ (avere)"}},
+    {id:"imperfetto",lv:"b1",topic:"Tempi",title:"Imperfetto — descrizioni e abitudini passate",rule:"Per descrizioni nel passato, abitudini passate e azioni in corso interrotte.",formula:"io -avo/-evo/-ivo, tu -avi/-evi/-ivi, lui -ava/-eva/-iva",examples:[{t:"Quando era bambino, leggeva molto.",src:""},{t:"Renzo camminava veloce mentre il sole tramontava.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Quando era bambino, ha letto molto",right:"Quando era bambino, leggeva molto"}},
+    {id:"futuro",lv:"b1",topic:"Tempi",title:"Futuro semplice — azioni future e probabilità",rule:"Per azioni future e per esprimere probabilità nel presente.",formula:"io -erò/-irò, tu -erai/-irai, lui -erà/-irà, noi -eremo/-iremo",examples:[{t:"Domani partirò all'alba.",src:""},{t:"Un giorno ritorneranno, disse la vecchia.",src:""}],watch:{wrong:"Domani io vado (futuro informale)",right:"Domani partirò (futuro formale)"}},
+    {id:"condizionale",lv:"b2",topic:"Tempi",title:"Condizionale presente — ipotesi e cortesia",rule:"Per situazioni ipotetiche e per esprimere cortesia. Si forma sul tema del futuro.",formula:"io -erei/-irei, tu -eresti/-iresti, lui -erebbe/-irebbe",examples:[{t:"Se avessi tempo, leggerei di più.",src:""},{t:"Vorrei parlarti in privato.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Se avrei tempo, leggerei",right:"Se avessi tempo, leggerei"}},
+    {id:"congiuntivo",lv:"c1",topic:"Modo",title:"Congiuntivo presente — dubbio ed emozione",rule:"Dopo espressioni di dubbio, emozione, desiderio e necessità. Introdotto spesso da che.",formula:"che + soggetto + congiuntivo",examples:[{t:"Voglio che tu venga con me.",src:""},{t:"Bisogna che tu parta subito.",src:""}],watch:{wrong:"Voglio che tu vieni",right:"Voglio che tu venga"}},
+    {id:"articoli",lv:"a2",topic:"Articoli",title:"Articoli determinativi e indeterminativi",rule:"L'articolo concorda con genere e numero. Lo/gli si usano davanti a s+consonante, z, gn, ps.",formula:"il/lo/la/l' (sing.) · i/gli/le (plur.)",examples:[{t:"Lo studente legge il libro nella biblioteca.",src:""},{t:"La storia dell'uomo è scritta nei suoi errori.",src:""}],watch:{wrong:"Il studente / lo libro",right:"Lo studente / il libro"}},
+    {id:"pronomi_relativi",lv:"b2",topic:"Pronomi",title:"Pronomi relativi — che, cui, il quale",rule:"Che per soggetto e complemento oggetto. Cui dopo preposizione. Il quale per chiarezza o dopo preposizione.",formula:"che (sogg./ogg.) · prep. + cui · il/la quale (formale)",examples:[{t:"Il libro che ho letto era bellissimo.",src:""},{t:"La donna di cui parlavi era Lucia.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Il libro che ho letto-lo",right:"Il libro che ho letto"}},
+    {id:"passivo",lv:"b2",topic:"Sintassi",title:"Forma passiva — focus sull'azione",rule:"Usata quando l'azione è più importante di chi la compie. Il participio concorda con il soggetto.",formula:"essere (tempo giusto) + participio passato (concordante)",examples:[{t:"Il libro è stato scritto nel 1827.",src:""},{t:"La città fu distrutta dall'incendio.",src:""}],watch:{wrong:"Il libro sono stati scritti",right:"Il libro è stato scritto"}},
+    {id:"verbi_modali",lv:"b1",topic:"Verbi",title:"Verbi modali — potere, dovere, volere",rule:"Seguiti dall'infinitivo. L'ausiliare al passato dipende dal verbo principale.",formula:"modale (coniugato) + infinitivo",examples:[{t:"Devo leggere questo libro entro domani.",src:""},{t:"Non posso tacere oltre.",src:"I Promessi Sposi, Manzoni"}],watch:{wrong:"Io devo di leggere",right:"Io devo leggere"}}
+  ]
+};
 
 const VOCAB = {
   alice:{words:[
@@ -2801,6 +2877,68 @@ function chVoice(idx){
   if(_voiceOverride) localStorage.setItem('libreo_voice_'+S.lang, _voiceOverride.name);
 }
 
+
+// ── GRAMMAR ───────────────────────────────────────────────────────────────────
+let _grRules = [];
+let _grIdx   = 0;
+let _grTopic = null;
+
+function openGrammar(){
+  const lang = S.lang;
+  if(lang === 'es'){ toast('Gramática próximamente para español.'); return; }
+  const all = GRAMMAR[lang] || [];
+  if(!all.length){ toast('No hay gramática disponible para este idioma.'); return; }
+  _grRules = all;
+  _grIdx   = 0;
+  _grTopic = null;
+
+  // Build topic filter pills
+  const topics = [...new Set(all.map(r=>r.topic))];
+  const tbar = document.getElementById('gr-topics');
+  tbar.innerHTML = `<button class="gr-pill gr-pill-on" onclick="grSetTopic(null)">Todo</button>`
+    + topics.map(t=>`<button class="gr-pill" onclick="grSetTopic('${t}')">${t}</button>`).join('');
+
+  document.getElementById('gr-title').textContent = 'Gramática · ' + (LMETA[lang]?.badge||lang);
+  grRender();
+  goTo('sgr');
+}
+
+function grSetTopic(topic){
+  _grTopic = topic;
+  _grIdx   = 0;
+  document.querySelectorAll('.gr-pill').forEach(b=>{
+    b.classList.toggle('gr-pill-on',
+      (topic===null && b.textContent==='Todo') || b.textContent===topic);
+  });
+  grRender();
+}
+
+function grNav(dir){
+  const rules = _grTopic ? _grRules.filter(r=>r.topic===_grTopic) : _grRules;
+  _grIdx = (_grIdx + dir + rules.length) % rules.length;
+  grRender();
+}
+
+function grRender(){
+  const rules = _grTopic ? _grRules.filter(r=>r.topic===_grTopic) : _grRules;
+  if(!rules.length) return;
+  const r = rules[_grIdx];
+  document.getElementById('gr-topic-label').textContent = r.topic;
+  document.getElementById('gr-level').textContent       = r.lv.toUpperCase();
+  document.getElementById('gr-title-card').textContent  = r.title;
+  document.getElementById('gr-rule').textContent        = r.rule;
+  document.getElementById('gr-formula').textContent     = r.formula;
+  document.getElementById('gr-wrong').textContent       = r.watch.wrong;
+  document.getElementById('gr-right').textContent       = r.watch.right;
+  document.getElementById('gr-count').textContent       = (_grIdx+1)+'/'+rules.length;
+  const exDiv = document.getElementById('gr-examples');
+  exDiv.innerHTML = r.examples.map(e=>
+    `<div style="font-size:.85rem;font-style:italic;color:var(--tx);margin-bottom:.35rem;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.5">
+      ${esc(e.t)}${e.src?`<div style="font-size:.7rem;color:var(--dm);margin-top:.15rem">— ${esc(e.src)}</div>`:''}
+    </div>`
+  ).join('');
+}
+
 function showWordTr(word){
   if(!word) return;
   // Open panel
@@ -3358,5 +3496,47 @@ loadTheme();
 // ctx-menu buttons handled via onclick attributes in HTML
 // getSample is lazy — called on first translate, not at boot
 </script>
+
+<!-- GRAMMAR SCREEN -->
+<div id="sgr" class="sc">
+  <div class="topbar">
+    <button class="bbtn" onclick="goTo('sm')">← Volver</button>
+    <span class="tt" id="gr-title">Gramática</span>
+    <span id="gr-count" style="font-size:.78rem;color:var(--dm)"></span>
+  </div>
+  <div style="display:flex;gap:.5rem;padding:.6rem 1rem;border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch" id="gr-topics"></div>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem">
+    <div id="gr-card" style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+      <div id="gr-card-header" style="padding:.7rem 1.1rem;display:flex;justify-content:space-between;align-items:center">
+        <span id="gr-topic-label" style="font-size:.72rem;font-weight:600;color:var(--ac);text-transform:uppercase;letter-spacing:.06em"></span>
+        <span id="gr-level" style="font-size:.72rem;font-weight:600;background:var(--ac);color:#fff;padding:2px 8px;border-radius:6px"></span>
+      </div>
+      <div style="padding:.2rem 1.1rem .8rem;border-top:1px solid var(--bd)">
+        <div id="gr-title-card" style="font-size:1rem;font-weight:600;color:var(--tx);margin-bottom:.5rem"></div>
+        <div id="gr-rule" style="font-size:.85rem;color:var(--dm);line-height:1.6;margin-bottom:.8rem"></div>
+        <div style="background:var(--soft);border-radius:8px;padding:.5rem .8rem;margin-bottom:.8rem">
+          <div style="font-size:.68rem;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Fórmula</div>
+          <div id="gr-formula" style="font-family:monospace;font-size:.82rem;color:var(--tx)"></div>
+        </div>
+        <div style="margin-bottom:.8rem">
+          <div style="font-size:.68rem;color:var(--dm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">Ejemplos</div>
+          <div id="gr-examples"></div>
+        </div>
+        <div style="border-top:1px solid var(--bd);padding-top:.7rem">
+          <div style="font-size:.68rem;color:var(--dm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem">⚠ Atención</div>
+          <div style="font-size:.82rem;line-height:1.5">
+            <div><span style="color:#e55">✗</span> <span id="gr-wrong" style="color:var(--dm)"></span></div>
+            <div><span style="color:#3a3">✓</span> <span id="gr-right" style="color:var(--tx)"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-top:1rem">
+      <button class="bbtn" style="flex:1;justify-content:center" onclick="grNav(-1)">← Anterior</button>
+      <button class="bbtn" style="flex:1;justify-content:center" onclick="grNav(1)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
