@@ -289,6 +289,16 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .fs2 .rc p{font-size:1.05rem;}
 .fs3 .rc p{font-size:1.18rem;}
 .fs4 .rc p{font-size:1.35rem;}
+.fs0 .vw-word{font-size:.88rem;} .fs0 .vw-hint{font-size:.72rem;}
+.fs1 .vw-word{font-size:.95rem;} .fs1 .vw-hint{font-size:.78rem;}
+.fs2 .vw-word{font-size:1.05rem;} .fs2 .vw-hint{font-size:.85rem;}
+.fs3 .vw-word{font-size:1.18rem;} .fs3 .vw-hint{font-size:.95rem;}
+.fs4 .vw-word{font-size:1.35rem;} .fs4 .vw-hint{font-size:1.05rem;}
+.fs0 #gr-card{font-size:.82rem;} .fs0 #gr-title-card{font-size:.9rem;}
+.fs1 #gr-card{font-size:.88rem;} .fs1 #gr-title-card{font-size:.95rem;}
+.fs2 #gr-card{font-size:.95rem;} .fs2 #gr-title-card{font-size:1rem;}
+.fs3 #gr-card{font-size:1.05rem;} .fs3 #gr-title-card{font-size:1.1rem;}
+.fs4 #gr-card{font-size:1.18rem;} .fs4 #gr-title-card{font-size:1.25rem;}
 
 /* ── LOAD PROGRESS BAR ── */
 #load-bar-wrap{position:fixed;top:0;left:0;right:0;height:3px;z-index:200;display:none;}
@@ -493,6 +503,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
     <button class="bbtn" onclick="goTo('sm')">← Modos</button>
     <span class="tt" id="vocab-title">Vocabulario</span>
     <input class="vocab-search" id="vocab-search" type="search" placeholder="Buscar…" oninput="filterVocab(this.value)">
+    <button class="cb" onclick="cycleFont()" title="Tamaño texto">Aa</button>
     <div class="theme-wrap">
       <button class="theme-btn" onclick="toggleThemeMenu('sv')" title="Tema">🌓</button>
       <div class="theme-menu" id="theme-menu-sv" style="right:0">
@@ -3507,6 +3518,7 @@ loadTheme();
     <button class="bbtn" onclick="goTo('sm')">← Volver</button>
     <span class="tt" id="gr-title">Gramática</span>
     <span id="gr-count" style="font-size:.78rem;color:var(--dm)"></span>
+    <button class="cb" onclick="cycleFont()" title="Tamaño texto">Aa</button>
   </div>
   <div style="display:flex;gap:.5rem;padding:.6rem 1rem;border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch" id="gr-topics"></div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem">
