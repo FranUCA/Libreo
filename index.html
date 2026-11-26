@@ -294,11 +294,11 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
 .fs2 .vw-word{font-size:1.05rem;} .fs2 .vw-hint{font-size:.85rem;}
 .fs3 .vw-word{font-size:1.18rem;} .fs3 .vw-hint{font-size:.95rem;}
 .fs4 .vw-word{font-size:1.35rem;} .fs4 .vw-hint{font-size:1.05rem;}
-.fs0 #gr-card{font-size:.82rem;} .fs0 #gr-title-card{font-size:.9rem;}
-.fs1 #gr-card{font-size:.88rem;} .fs1 #gr-title-card{font-size:.95rem;}
-.fs2 #gr-card{font-size:.95rem;} .fs2 #gr-title-card{font-size:1rem;}
-.fs3 #gr-card{font-size:1.05rem;} .fs3 #gr-title-card{font-size:1.1rem;}
-.fs4 #gr-card{font-size:1.18rem;} .fs4 #gr-title-card{font-size:1.25rem;}
+.fs0 #sgr{font-size:.82rem;} .fs0 #gr-title-card{font-size:.88rem;}
+.fs1 #sgr{font-size:.88rem;} .fs1 #gr-title-card{font-size:.94rem;}
+.fs2 #sgr{font-size:.95rem;} .fs2 #gr-title-card{font-size:1rem;}
+.fs3 #sgr{font-size:1.05rem;} .fs3 #gr-title-card{font-size:1.12rem;}
+.fs4 #sgr{font-size:1.18rem;} .fs4 #gr-title-card{font-size:1.28rem;}
 
 /* ── LOAD PROGRESS BAR ── */
 #load-bar-wrap{position:fixed;top:0;left:0;right:0;height:3px;z-index:200;display:none;}
@@ -457,14 +457,7 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
     <button class="bbtn" onclick="goTo('sl')">← Idiomas</button>
     <span class="tt">Biblioteca</span>
     <span id="bdg" class="bdg"></span>
-    <div class="theme-wrap">
-      <button class="theme-btn" onclick="toggleThemeMenu('sb')" title="Tema">🌓</button>
-      <div class="theme-menu" id="theme-menu-sb">
-        <div class="theme-opt" onclick="setTheme('dark','sb')">🌙 Oscuro</div>
-        <div class="theme-opt" onclick="setTheme('light','sb')">☀️ Claro</div>
-        <div class="theme-opt" onclick="setTheme('auto','sb')">⚙️ Automático</div>
-      </div>
-    </div>
+
   </div>
   <div id="voice-bar" style="display:none;padding:.5rem 1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:.6rem;font-size:.82rem;color:var(--dm)">
     🔊 <span>Voz:</span>
@@ -502,7 +495,6 @@ body{display:flex;flex-direction:column;min-height:100%;height:100%;
   <div class="vocab-topbar">
     <button class="bbtn" onclick="goTo('sm')">← Modos</button>
     <span class="tt" id="vocab-title">Vocabulario</span>
-    <input class="vocab-search" id="vocab-search" type="search" placeholder="Buscar…" oninput="filterVocab(this.value)">
     <button class="cb" onclick="cycleFont()" title="Tamaño texto">Aa</button>
     <div class="theme-wrap">
       <button class="theme-btn" onclick="toggleThemeMenu('sv')" title="Tema">🌓</button>
@@ -2983,7 +2975,7 @@ function grRender(){
   document.getElementById('gr-count').textContent       = (_grIdx+1)+'/'+rules.length;
   const exDiv = document.getElementById('gr-examples');
   exDiv.innerHTML = r.examples.map(e=>
-    `<div style="font-size:.85rem;font-style:italic;color:var(--tx);margin-bottom:.35rem;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.5">
+    `<div style="font-style:italic;color:var(--tx);margin-bottom:.35rem;border-left:3px solid var(--ac);padding-left:.6rem;line-height:1.5">
       ${esc(e.t)}${e.src?`<div style="font-size:.7rem;color:var(--dm);margin-top:.15rem">— ${esc(e.src)}</div>`:''}
     </div>`
   ).join('');
@@ -3563,11 +3555,11 @@ loadTheme();
         <span id="gr-level" style="font-size:.72rem;font-weight:600;background:var(--ac);color:#fff;padding:2px 8px;border-radius:6px"></span>
       </div>
       <div style="padding:.2rem 1.1rem .8rem;border-top:1px solid var(--bd)">
-        <div id="gr-title-card" style="font-size:1rem;font-weight:600;color:var(--tx);margin-bottom:.5rem"></div>
-        <div id="gr-rule" style="font-size:.85rem;color:var(--dm);line-height:1.6;margin-bottom:.8rem"></div>
+        <div id="gr-title-card" style="font-weight:600;color:var(--tx);margin-bottom:.5rem"></div>
+        <div id="gr-rule" style="color:var(--dm);line-height:1.6;margin-bottom:.8rem"></div>
         <div style="background:var(--soft);border-radius:8px;padding:.5rem .8rem;margin-bottom:.8rem">
           <div style="font-size:.68rem;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Fórmula</div>
-          <div id="gr-formula" style="font-family:monospace;font-size:.82rem;color:var(--tx)"></div>
+          <div id="gr-formula" style="font-family:monospace;color:var(--tx)"></div>
         </div>
         <div style="margin-bottom:.8rem">
           <div style="font-size:.68rem;color:var(--dm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">Ejemplos</div>
